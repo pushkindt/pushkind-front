@@ -41,4 +41,4 @@ jobs:
         env:
           RSYNC_RSH: ssh -o StrictHostKeyChecking=yes
         run: |
-          rsync -az --delete dist/ cicd@store.pushkind.com:/var/www/
+          rsync -az --delete dist/ cicd@store.pushkind.com:/var/www/html/
