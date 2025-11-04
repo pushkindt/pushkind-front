@@ -1,4 +1,4 @@
-import { HUB_ID } from "../constants";
+import { API_URL, HUB_ID } from "../constants";
 import type { Category, Product, Tag, User } from "../types";
 
 // --- MOCK DATABASE ---
@@ -154,26 +154,43 @@ const getProductWithPrice = (
 
 const simulateDelay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
+const BASE_API_URL = API_URL.replace(/\/$/, "");
+const logMockRequest = (
+  method: string,
+  path: string,
+  hubId: string,
+  details?: unknown,
+) => {
+  const url = `${BASE_API_URL}/hubs/${hubId}${path}`;
+  if (details !== undefined) {
+    console.log(`[mock:${method}] ${url}`, details);
+  } else {
+    console.log(`[mock:${method}] ${url}`);
+  }
+};
+
 // --- EXPORTED API FUNCTIONS ---
 
-export const fetchCategories = async (hubId: string): Promise<Category[]> => {
-  console.log(`Fetching categories for hub: ${hubId}`);
+export const fetchCategories = async (
+  hubId: string = HUB_ID,
+): Promise<Category[]> => {
+  logMockRequest("GET", "/categories", hubId);
   await simulateDelay(300);
   return MOCK_CATEGORIES;
 };
 
-export const fetchTags = async (hubId: string): Promise<Tag[]> => {
-  console.log(`Fetching tags for hub: ${hubId}`);
+export const fetchTags = async (hubId: string = HUB_ID): Promise<Tag[]> => {
+  logMockRequest("GET", "/tags", hubId);
   await simulateDelay(200);
   return MOCK_TAGS;
 };
 
 export const fetchProducts = async (
-  hubId: string,
+  hubId: string = HUB_ID,
   user: User | null,
   filter: { categoryId?: number; tagId?: number } = {},
 ): Promise<Product[]> => {
-  console.log(`Fetching products for hub: ${hubId} with filter:`, filter);
+  logMockRequest("GET", "/products", hubId, filter);
   await simulateDelay(500);
   let products = MOCK_PRODUCTS;
 
@@ -188,21 +205,21 @@ export const fetchProducts = async (
 };
 
 export const fetchProductById = async (
-  hubId: string,
+  hubId: string = HUB_ID,
   user: User | null,
   productId: number,
 ): Promise<Product | undefined> => {
-  console.log(`Fetching product ${productId} for hub: ${hubId}`);
+  logMockRequest("GET", `/products/${productId}`, hubId);
   await simulateDelay(400);
   const product = MOCK_PRODUCTS.find((p) => p.id === productId);
   return product ? getProductWithPrice(product, user) : undefined;
 };
 
 export const sendOtp = async (
-  hubId: string,
+  hubId: string = HUB_ID,
   phone: string,
 ): Promise<{ success: boolean }> => {
-  console.log(`Sending OTP to ${phone} for hub: ${hubId}`);
+  logMockRequest("POST", "/auth/otp", hubId, { phone });
   await simulateDelay(1000);
   const userExists = MOCK_USERS.some((u) => u.phone === phone);
   if (userExists) {
@@ -214,11 +231,11 @@ export const sendOtp = async (
 };
 
 export const verifyOtp = async (
-  hubId: string,
+  hubId: string = HUB_ID,
   phone: string,
   otp: string,
 ): Promise<{ success: boolean; user?: User }> => {
-  console.log(`Verifying OTP ${otp} for ${phone} on hub: ${hubId}`);
+  logMockRequest("POST", "/auth/otp/verify", hubId, { phone, otp });
   await simulateDelay(1000);
   if (otp === "123456") {
     const user = MOCK_USERS.find((u) => u.phone === phone);
