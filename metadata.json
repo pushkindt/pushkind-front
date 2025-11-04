@@ -1,0 +1,5 @@
+{
+  "name": "OmniMart Frontend",
+  "description": "A modern, responsive e-commerce storefront designed to browse products and categories. It features an SMS OTP-based authentication system that unlocks user-specific pricing and enables order placement.",
+  "requestFramePermissions": []
+}
