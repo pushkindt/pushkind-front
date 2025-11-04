@@ -18,7 +18,7 @@ const Header: React.FC<HeaderProps> = ({ user, cartItemCount, onLoginClick, onCa
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <button onClick={onHomeClick} className="text-2xl font-bold text-gray-800 hover:text-indigo-600 transition-colors">
-              OmniMart
+              pushkind-front
             </button>
           </div>
           <div className="flex items-center space-x-4">
