@@ -161,7 +161,7 @@ const logMockRequest = (
   hubId: string,
   details?: unknown,
 ) => {
-  const url = `${BASE_API_URL}/hubs/${hubId}${path}`;
+  const url = `${BASE_API_URL}/${hubId}${path}`;
   if (details !== undefined) {
     console.log(`[mock:${method}] ${url}`, details);
   } else {
