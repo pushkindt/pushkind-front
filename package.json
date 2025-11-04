@@ -1,5 +1,5 @@
 {
-  "name": "pushkind-fron",
+  "name": "pushkind-front",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,13 +9,22 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react-dom": "19.2.0",
-    "react": "19.2.0"
+    "react": "19.2.0",
+    "react-dom": "19.2.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.1",
     "@types/node": "24.10.0",
     "@vitejs/plugin-react": "5.1.0",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-react": "^7.37.5",
+    "globals": "^16.5.0",
+    "jiti": "^2.6.1",
+    "prettier": "^3.6.2",
     "typescript": "5.9.3",
+    "typescript-eslint": "^8.46.3",
     "vite": "7.1.12"
   }
 }

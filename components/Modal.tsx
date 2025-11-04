@@ -1,6 +1,5 @@
-
-import React, { ReactNode } from 'react';
-import { XIcon } from './Icons';
+import React, { ReactNode } from "react";
+import { XIcon } from "./Icons";
 
 interface ModalProps {
   isOpen: boolean;
@@ -30,9 +29,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
             <XIcon className="w-6 h-6" />
           </button>
         </div>
-        <div className="p-6">
-          {children}
-        </div>
+        <div className="p-6">{children}</div>
       </div>
       <style>{`
         @keyframes fade-in-up {

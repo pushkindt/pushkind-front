@@ -1,4 +1,3 @@
-
 export interface Category {
   id: number;
   name: string;
@@ -25,7 +24,7 @@ export interface User {
   id: string;
   phone: string;
   name: string;
-  priceLevel: 'default' | 'silver' | 'gold';
+  priceLevel: "default" | "silver" | "gold";
 }
 
 export interface CartItem extends Product {
@@ -33,7 +32,7 @@ export interface CartItem extends Product {
 }
 
 export type View =
-  | { type: 'home' }
-  | { type: 'category'; categoryId: number; categoryName: string }
-  | { type: 'product'; productId: number }
-  | { type: 'tag'; tagId: number; tagName: string };
+  | { type: "home" }
+  | { type: "category"; categoryId: number; categoryName: string }
+  | { type: "product"; productId: number }
+  | { type: "tag"; tagId: number; tagName: string };
