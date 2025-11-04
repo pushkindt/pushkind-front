@@ -11,6 +11,10 @@ This Vite + React app loads through `index.tsx` with the main view logic in `App
 - `npm run build`: Create optimized bundles in `dist/`; execute before shipping config or API changes.
 - `npm run preview`: Serve the latest build locally for production-like smoke checks.
 
+## Formatting & Linting
+
+Run `npx eslint .` and `npx prettier --write .` after every change to keep linting and formatting consistent.
+
 ## Coding Style & Naming Conventions
 
 Use TypeScript with React functional components and hooks. Match the existing four-space indentation, single-quote imports, and PascalCase component names. Keep props and helper functions camelCased, and centralize shared types in `types.ts` instead of redefining inline interfaces. Prefer clear, composable functions over large effect handlers, and separate view logic from API calls by expanding `services/api.ts` when new endpoints appear.
