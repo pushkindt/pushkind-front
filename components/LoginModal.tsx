@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { HUB_ID } from "../constants";
 import { sendOtp, verifyOtp } from "../services/api";
 import type { User } from "../types";
 import Modal from "./Modal";
@@ -26,7 +25,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
     e.preventDefault();
     setError("");
     setIsLoading(true);
-    const { success } = await sendOtp(HUB_ID, phone);
+    const { success } = await sendOtp(phone);
     setIsLoading(false);
     if (success) {
       setStep("otp");
@@ -39,7 +38,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
     e.preventDefault();
     setError("");
     setIsLoading(true);
-    const { success, user } = await verifyOtp(HUB_ID, phone, otp);
+    const { success, user } = await verifyOtp(phone, otp);
     setIsLoading(false);
     if (success && user) {
       onLoginSuccess(user);

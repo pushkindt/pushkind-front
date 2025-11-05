@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
 import type { User, Product, Category, Tag, CartItem, View } from "./types";
-import { HUB_ID } from "./constants";
 import * as api from "./services/api";
 import Header from "./components/Header";
 import LoginModal from "./components/LoginModal";
@@ -26,29 +25,25 @@ const App: React.FC = () => {
       const categoryParentId =
         view.type === "category" ? view.categoryId : null;
       const [fetchedCategories, fetchedTags] = await Promise.all([
-        api.fetchCategories(HUB_ID, categoryParentId),
-        api.fetchTags(HUB_ID),
+        api.fetchCategories(categoryParentId),
+        api.fetchTags(),
       ]);
       setCategories(fetchedCategories);
       setTags(fetchedTags);
 
       let fetchedProducts: Product[] = [];
       if (view.type === "home") {
-        fetchedProducts = await api.fetchProducts(HUB_ID, user);
+        fetchedProducts = await api.fetchProducts(user);
       } else if (view.type === "category") {
-        fetchedProducts = await api.fetchProducts(HUB_ID, user, {
+        fetchedProducts = await api.fetchProducts(user, {
           categoryId: view.categoryId,
         });
       } else if (view.type === "tag") {
-        fetchedProducts = await api.fetchProducts(HUB_ID, user, {
+        fetchedProducts = await api.fetchProducts(user, {
           tagId: view.tagId,
         });
       } else if (view.type === "product") {
-        const product = await api.fetchProductById(
-          HUB_ID,
-          user,
-          view.productId,
-        );
+        const product = await api.fetchProductById(user, view.productId);
         setSelectedProduct(product || null);
         setProducts([]); // No list to show
       }
