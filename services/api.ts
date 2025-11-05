@@ -237,12 +237,37 @@ const logMockRequest = (
 export const fetchCategories = async (
   parentId?: number | null,
 ): Promise<Category[]> => {
-  logMockRequest("GET", "/categories", { parentId });
-  await simulateDelay(300);
-  if (parentId === undefined) {
-    return MOCK_CATEGORIES;
+  const url = new URL(`${BASE_API_URL}/${HUB_ID}/categories`);
+  if (parentId !== undefined) {
+    url.searchParams.set(
+      "parentId",
+      parentId === null ? "null" : String(parentId),
+    );
   }
-  return MOCK_CATEGORIES.filter((category) => category.parentId === parentId);
+
+  try {
+    const response = await fetch(url.toString(), {
+      headers: { Accept: "application/json" },
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch categories: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    const categories = (await response.json()) as Category[];
+    return categories;
+  } catch (error) {
+    console.error(
+      "Failed to fetch categories from API, falling back to mock data.",
+      error,
+    );
+    if (parentId === undefined) {
+      return MOCK_CATEGORIES;
+    }
+    return MOCK_CATEGORIES.filter((category) => category.parentId === parentId);
+  }
 };
 
 export const fetchTags = async (): Promise<Tag[]> => {
