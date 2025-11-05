@@ -14,11 +14,14 @@ export interface Tag {
 export interface Product {
   id: number;
   name: string;
+  sku: string | null;
   description: string;
-  imageUrl: string;
+  units: string | null,
+  currency: string,
+  imageUrls: string[];
   price: number;
   originalPrice?: number;
-  categoryId: number;
+  categoryId: number | null;
   tags: number[];
 }
 

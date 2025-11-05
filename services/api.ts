@@ -101,72 +101,120 @@ const MOCK_PRODUCTS: Omit<Product, "price" | "originalPrice">[] = [
   {
     id: 101,
     name: "Smart Noise-Cancelling Headphones",
+    sku: "SKU-101",
     description:
       "Immerse yourself in high-fidelity audio with these sleek, wireless headphones. Long-lasting battery and comfortable design.",
-    imageUrl: "https://picsum.photos/seed/product101/600/600",
+    units: "pcs",
+    currency: "USD",
+    imageUrls: [
+      "https://picsum.photos/seed/product101/600/600",
+      "https://picsum.photos/seed/product101-alt/600/600",
+    ],
     categoryId: 1,
     tags: [1, 3],
   },
   {
     id: 102,
     name: "Organic Cotton T-Shirt",
+    sku: "SKU-102",
     description:
       "A classic, comfortable t-shirt made from 100% organic cotton. Perfect for everyday wear.",
-    imageUrl: "https://picsum.photos/seed/product102/600/600",
+    units: "pcs",
+    currency: "USD",
+    imageUrls: [
+      "https://picsum.photos/seed/product102/600/600",
+      "https://picsum.photos/seed/product102-alt/600/600",
+    ],
     categoryId: 2,
     tags: [4],
   },
   {
     id: 103,
     name: "Artisanal Sourdough Bread",
+    sku: "SKU-103",
     description:
       "Freshly baked sourdough bread with a crispy crust and soft, chewy interior. Made with locally sourced ingredients.",
-    imageUrl: "https://picsum.photos/seed/product103/600/600",
+    units: "loaf",
+    currency: "USD",
+    imageUrls: [
+      "https://picsum.photos/seed/product103/600/600",
+      "https://picsum.photos/seed/product103-alt/600/600",
+    ],
     categoryId: 3,
     tags: [3],
   },
   {
     id: 104,
     name: "Modern Minimalist Desk Lamp",
+    sku: "SKU-104",
     description:
       "Illuminate your workspace with this stylish and functional LED desk lamp. Features adjustable brightness.",
-    imageUrl: "https://picsum.photos/seed/product104/600/600",
+    units: "pcs",
+    currency: "USD",
+    imageUrls: [
+      "https://picsum.photos/seed/product104/600/600",
+      "https://picsum.photos/seed/product104-alt/600/600",
+    ],
     categoryId: 4,
     tags: [1],
   },
   {
     id: 105,
     name: "Portable Power Bank 20000mAh",
+    sku: "SKU-105",
     description:
       "Never run out of battery again with this high-capacity power bank. Charges multiple devices at once.",
-    imageUrl: "https://picsum.photos/seed/product105/600/600",
+    units: "pcs",
+    currency: "USD",
+    imageUrls: [
+      "https://picsum.photos/seed/product105/600/600",
+      "https://picsum.photos/seed/product105-alt/600/600",
+    ],
     categoryId: 1,
     tags: [],
   },
   {
     id: 106,
     name: "All-Weather Performance Jacket",
+    sku: "SKU-106",
     description:
       "Stay dry and comfortable in any weather with this waterproof and breathable jacket. On sale now!",
-    imageUrl: "https://picsum.photos/seed/product106/600/600",
+    units: "pcs",
+    currency: "USD",
+    imageUrls: [
+      "https://picsum.photos/seed/product106/600/600",
+      "https://picsum.photos/seed/product106-alt/600/600",
+    ],
     categoryId: 2,
     tags: [2],
   },
   {
     id: 107,
     name: "Gourmet Coffee Beans",
+    sku: "SKU-107",
     description:
       "A rich and aromatic blend of single-origin Arabica coffee beans. Ethically sourced and expertly roasted.",
-    imageUrl: "https://picsum.photos/seed/product107/600/600",
+    units: "bag",
+    currency: "USD",
+    imageUrls: [
+      "https://picsum.photos/seed/product107/600/600",
+      "https://picsum.photos/seed/product107-alt/600/600",
+    ],
     categoryId: 3,
     tags: [3, 4],
   },
   {
     id: 108,
     name: "Ergonomic Office Chair",
+    sku: "SKU-108",
     description:
       "Improve your posture and comfort with this fully adjustable ergonomic office chair. A bestseller for a reason.",
-    imageUrl: "https://picsum.photos/seed/product108/600/600",
+    units: "pcs",
+    currency: "USD",
+    imageUrls: [
+      "https://picsum.photos/seed/product108/600/600",
+      "https://picsum.photos/seed/product108-alt/600/600",
+    ],
     categoryId: 4,
     tags: [3],
   },

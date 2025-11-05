@@ -12,6 +12,22 @@ const ProductCard: React.FC<ProductCardProps> = ({
   onProductClick,
   onAddToCart,
 }) => {
+  const primaryImage =
+    product.imageUrls.length > 0
+      ? product.imageUrls[0]
+      : "https://picsum.photos/seed/product-placeholder/600/600";
+  const formattedPrice = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: product.currency,
+  }).format(product.price);
+  const formattedOriginalPrice =
+    product.originalPrice !== undefined
+      ? new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: product.currency,
+        }).format(product.originalPrice)
+      : null;
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden transform hover:-translate-y-1 transition-all duration-300 group">
       <div className="relative">
@@ -21,7 +37,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         >
           <img
             className="w-full h-48 object-cover"
-            src={product.imageUrl}
+            src={primaryImage}
             alt={product.name}
           />
         </div>
@@ -45,17 +61,23 @@ const ProductCard: React.FC<ProductCardProps> = ({
         >
           {product.name}
         </h3>
+        {product.sku && (
+          <p className="text-xs text-gray-400 mt-1 uppercase tracking-wide">
+            SKU: {product.sku}
+          </p>
+        )}
         <p className="text-sm text-gray-500 mt-1 flex-grow">
           {product.description.substring(0, 50)}...
         </p>
         <div className="mt-4 flex items-baseline justify-between">
           <div>
             <span className="text-xl font-bold text-gray-900">
-              ${product.price.toFixed(2)}
+              {formattedPrice}
+              {product.units ? ` / ${product.units}` : ""}
             </span>
-            {product.originalPrice && (
+            {formattedOriginalPrice && (
               <span className="text-sm text-gray-500 line-through ml-2">
-                ${product.originalPrice.toFixed(2)}
+                {formattedOriginalPrice}
               </span>
             )}
           </div>

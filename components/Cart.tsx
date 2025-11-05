@@ -25,6 +25,11 @@ const Cart: React.FC<CartProps> = ({
     (acc, item) => acc + item.price * item.quantity,
     0,
   );
+  const subtotalCurrency = cartItems[0]?.currency ?? "USD";
+  const formatCurrency = (value: number, currency: string) =>
+    new Intl.NumberFormat("en-US", { style: "currency", currency }).format(
+      value,
+    );
 
   const handleCheckout = () => {
     alert("Checkout process started! (This is a demo)");
@@ -71,7 +76,10 @@ const Cart: React.FC<CartProps> = ({
                 {cartItems.map((item) => (
                   <li key={item.id} className="flex py-4">
                     <img
-                      src={item.imageUrl}
+                      src={
+                        item.imageUrls[0] ??
+                        "https://picsum.photos/seed/product-placeholder/200/200"
+                      }
                       alt={item.name}
                       className="w-20 h-20 object-cover rounded-md"
                     />
@@ -80,9 +88,19 @@ const Cart: React.FC<CartProps> = ({
                         <div className="flex justify-between text-base font-medium text-gray-900">
                           <h3>{item.name}</h3>
                           <p className="ml-4">
-                            ${(item.price * item.quantity).toFixed(2)}
+                            {formatCurrency(item.price * item.quantity, item.currency)}
                           </p>
                         </div>
+                        {item.sku && (
+                          <p className="text-xs text-gray-400 uppercase tracking-wide">
+                            SKU: {item.sku}
+                          </p>
+                        )}
+                        {item.units && (
+                          <p className="text-xs text-gray-500">
+                            Units: {item.units}
+                          </p>
+                        )}
                       </div>
                       <div className="flex-1 flex items-end justify-between text-sm">
                         <div className="flex items-center border border-gray-300 rounded-md">
@@ -124,7 +142,7 @@ const Cart: React.FC<CartProps> = ({
             <div className="border-t border-gray-200 p-4">
               <div className="flex justify-between text-lg font-medium text-gray-900">
                 <p>Subtotal</p>
-                <p>${subtotal.toFixed(2)}</p>
+                <p>{formatCurrency(subtotal, subtotalCurrency)}</p>
               </div>
               <p className="mt-0.5 text-sm text-gray-500">
                 Shipping and taxes calculated at checkout.

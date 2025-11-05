@@ -111,13 +111,30 @@ const App: React.FC = () => {
     if (view.type === "product") {
       if (!selectedProduct)
         return <p className="text-center text-gray-500">Product not found.</p>;
+      const imageUrls =
+        selectedProduct.imageUrls.length > 0
+          ? selectedProduct.imageUrls
+          : ["https://picsum.photos/seed/product-placeholder/600/600"];
+      const activeImage = imageUrls[0];
+      const formattedPrice = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: selectedProduct.currency,
+      }).format(selectedProduct.price);
+      const formattedOriginalPrice =
+        selectedProduct.originalPrice !== undefined
+          ? new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: selectedProduct.currency,
+            }).format(selectedProduct.originalPrice)
+          : null;
+
       return (
         <div className="bg-white rounded-lg shadow-xl overflow-hidden max-w-4xl mx-auto">
           <div className="md:flex">
             <div className="md:flex-shrink-0">
               <img
                 className="h-64 w-full object-cover md:h-full md:w-80"
-                src={selectedProduct.imageUrl}
+                src={activeImage}
                 alt={selectedProduct.name}
               />
             </div>
@@ -132,6 +149,16 @@ const App: React.FC = () => {
                 <h1 className="block mt-1 text-3xl leading-tight font-extrabold text-black">
                   {selectedProduct.name}
                 </h1>
+                {selectedProduct.sku && (
+                  <p className="mt-2 text-sm text-gray-500 uppercase tracking-wide">
+                    SKU: {selectedProduct.sku}
+                  </p>
+                )}
+                {selectedProduct.units && (
+                  <p className="text-sm text-gray-500">
+                    Units: {selectedProduct.units}
+                  </p>
+                )}
                 <p className="mt-4 text-gray-600">
                   {selectedProduct.description}
                 </p>
@@ -139,11 +166,12 @@ const App: React.FC = () => {
               <div className="mt-6">
                 <div className="flex items-baseline mb-4">
                   <span className="text-3xl font-bold text-gray-900">
-                    ${selectedProduct.price.toFixed(2)}
+                    {formattedPrice}
+                    {selectedProduct.units ? ` / ${selectedProduct.units}` : ""}
                   </span>
-                  {selectedProduct.originalPrice && (
+                  {formattedOriginalPrice && (
                     <span className="text-lg text-gray-500 line-through ml-3">
-                      ${selectedProduct.originalPrice.toFixed(2)}
+                      {formattedOriginalPrice}
                     </span>
                   )}
                 </div>
