@@ -1,7 +1,9 @@
 export interface Category {
   id: number;
+  parentId: number | null;
   name: string;
-  imageUrl: string;
+  description: string | null;
+  imageUrl: string | null;
 }
 
 export interface Tag {

@@ -184,7 +184,10 @@ const App: React.FC = () => {
                   className="relative rounded-lg overflow-hidden shadow-lg cursor-pointer group transform hover:scale-105 transition-transform duration-300"
                 >
                   <img
-                    src={category.imageUrl}
+                    src={
+                      category.imageUrl ??
+                      "https://via.placeholder.com/600x400?text=Category"
+                    }
                     alt={category.name}
                     className="w-full h-40 object-cover"
                   />
