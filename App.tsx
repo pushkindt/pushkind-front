@@ -23,8 +23,10 @@ const App: React.FC = () => {
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
+      const categoryParentId =
+        view.type === "category" ? view.categoryId : null;
       const [fetchedCategories, fetchedTags] = await Promise.all([
-        api.fetchCategories(HUB_ID),
+        api.fetchCategories(HUB_ID, categoryParentId),
         api.fetchTags(HUB_ID),
       ]);
       setCategories(fetchedCategories);
@@ -165,11 +167,14 @@ const App: React.FC = () => {
 
     return (
       <>
-        {view.type === "home" && (
+        {(view.type === "home" ||
+          (view.type === "category" && categories.length > 0)) && (
           <div className="mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-6">
-              Categories
-            </h2>
+            {view.type === "home" && (
+              <h2 className="text-3xl font-bold text-gray-800 mb-6">
+                Categories
+              </h2>
+            )}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {categories.map((category) => (
                 <div
@@ -199,24 +204,30 @@ const App: React.FC = () => {
                 </div>
               ))}
             </div>
-            <div className="mt-8">
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">
-                Browse by Tag
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {tags.map((tag) => (
-                  <button
-                    key={tag.id}
-                    onClick={() =>
-                      setView({ type: "tag", tagId: tag.id, tagName: tag.name })
-                    }
-                    className="bg-gray-200 text-gray-700 px-4 py-2 rounded-full hover:bg-indigo-500 hover:text-white transition-colors duration-200"
-                  >
-                    {tag.name}
-                  </button>
-                ))}
+            {view.type === "home" && (
+              <div className="mt-8">
+                <h3 className="text-2xl font-bold text-gray-800 mb-4">
+                  Browse by Tag
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {tags.map((tag) => (
+                    <button
+                      key={tag.id}
+                      onClick={() =>
+                        setView({
+                          type: "tag",
+                          tagId: tag.id,
+                          tagName: tag.name,
+                        })
+                      }
+                      className="bg-gray-200 text-gray-700 px-4 py-2 rounded-full hover:bg-indigo-500 hover:text-white transition-colors duration-200"
+                    >
+                      {tag.name}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         )}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

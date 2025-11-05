@@ -237,10 +237,14 @@ const logMockRequest = (
 
 export const fetchCategories = async (
   hubId: string = HUB_ID,
+  parentId?: number | null,
 ): Promise<Category[]> => {
-  logMockRequest("GET", "/categories", hubId);
+  logMockRequest("GET", "/categories", hubId, { parentId });
   await simulateDelay(300);
-  return MOCK_CATEGORIES;
+  if (parentId === undefined) {
+    return MOCK_CATEGORIES;
+  }
+  return MOCK_CATEGORIES.filter((category) => category.parentId === parentId);
 };
 
 export const fetchTags = async (hubId: string = HUB_ID): Promise<Tag[]> => {
