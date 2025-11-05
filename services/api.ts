@@ -271,9 +271,18 @@ export const fetchCategories = async (
 };
 
 export const fetchTags = async (): Promise<Tag[]> => {
-  logMockRequest("GET", "/tags");
-  await simulateDelay(200);
-  return MOCK_TAGS;
+  const url = `${BASE_API_URL}/${HUB_ID}/tags`;
+
+  try {
+    const response = await fetch(url, { headers: { Accept: "application/json" } });
+    if (!response.ok) {
+      throw new Error(`Failed to fetch tags: ${response.status} ${response.statusText}`);
+    }
+    return (await response.json()) as Tag[];
+  } catch (error) {
+    console.error("Failed to fetch tags from API, falling back to mock data.", error);
+    return MOCK_TAGS;
+  }
 };
 
 export const fetchProducts = async (
