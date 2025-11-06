@@ -13,9 +13,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   onAddToCart,
 }) => {
   const primaryImage =
-    product.imageUrls.length > 0
-      ? product.imageUrls[0]
-      : "https://picsum.photos/seed/product-placeholder/600/600";
+    product.imageUrls.length > 0 ? product.imageUrls[0] : "placeholder.png";
   const formattedPrice =
     product.priceCents !== null
       ? new Intl.NumberFormat("en-US", {
@@ -64,9 +62,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
             SKU: {product.sku}
           </p>
         )}
-        <p className="text-sm text-gray-500 mt-1 flex-grow">
-          {product.description.substring(0, 50)}...
-        </p>
+        {product.description && (
+          <p className="text-sm text-gray-500 mt-1 flex-grow">
+            {product.description.substring(0, 50)}...
+          </p>
+        )}
         <div className="mt-4 flex items-baseline justify-between">
           <div>
             <span className="text-xl font-bold text-gray-900">

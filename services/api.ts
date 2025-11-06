@@ -310,32 +310,88 @@ export const fetchTags = async (): Promise<Tag[]> => {
 };
 
 export const fetchProducts = async (
-  _user: User | null,
+  user: User | null,
   filter: { categoryId?: number; tagId?: number } = {},
 ): Promise<Product[]> => {
-  logMockRequest("GET", "/products", filter);
-  await simulateDelay(500);
-  let products = MOCK_PRODUCTS;
-  const { categoryId, tagId } = filter;
-
-  if (typeof categoryId === "number") {
-    products = products.filter((p) => p.categoryId === categoryId);
+  const url = new URL(`${BASE_API_URL}/${HUB_ID}/products`);
+  if (filter.categoryId !== undefined) {
+    url.searchParams.set("categoryId", String(filter.categoryId));
   }
-  if (typeof tagId === "number") {
-    products = products.filter((p) => p.tags.some((tag) => tag.id === tagId));
+  if (filter.tagId !== undefined) {
+    url.searchParams.set("tagId", String(filter.tagId));
+  }
+  if (user?.id) {
+    url.searchParams.set("userId", user.id);
   }
 
-  return products;
+  try {
+    const response = await fetch(url.toString(), {
+      headers: { Accept: "application/json" },
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch products: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    return (await response.json()) as Product[];
+  } catch (error) {
+    console.error(
+      "Failed to fetch products from API, falling back to mock data.",
+      error,
+    );
+    logMockRequest("GET", "/products", filter);
+    await simulateDelay(500);
+    let products = MOCK_PRODUCTS;
+    const { categoryId, tagId } = filter;
+
+    if (typeof categoryId === "number") {
+      products = products.filter((p) => p.categoryId === categoryId);
+    }
+    if (typeof tagId === "number") {
+      products = products.filter((p) => p.tags.some((tag) => tag.id === tagId));
+    }
+
+    return products;
+  }
 };
 
 export const fetchProductById = async (
-  _user: User | null,
+  user: User | null,
   productId: number,
 ): Promise<Product | undefined> => {
-  logMockRequest("GET", `/products/${productId}`);
-  await simulateDelay(400);
-  const product = MOCK_PRODUCTS.find((p) => p.id === productId);
-  return product;
+  const url = new URL(`${BASE_API_URL}/${HUB_ID}/products/${productId}`);
+  if (user?.id) {
+    url.searchParams.set("userId", user.id);
+  }
+
+  try {
+    const response = await fetch(url.toString(), {
+      headers: { Accept: "application/json" },
+    });
+
+    if (response.status === 404) {
+      return undefined;
+    }
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch product: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    return (await response.json()) as Product;
+  } catch (error) {
+    console.error(
+      `Failed to fetch product ${productId} from API, falling back to mock data.`,
+      error,
+    );
+    logMockRequest("GET", `/products/${productId}`);
+    await simulateDelay(400);
+    const product = MOCK_PRODUCTS.find((p) => p.id === productId);
+    return product;
+  }
 };
 
 export const sendOtp = async (phone: string): Promise<{ success: boolean }> => {

@@ -114,7 +114,7 @@ const App: React.FC = () => {
       const imageUrls =
         selectedProduct.imageUrls.length > 0
           ? selectedProduct.imageUrls
-          : ["https://picsum.photos/seed/product-placeholder/600/600"];
+          : ["placeholder.png"];
       const activeImage = imageUrls[0];
       const formattedPrice =
         selectedProduct.priceCents !== null
