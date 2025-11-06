@@ -16,17 +16,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
     product.imageUrls.length > 0
       ? product.imageUrls[0]
       : "https://picsum.photos/seed/product-placeholder/600/600";
-  const formattedPrice = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: product.currency,
-  }).format(product.price);
-  const formattedOriginalPrice =
-    product.originalPrice !== undefined
+  const formattedPrice =
+    product.priceCents !== null
       ? new Intl.NumberFormat("en-US", {
           style: "currency",
           currency: product.currency,
-        }).format(product.originalPrice)
-      : null;
+        }).format(product.priceCents / 100)
+      : "Price unavailable";
+  const hasTag = (tagId: number) =>
+    product.tags.some((tag) => tag.id === tagId);
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden transform hover:-translate-y-1 transition-all duration-300 group">
@@ -42,12 +40,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
           />
         </div>
         <div className="absolute top-2 right-2 flex space-x-1">
-          {product.tags.includes(2) && (
+          {hasTag(2) && (
             <span className="text-xs bg-red-500 text-white font-semibold px-2 py-1 rounded-full">
               Sale
             </span>
           )}
-          {product.tags.includes(1) && (
+          {hasTag(1) && (
             <span className="text-xs bg-blue-500 text-white font-semibold px-2 py-1 rounded-full">
               New
             </span>
@@ -73,13 +71,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <div>
             <span className="text-xl font-bold text-gray-900">
               {formattedPrice}
-              {product.units ? ` / ${product.units}` : ""}
+              {product.priceCents !== null && product.units
+                ? ` / ${product.units}`
+                : ""}
             </span>
-            {formattedOriginalPrice && (
-              <span className="text-sm text-gray-500 line-through ml-2">
-                {formattedOriginalPrice}
-              </span>
-            )}
           </div>
         </div>
         <button

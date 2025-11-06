@@ -21,15 +21,17 @@ const Cart: React.FC<CartProps> = ({
   onRemoveItem,
   onLoginClick,
 }) => {
-  const subtotal = cartItems.reduce(
-    (acc, item) => acc + item.price * item.quantity,
-    0,
-  );
+  const subtotalCents = cartItems.reduce((acc, item) => {
+    if (item.priceCents === null) return acc;
+    return acc + item.priceCents * item.quantity;
+  }, 0);
   const subtotalCurrency = cartItems[0]?.currency ?? "USD";
-  const formatCurrency = (value: number, currency: string) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency }).format(
-      value,
-    );
+  const hasPricedItems = cartItems.some((item) => item.priceCents !== null);
+  const formatCurrency = (valueInCents: number, currency: string) =>
+    new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency,
+    }).format(valueInCents / 100);
 
   const handleCheckout = () => {
     alert("Checkout process started! (This is a demo)");
@@ -88,7 +90,12 @@ const Cart: React.FC<CartProps> = ({
                         <div className="flex justify-between text-base font-medium text-gray-900">
                           <h3>{item.name}</h3>
                           <p className="ml-4">
-                            {formatCurrency(item.price * item.quantity, item.currency)}
+                            {item.priceCents !== null
+                              ? formatCurrency(
+                                item.priceCents * item.quantity,
+                                item.currency,
+                              )
+                              : "N/A"}
                           </p>
                         </div>
                         {item.sku && (
@@ -142,7 +149,11 @@ const Cart: React.FC<CartProps> = ({
             <div className="border-t border-gray-200 p-4">
               <div className="flex justify-between text-lg font-medium text-gray-900">
                 <p>Subtotal</p>
-                <p>{formatCurrency(subtotal, subtotalCurrency)}</p>
+                <p>
+                  {hasPricedItems
+                    ? formatCurrency(subtotalCents, subtotalCurrency)
+                    : "N/A"}
+                </p>
               </div>
               <p className="mt-0.5 text-sm text-gray-500">
                 Shipping and taxes calculated at checkout.

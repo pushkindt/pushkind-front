@@ -116,17 +116,13 @@ const App: React.FC = () => {
           ? selectedProduct.imageUrls
           : ["https://picsum.photos/seed/product-placeholder/600/600"];
       const activeImage = imageUrls[0];
-      const formattedPrice = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: selectedProduct.currency,
-      }).format(selectedProduct.price);
-      const formattedOriginalPrice =
-        selectedProduct.originalPrice !== undefined
+      const formattedPrice =
+        selectedProduct.priceCents !== null
           ? new Intl.NumberFormat("en-US", {
               style: "currency",
               currency: selectedProduct.currency,
-            }).format(selectedProduct.originalPrice)
-          : null;
+            }).format(selectedProduct.priceCents / 100)
+          : "Price unavailable";
 
       return (
         <div className="bg-white rounded-lg shadow-xl overflow-hidden max-w-4xl mx-auto">
@@ -167,13 +163,10 @@ const App: React.FC = () => {
                 <div className="flex items-baseline mb-4">
                   <span className="text-3xl font-bold text-gray-900">
                     {formattedPrice}
-                    {selectedProduct.units ? ` / ${selectedProduct.units}` : ""}
+                    {selectedProduct.priceCents !== null && selectedProduct.units
+                      ? ` / ${selectedProduct.units}`
+                      : ""}
                   </span>
-                  {formattedOriginalPrice && (
-                    <span className="text-lg text-gray-500 line-through ml-3">
-                      {formattedOriginalPrice}
-                    </span>
-                  )}
                 </div>
                 <button
                   onClick={() => handleAddToCart(selectedProduct)}

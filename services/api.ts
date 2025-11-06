@@ -97,7 +97,9 @@ const MOCK_TAGS: Tag[] = [
   { id: 4, name: "Eco-Friendly" },
 ];
 
-const MOCK_PRODUCTS: Omit<Product, "price" | "originalPrice">[] = [
+const [tagNewArrival, tagOnSale, tagBestseller, tagEcoFriendly] = MOCK_TAGS;
+
+const MOCK_PRODUCTS: Product[] = [
   {
     id: 101,
     name: "Smart Noise-Cancelling Headphones",
@@ -111,7 +113,8 @@ const MOCK_PRODUCTS: Omit<Product, "price" | "originalPrice">[] = [
       "https://picsum.photos/seed/product101-alt/600/600",
     ],
     categoryId: 1,
-    tags: [1, 3],
+    tags: [tagNewArrival, tagBestseller],
+    priceCents: 24999,
   },
   {
     id: 102,
@@ -126,7 +129,8 @@ const MOCK_PRODUCTS: Omit<Product, "price" | "originalPrice">[] = [
       "https://picsum.photos/seed/product102-alt/600/600",
     ],
     categoryId: 2,
-    tags: [4],
+    tags: [tagEcoFriendly],
+    priceCents: 2500,
   },
   {
     id: 103,
@@ -141,7 +145,8 @@ const MOCK_PRODUCTS: Omit<Product, "price" | "originalPrice">[] = [
       "https://picsum.photos/seed/product103-alt/600/600",
     ],
     categoryId: 3,
-    tags: [3],
+    tags: [tagBestseller],
+    priceCents: 750,
   },
   {
     id: 104,
@@ -156,7 +161,8 @@ const MOCK_PRODUCTS: Omit<Product, "price" | "originalPrice">[] = [
       "https://picsum.photos/seed/product104-alt/600/600",
     ],
     categoryId: 4,
-    tags: [1],
+    tags: [tagNewArrival],
+    priceCents: 5999,
   },
   {
     id: 105,
@@ -172,6 +178,7 @@ const MOCK_PRODUCTS: Omit<Product, "price" | "originalPrice">[] = [
     ],
     categoryId: 1,
     tags: [],
+    priceCents: 4500,
   },
   {
     id: 106,
@@ -186,7 +193,8 @@ const MOCK_PRODUCTS: Omit<Product, "price" | "originalPrice">[] = [
       "https://picsum.photos/seed/product106-alt/600/600",
     ],
     categoryId: 2,
-    tags: [2],
+    tags: [tagOnSale],
+    priceCents: 12000,
   },
   {
     id: 107,
@@ -201,7 +209,8 @@ const MOCK_PRODUCTS: Omit<Product, "price" | "originalPrice">[] = [
       "https://picsum.photos/seed/product107-alt/600/600",
     ],
     categoryId: 3,
-    tags: [3, 4],
+    tags: [tagBestseller, tagEcoFriendly],
+    priceCents: 1899,
   },
   {
     id: 108,
@@ -216,7 +225,8 @@ const MOCK_PRODUCTS: Omit<Product, "price" | "originalPrice">[] = [
       "https://picsum.photos/seed/product108-alt/600/600",
     ],
     categoryId: 4,
-    tags: [3],
+    tags: [tagBestseller],
+    priceCents: 35000,
   },
 ];
 
@@ -225,44 +235,7 @@ const MOCK_USERS: User[] = [
   { id: "user-2", phone: "5553334444", name: "Bob", priceLevel: "silver" },
 ];
 
-const MOCK_BASE_PRICES: { [productId: number]: number } = {
-  101: 249.99,
-  102: 25.0,
-  103: 7.5,
-  104: 59.99,
-  105: 45.0,
-  106: 120.0,
-  107: 18.99,
-  108: 350.0,
-};
-
 // --- MOCK API LOGIC ---
-
-const applyPriceLevel = (
-  basePrice: number,
-  priceLevel: User["priceLevel"],
-): { price: number; originalPrice?: number } => {
-  let price = basePrice;
-  let originalPrice: number | undefined = undefined;
-
-  if (priceLevel !== "default") {
-    originalPrice = basePrice;
-    if (priceLevel === "silver") price *= 0.95; // 5% discount
-    if (priceLevel === "gold") price *= 0.9; // 10% discount
-  }
-
-  return { price: parseFloat(price.toFixed(2)), originalPrice };
-};
-
-const getProductWithPrice = (
-  product: Omit<Product, "price" | "originalPrice">,
-  user: User | null,
-): Product => {
-  const basePrice = MOCK_BASE_PRICES[product.id];
-  const priceLevel = user ? user.priceLevel : "default";
-  const { price, originalPrice } = applyPriceLevel(basePrice, priceLevel);
-  return { ...product, price, originalPrice };
-};
 
 const simulateDelay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
@@ -334,31 +307,32 @@ export const fetchTags = async (): Promise<Tag[]> => {
 };
 
 export const fetchProducts = async (
-  user: User | null,
+  _user: User | null,
   filter: { categoryId?: number; tagId?: number } = {},
 ): Promise<Product[]> => {
   logMockRequest("GET", "/products", filter);
   await simulateDelay(500);
   let products = MOCK_PRODUCTS;
+  const { categoryId, tagId } = filter;
 
-  if (filter.categoryId) {
-    products = products.filter((p) => p.categoryId === filter.categoryId);
+  if (typeof categoryId === "number") {
+    products = products.filter((p) => p.categoryId === categoryId);
   }
-  if (filter.tagId) {
-    products = products.filter((p) => p.tags.includes(filter.tagId!));
+  if (typeof tagId === "number") {
+    products = products.filter((p) => p.tags.some((tag) => tag.id === tagId));
   }
 
-  return products.map((p) => getProductWithPrice(p, user));
+  return products;
 };
 
 export const fetchProductById = async (
-  user: User | null,
+  _user: User | null,
   productId: number,
 ): Promise<Product | undefined> => {
   logMockRequest("GET", `/products/${productId}`);
   await simulateDelay(400);
   const product = MOCK_PRODUCTS.find((p) => p.id === productId);
-  return product ? getProductWithPrice(product, user) : undefined;
+  return product;
 };
 
 export const sendOtp = async (

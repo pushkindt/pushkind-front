@@ -13,16 +13,15 @@ export interface Tag {
 
 export interface Product {
   id: number;
+  categoryId: number | null;
   name: string;
   sku: string | null;
   description: string;
   units: string | null,
   currency: string,
+  priceCents: number | null;
+  tags: Tag[];
   imageUrls: string[];
-  price: number;
-  originalPrice?: number;
-  categoryId: number | null;
-  tags: number[];
 }
 
 export interface User {
