@@ -1,11 +1,11 @@
 const hubId = import.meta.env.VITE_HUB_ID;
 if (!hubId) {
-  throw new Error("Missing VITE_HUB_ID environment variable");
+  throw new Error("Отсутствует переменная окружения VITE_HUB_ID");
 }
 
 const apiUrl = import.meta.env.VITE_API_URL;
 if (!apiUrl) {
-  throw new Error("Missing VITE_API_URL environment variable");
+  throw new Error("Отсутствует переменная окружения VITE_API_URL");
 }
 
 export const HUB_ID = hubId;

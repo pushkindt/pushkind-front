@@ -28,13 +28,13 @@ const Cart: React.FC<CartProps> = ({
   const subtotalCurrency = cartItems[0]?.currency ?? "USD";
   const hasPricedItems = cartItems.some((item) => item.priceCents !== null);
   const formatCurrency = (valueInCents: number, currency: string) =>
-    new Intl.NumberFormat("en-US", {
+    new Intl.NumberFormat("ru-RU", {
       style: "currency",
       currency,
     }).format(valueInCents / 100);
 
   const handleCheckout = () => {
-    alert("Checkout process started! (This is a demo)");
+    alert("Начат процесс оформления заказа! (демо)");
   };
 
   return (
@@ -48,9 +48,7 @@ const Cart: React.FC<CartProps> = ({
       >
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between p-4 border-b">
-            <h2 className="text-xl font-semibold text-gray-800">
-              Shopping Cart
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-800">Корзина</h2>
             <button
               onClick={onClose}
               className="text-gray-500 hover:text-gray-800"
@@ -62,14 +60,14 @@ const Cart: React.FC<CartProps> = ({
             <div className="flex-grow flex flex-col items-center justify-center text-center p-4">
               <img
                 src="https://picsum.photos/seed/emptycart/200/200"
-                alt="Empty cart"
+                alt="Пустая корзина"
                 className="w-40 h-40 rounded-full mb-4 opacity-50"
               />
               <h3 className="text-lg font-semibold text-gray-700">
-                Your cart is empty
+                Ваша корзина пуста
               </h3>
               <p className="text-gray-500 mt-1">
-                Looks like you haven&apos;t added anything yet.
+                Похоже, вы еще ничего не добавили.
               </p>
             </div>
           ) : (
@@ -95,17 +93,17 @@ const Cart: React.FC<CartProps> = ({
                                   item.priceCents * item.quantity,
                                   item.currency,
                                 )
-                              : "N/A"}
+                              : "Нет данных"}
                           </p>
                         </div>
                         {item.sku && (
                           <p className="text-xs text-gray-400 uppercase tracking-wide">
-                            SKU: {item.sku}
+                            Артикул: {item.sku}
                           </p>
                         )}
                         {item.units && (
                           <p className="text-xs text-gray-500">
-                            Units: {item.units}
+                            Единицы: {item.units}
                           </p>
                         )}
                       </div>
@@ -136,7 +134,7 @@ const Cart: React.FC<CartProps> = ({
                           onClick={() => onRemoveItem(item.id)}
                           className="font-medium text-red-600 hover:text-red-800 flex items-center"
                         >
-                          <TrashIcon className="w-4 h-4 mr-1" /> Remove
+                          <TrashIcon className="w-4 h-4 mr-1" /> Удалить
                         </button>
                       </div>
                     </div>
@@ -148,15 +146,16 @@ const Cart: React.FC<CartProps> = ({
           {cartItems.length > 0 && (
             <div className="border-t border-gray-200 p-4">
               <div className="flex justify-between text-lg font-medium text-gray-900">
-                <p>Subtotal</p>
+                <p>Итого</p>
                 <p>
                   {hasPricedItems
                     ? formatCurrency(subtotalCents, subtotalCurrency)
-                    : "N/A"}
+                    : "Нет данных"}
                 </p>
               </div>
               <p className="mt-0.5 text-sm text-gray-500">
-                Shipping and taxes calculated at checkout.
+                Стоимость доставки и налоги рассчитываются при оформлении
+                заказа.
               </p>
               <div className="mt-6">
                 {user ? (
@@ -164,7 +163,7 @@ const Cart: React.FC<CartProps> = ({
                     onClick={handleCheckout}
                     className="w-full bg-indigo-600 text-white py-3 px-4 rounded-md font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >
-                    Checkout
+                    Оформить заказ
                   </button>
                 ) : (
                   <button
@@ -174,18 +173,19 @@ const Cart: React.FC<CartProps> = ({
                     }}
                     className="w-full bg-gray-600 text-white py-3 px-4 rounded-md font-semibold hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                   >
-                    Login to Checkout
+                    Войти, чтобы оформить
                   </button>
                 )}
               </div>
               <div className="mt-4 flex justify-center text-sm text-center text-gray-500">
                 <p>
-                  or{" "}
+                  или{" "}
                   <button
                     onClick={onClose}
                     className="text-indigo-600 font-medium hover:text-indigo-500"
                   >
-                    Continue Shopping<span aria-hidden="true"> &rarr;</span>
+                    Продолжить покупки
+                    <span aria-hidden="true"> &rarr;</span>
                   </button>
                 </p>
               </div>

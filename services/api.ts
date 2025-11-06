@@ -7,94 +7,94 @@ const MOCK_CATEGORIES: Category[] = [
   {
     id: 1,
     parentId: null,
-    name: "Electronics",
-    description: "Latest gadgets, devices, and accessories.",
+    name: "Электроника",
+    description: "Новейшие гаджеты, устройства и аксессуары.",
     imageUrl: "https://picsum.photos/seed/electronics/600/400",
   },
   {
     id: 5,
     parentId: 1,
-    name: "Smartphones",
-    description: "Flagship and budget phones from top brands.",
+    name: "Смартфоны",
+    description: "Флагманские и доступные модели ведущих брендов.",
     imageUrl: "https://picsum.photos/seed/smartphones/600/400",
   },
   {
     id: 6,
     parentId: 1,
-    name: "Audio & Headphones",
-    description: "Headphones, earbuds, and portable speakers.",
+    name: "Аудио и наушники",
+    description: "Наушники, гарнитуры и портативные колонки.",
     imageUrl: "https://picsum.photos/seed/audio/600/400",
   },
   {
     id: 2,
     parentId: null,
-    name: "Apparel",
-    description: "Fashionable clothing and accessories.",
+    name: "Одежда",
+    description: "Стильная одежда и аксессуары.",
     imageUrl: "https://picsum.photos/seed/apparel/600/400",
   },
   {
     id: 7,
     parentId: 2,
-    name: "Men's Clothing",
-    description: "Everyday staples and seasonal menswear.",
+    name: "Мужская одежда",
+    description: "Повседневные базовые вещи и сезонные новинки.",
     imageUrl: "https://picsum.photos/seed/mens-clothing/600/400",
   },
   {
     id: 8,
     parentId: 2,
-    name: "Women's Clothing",
-    description: "From casual basics to statement pieces.",
+    name: "Женская одежда",
+    description: "От базовых повседневных вещей до ярких образов.",
     imageUrl: "https://picsum.photos/seed/womens-clothing/600/400",
   },
   {
     id: 3,
     parentId: null,
-    name: "Groceries",
-    description: "Fresh produce, pantry staples, and more.",
+    name: "Продукты питания",
+    description: "Свежие продукты, товары для кухни и многое другое.",
     imageUrl: "https://picsum.photos/seed/groceries/600/400",
   },
   {
     id: 9,
     parentId: 3,
-    name: "Fresh Produce",
-    description: "Farm-fresh fruits and vegetables.",
+    name: "Свежие овощи и фрукты",
+    description: "Фрукты и овощи прямо с фермы.",
     imageUrl: "https://picsum.photos/seed/produce/600/400",
   },
   {
     id: 10,
     parentId: 3,
-    name: "Pantry Staples",
-    description: "Dry goods, spices, and everyday cooking needs.",
+    name: "Базовые продукты",
+    description: "Бакалея, специи и необходимые ингредиенты для готовки.",
     imageUrl: "https://picsum.photos/seed/pantry/600/400",
   },
   {
     id: 4,
     parentId: null,
-    name: "Home Goods",
-    description: "Furniture, decor, and household must-haves.",
+    name: "Товары для дома",
+    description: "Мебель, декор и незаменимые вещи для дома.",
     imageUrl: "https://picsum.photos/seed/homegoods/600/400",
   },
   {
     id: 11,
     parentId: 4,
-    name: "Kitchen & Dining",
-    description: "Cookware, tableware, and entertaining essentials.",
+    name: "Кухня и сервировка",
+    description: "Посуда, текстиль и все для приема гостей.",
     imageUrl: "https://picsum.photos/seed/kitchen-dining/600/400",
   },
   {
     id: 12,
     parentId: 4,
-    name: "Home Office",
-    description: "Workspace furniture, lighting, and organizers.",
+    name: "Домашний офис",
+    description: "Мебель, свет и органайзеры для рабочего места.",
     imageUrl: "https://picsum.photos/seed/home-office/600/400",
   },
 ];
 
 const MOCK_TAGS: Tag[] = [
-  { id: 1, name: "New Arrival" },
-  { id: 2, name: "On Sale" },
-  { id: 3, name: "Bestseller" },
-  { id: 4, name: "Eco-Friendly" },
+  { id: 1, name: "Новинка" },
+  { id: 2, name: "Скидка" },
+  { id: 3, name: "Бестселлер" },
+  { id: 4, name: "Экологично" },
 ];
 
 const [tagNewArrival, tagOnSale, tagBestseller, tagEcoFriendly] = MOCK_TAGS;
@@ -102,11 +102,11 @@ const [tagNewArrival, tagOnSale, tagBestseller, tagEcoFriendly] = MOCK_TAGS;
 const MOCK_PRODUCTS: Product[] = [
   {
     id: 101,
-    name: "Smart Noise-Cancelling Headphones",
+    name: "Умные наушники с шумоподавлением",
     sku: "SKU-101",
     description:
-      "Immerse yourself in high-fidelity audio with these sleek, wireless headphones. Long-lasting battery and comfortable design.",
-    units: "pcs",
+      "Погрузитесь в мир чистого звука с этими стильными беспроводными наушниками. Долгое время работы и удобная посадка.",
+    units: "шт.",
     currency: "USD",
     imageUrls: [
       "https://picsum.photos/seed/product101/600/600",
@@ -118,11 +118,11 @@ const MOCK_PRODUCTS: Product[] = [
   },
   {
     id: 102,
-    name: "Organic Cotton T-Shirt",
+    name: "Футболка из органического хлопка",
     sku: "SKU-102",
     description:
-      "A classic, comfortable t-shirt made from 100% organic cotton. Perfect for everyday wear.",
-    units: "pcs",
+      "Классическая и удобная футболка из 100% органического хлопка. Идеальна для повседневной носки.",
+    units: "шт.",
     currency: "USD",
     imageUrls: [
       "https://picsum.photos/seed/product102/600/600",
@@ -134,11 +134,11 @@ const MOCK_PRODUCTS: Product[] = [
   },
   {
     id: 103,
-    name: "Artisanal Sourdough Bread",
+    name: "Ремесленный хлеб на закваске",
     sku: "SKU-103",
     description:
-      "Freshly baked sourdough bread with a crispy crust and soft, chewy interior. Made with locally sourced ingredients.",
-    units: "loaf",
+      "Свежевыпеченный хлеб на закваске с хрустящей коркой и мягким мякишем. Изготовлен из локальных ингредиентов.",
+    units: "буханка",
     currency: "USD",
     imageUrls: [
       "https://picsum.photos/seed/product103/600/600",
@@ -150,11 +150,11 @@ const MOCK_PRODUCTS: Product[] = [
   },
   {
     id: 104,
-    name: "Modern Minimalist Desk Lamp",
+    name: "Современная минималистичная настольная лампа",
     sku: "SKU-104",
     description:
-      "Illuminate your workspace with this stylish and functional LED desk lamp. Features adjustable brightness.",
-    units: "pcs",
+      "Осветите рабочее место стильной и функциональной светодиодной лампой. Регулировка яркости обеспечивает комфорт.",
+    units: "шт.",
     currency: "USD",
     imageUrls: [
       "https://picsum.photos/seed/product104/600/600",
@@ -166,11 +166,11 @@ const MOCK_PRODUCTS: Product[] = [
   },
   {
     id: 105,
-    name: "Portable Power Bank 20000mAh",
+    name: "Портативный пауэрбанк 20000 мА·ч",
     sku: "SKU-105",
     description:
-      "Never run out of battery again with this high-capacity power bank. Charges multiple devices at once.",
-    units: "pcs",
+      "Больше никакой разряженной техники — емкий пауэрбанк заряжает сразу несколько устройств.",
+    units: "шт.",
     currency: "USD",
     imageUrls: [
       "https://picsum.photos/seed/product105/600/600",
@@ -182,11 +182,11 @@ const MOCK_PRODUCTS: Product[] = [
   },
   {
     id: 106,
-    name: "All-Weather Performance Jacket",
+    name: "Функциональная куртка для любой погоды",
     sku: "SKU-106",
     description:
-      "Stay dry and comfortable in any weather with this waterproof and breathable jacket. On sale now!",
-    units: "pcs",
+      "Оставайтесь сухими и в комфорте в любую погоду – водонепроницаемая и дышащая куртка сейчас со скидкой!",
+    units: "шт.",
     currency: "USD",
     imageUrls: [
       "https://picsum.photos/seed/product106/600/600",
@@ -198,11 +198,11 @@ const MOCK_PRODUCTS: Product[] = [
   },
   {
     id: 107,
-    name: "Gourmet Coffee Beans",
+    name: "Премиальные кофейные зерна",
     sku: "SKU-107",
     description:
-      "A rich and aromatic blend of single-origin Arabica coffee beans. Ethically sourced and expertly roasted.",
-    units: "bag",
+      "Насыщенная ароматная арабика одного происхождения. Этично выращена и профессионально обжарена.",
+    units: "пакет",
     currency: "USD",
     imageUrls: [
       "https://picsum.photos/seed/product107/600/600",
@@ -214,11 +214,11 @@ const MOCK_PRODUCTS: Product[] = [
   },
   {
     id: 108,
-    name: "Ergonomic Office Chair",
+    name: "Эргономичное офисное кресло",
     sku: "SKU-108",
     description:
-      "Improve your posture and comfort with this fully adjustable ergonomic office chair. A bestseller for a reason.",
-    units: "pcs",
+      "Улучшите осанку и комфорт благодаря полностью регулируемому эргономичному креслу. Бестселлер не случайно.",
+    units: "шт.",
     currency: "USD",
     imageUrls: [
       "https://picsum.photos/seed/product108/600/600",
@@ -231,8 +231,8 @@ const MOCK_PRODUCTS: Product[] = [
 ];
 
 const MOCK_USERS: User[] = [
-  { id: "user-1", phone: "5551112222", name: "Alice", priceLevel: "gold" },
-  { id: "user-2", phone: "5553334444", name: "Bob", priceLevel: "silver" },
+  { id: "user-1", phone: "5551112222", name: "Алиса", priceLevel: "gold" },
+  { id: "user-2", phone: "5553334444", name: "Борис", priceLevel: "silver" },
 ];
 
 // --- MOCK API LOGIC ---
@@ -269,7 +269,7 @@ export const fetchCategories = async (
 
     if (!response.ok) {
       throw new Error(
-        `Failed to fetch categories: ${response.status} ${response.statusText}`,
+        `Не удалось загрузить категории: ${response.status} ${response.statusText}`,
       );
     }
 
@@ -277,7 +277,7 @@ export const fetchCategories = async (
     return categories;
   } catch (error) {
     console.error(
-      "Failed to fetch categories from API, falling back to mock data.",
+      "Не удалось получить категории из API, используем тестовые данные.",
       error,
     );
     if (parentId === undefined) {
@@ -296,13 +296,13 @@ export const fetchTags = async (): Promise<Tag[]> => {
     });
     if (!response.ok) {
       throw new Error(
-        `Failed to fetch tags: ${response.status} ${response.statusText}`,
+        `Не удалось загрузить теги: ${response.status} ${response.statusText}`,
       );
     }
     return (await response.json()) as Tag[];
   } catch (error) {
     console.error(
-      "Failed to fetch tags from API, falling back to mock data.",
+      "Не удалось получить теги из API, используем тестовые данные.",
       error,
     );
     return MOCK_TAGS;
@@ -331,14 +331,14 @@ export const fetchProducts = async (
 
     if (!response.ok) {
       throw new Error(
-        `Failed to fetch products: ${response.status} ${response.statusText}`,
+        `Не удалось загрузить товары: ${response.status} ${response.statusText}`,
       );
     }
 
     return (await response.json()) as Product[];
   } catch (error) {
     console.error(
-      "Failed to fetch products from API, falling back to mock data.",
+      "Не удалось получить товары из API, используем тестовые данные.",
       error,
     );
     logMockRequest("GET", "/products", filter);
@@ -377,14 +377,14 @@ export const fetchProductById = async (
 
     if (!response.ok) {
       throw new Error(
-        `Failed to fetch product: ${response.status} ${response.statusText}`,
+        `Не удалось загрузить товар: ${response.status} ${response.statusText}`,
       );
     }
 
     return (await response.json()) as Product;
   } catch (error) {
     console.error(
-      `Failed to fetch product ${productId} from API, falling back to mock data.`,
+      `Не удалось получить товар ${productId} из API, используем тестовые данные.`,
       error,
     );
     logMockRequest("GET", `/products/${productId}`);
@@ -400,7 +400,7 @@ export const sendOtp = async (phone: string): Promise<{ success: boolean }> => {
   const userExists = MOCK_USERS.some((u) => u.phone === phone);
   if (userExists) {
     // In a real app, an OTP like '123456' would be sent via SMS
-    console.log(`Mock OTP for ${phone} is 123456`);
+    console.log(`Демо-код для ${phone}: 123456`);
     return { success: true };
   }
   return { success: false };

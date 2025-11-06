@@ -26,7 +26,7 @@ const Header: React.FC<HeaderProps> = ({
               onClick={onHomeClick}
               className="text-2xl font-bold text-gray-800 hover:text-indigo-600 transition-colors"
             >
-              pushkind-front
+              Витрина
             </button>
           </div>
           <div className="flex items-center space-x-4">
@@ -35,7 +35,7 @@ const Header: React.FC<HeaderProps> = ({
               className="flex items-center text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors"
             >
               <UserIcon className="w-6 h-6 mr-1" />
-              {user ? `Hi, ${user.name}` : "Login"}
+              {user ? `Привет, ${user.name}` : "Войти"}
             </button>
             <div className="h-6 w-px bg-gray-200"></div>
             <button

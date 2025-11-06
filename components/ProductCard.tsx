@@ -16,11 +16,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
     product.imageUrls.length > 0 ? product.imageUrls[0] : "placeholder.png";
   const formattedPrice =
     product.priceCents !== null
-      ? new Intl.NumberFormat("en-US", {
+      ? new Intl.NumberFormat("ru-RU", {
           style: "currency",
           currency: product.currency,
         }).format(product.priceCents / 100)
-      : "Price unavailable";
+      : "Цена недоступна";
   const hasTag = (tagId: number) =>
     product.tags.some((tag) => tag.id === tagId);
 
@@ -40,12 +40,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <div className="absolute top-2 right-2 flex space-x-1">
           {hasTag(2) && (
             <span className="text-xs bg-red-500 text-white font-semibold px-2 py-1 rounded-full">
-              Sale
+              Скидка
             </span>
           )}
           {hasTag(1) && (
             <span className="text-xs bg-blue-500 text-white font-semibold px-2 py-1 rounded-full">
-              New
+              Новинка
             </span>
           )}
         </div>
@@ -59,7 +59,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </h3>
         {product.sku && (
           <p className="text-xs text-gray-400 mt-1 uppercase tracking-wide">
-            SKU: {product.sku}
+            Артикул: {product.sku}
           </p>
         )}
         {product.description && (
@@ -81,7 +81,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           onClick={() => onAddToCart(product)}
           className="mt-4 w-full bg-indigo-600 text-white py-2 px-4 rounded-md font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
         >
-          Add to Cart
+          Добавить в корзину
         </button>
       </div>
     </div>

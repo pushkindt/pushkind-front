@@ -30,7 +30,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
     if (success) {
       setStep("otp");
     } else {
-      setError("Could not find an account with this number.");
+      setError("Не удалось найти учетную запись с этим номером.");
     }
   };
 
@@ -44,7 +44,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
       onLoginSuccess(user);
       resetState();
     } else {
-      setError("Invalid OTP. Please try again.");
+      setError("Неверный код. Попробуйте еще раз.");
     }
   };
 
@@ -60,12 +60,12 @@ const LoginModal: React.FC<LoginModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={resetState}
-      title={step === "phone" ? "Login with Phone" : "Enter OTP"}
+      title={step === "phone" ? "Вход по телефону" : "Введите код"}
     >
       {step === "phone" ? (
         <form onSubmit={handlePhoneSubmit}>
           <p className="text-gray-600 mb-4">
-            Enter your phone number to receive a one-time password.
+            Введите номер телефона, чтобы получить одноразовый код.
           </p>
           <input
             type="tel"
@@ -81,12 +81,12 @@ const LoginModal: React.FC<LoginModalProps> = ({
             disabled={isLoading || phone.length < 10}
             className="mt-4 w-full bg-indigo-600 text-white py-2 px-4 rounded-md font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-300 disabled:cursor-not-allowed flex justify-center items-center"
           >
-            {isLoading ? <SpinnerIcon className="w-5 h-5" /> : "Send OTP"}
+            {isLoading ? <SpinnerIcon className="w-5 h-5" /> : "Отправить код"}
           </button>
         </form>
       ) : (
         <form onSubmit={handleOtpSubmit}>
-          <p className="text-gray-600 mb-4">An OTP has been sent to {phone}.</p>
+          <p className="text-gray-600 mb-4">На номер {phone} отправлен код.</p>
           <input
             type="text"
             value={otp}
@@ -102,7 +102,11 @@ const LoginModal: React.FC<LoginModalProps> = ({
             disabled={isLoading || otp.length < 6}
             className="mt-4 w-full bg-indigo-600 text-white py-2 px-4 rounded-md font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-300 disabled:cursor-not-allowed flex justify-center items-center"
           >
-            {isLoading ? <SpinnerIcon className="w-5 h-5" /> : "Verify & Login"}
+            {isLoading ? (
+              <SpinnerIcon className="w-5 h-5" />
+            ) : (
+              "Подтвердить и войти"
+            )}
           </button>
           <button
             type="button"
@@ -112,7 +116,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
             }}
             className="mt-2 w-full text-sm text-indigo-600 hover:underline"
           >
-            Use a different number
+            Использовать другой номер
           </button>
         </form>
       )}

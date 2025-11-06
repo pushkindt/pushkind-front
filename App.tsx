@@ -52,7 +52,7 @@ const App: React.FC = () => {
         setSelectedProduct(null);
       }
     } catch (error) {
-      console.error("Failed to fetch data:", error);
+      console.error("Не удалось загрузить данные:", error);
     } finally {
       setIsLoading(false);
     }
@@ -110,7 +110,7 @@ const App: React.FC = () => {
 
     if (view.type === "product") {
       if (!selectedProduct)
-        return <p className="text-center text-gray-500">Product not found.</p>;
+        return <p className="text-center text-gray-500">Товар не найден.</p>;
       const imageUrls =
         selectedProduct.imageUrls.length > 0
           ? selectedProduct.imageUrls
@@ -118,11 +118,11 @@ const App: React.FC = () => {
       const activeImage = imageUrls[0];
       const formattedPrice =
         selectedProduct.priceCents !== null
-          ? new Intl.NumberFormat("en-US", {
-              style: "currency",
-              currency: selectedProduct.currency,
-            }).format(selectedProduct.priceCents / 100)
-          : "Price unavailable";
+          ? new Intl.NumberFormat("ru-RU", {
+            style: "currency",
+            currency: selectedProduct.currency,
+          }).format(selectedProduct.priceCents / 100)
+          : "Цена недоступна";
 
       return (
         <div className="bg-white rounded-lg shadow-xl overflow-hidden max-w-4xl mx-auto">
@@ -147,12 +147,12 @@ const App: React.FC = () => {
                 </h1>
                 {selectedProduct.sku && (
                   <p className="mt-2 text-sm text-gray-500 uppercase tracking-wide">
-                    SKU: {selectedProduct.sku}
+                    Артикул: {selectedProduct.sku}
                   </p>
                 )}
                 {selectedProduct.units && (
                   <p className="text-sm text-gray-500">
-                    Units: {selectedProduct.units}
+                    Единицы: {selectedProduct.units}
                   </p>
                 )}
                 <p className="mt-4 text-gray-600">
@@ -164,7 +164,7 @@ const App: React.FC = () => {
                   <span className="text-3xl font-bold text-gray-900">
                     {formattedPrice}
                     {selectedProduct.priceCents !== null &&
-                    selectedProduct.units
+                      selectedProduct.units
                       ? ` / ${selectedProduct.units}`
                       : ""}
                   </span>
@@ -173,7 +173,7 @@ const App: React.FC = () => {
                   onClick={() => handleAddToCart(selectedProduct)}
                   className="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-indigo-700 text-lg"
                 >
-                  Add to Cart
+                  Добавить в корзину
                 </button>
               </div>
             </div>
@@ -186,64 +186,64 @@ const App: React.FC = () => {
       <>
         {(view.type === "home" ||
           (view.type === "category" && categories.length > 0)) && (
-          <div className="mb-12">
-            {view.type === "home" && (
-              <h2 className="text-3xl font-bold text-gray-800 mb-6">
-                Categories
-              </h2>
-            )}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {categories.map((category) => (
-                <div
-                  key={category.id}
-                  onClick={() =>
-                    setView({
-                      type: "category",
-                      categoryId: category.id,
-                      categoryName: category.name,
-                    })
-                  }
-                  className="relative rounded-lg overflow-hidden shadow-lg cursor-pointer group transform hover:scale-105 transition-transform duration-300"
-                >
-                  <img
-                    src={category.imageUrl ?? "/placeholder.png"}
-                    alt={category.name}
-                    className="w-full h-40 object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
-                    <h3 className="text-white text-2xl font-bold">
-                      {category.name}
-                    </h3>
+            <div className="mb-12">
+              {view.type === "home" && (
+                <h2 className="text-3xl font-bold text-gray-800 mb-6">
+                  Категории
+                </h2>
+              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {categories.map((category) => (
+                  <div
+                    key={category.id}
+                    onClick={() =>
+                      setView({
+                        type: "category",
+                        categoryId: category.id,
+                        categoryName: category.name,
+                      })
+                    }
+                    className="relative rounded-lg overflow-hidden shadow-lg cursor-pointer group transform hover:scale-105 transition-transform duration-300"
+                  >
+                    <img
+                      src={category.imageUrl ?? "/placeholder.png"}
+                      alt={category.name}
+                      className="w-full h-40 object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
+                      <h3 className="text-white text-2xl font-bold">
+                        {category.name}
+                      </h3>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {view.type === "home" && (
+                <div className="mt-8">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-4">
+                    Фильтр по тегам
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {tags.map((tag) => (
+                      <button
+                        key={tag.id}
+                        onClick={() =>
+                          setView({
+                            type: "tag",
+                            tagId: tag.id,
+                            tagName: tag.name,
+                          })
+                        }
+                        className="bg-gray-200 text-gray-700 px-4 py-2 rounded-full hover:bg-indigo-500 hover:text-white transition-colors duration-200"
+                      >
+                        {tag.name}
+                      </button>
+                    ))}
                   </div>
                 </div>
-              ))}
+              )}
             </div>
-            {view.type === "home" && (
-              <div className="mt-8">
-                <h3 className="text-2xl font-bold text-gray-800 mb-4">
-                  Browse by Tag
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {tags.map((tag) => (
-                    <button
-                      key={tag.id}
-                      onClick={() =>
-                        setView({
-                          type: "tag",
-                          tagId: tag.id,
-                          tagName: tag.name,
-                        })
-                      }
-                      className="bg-gray-200 text-gray-700 px-4 py-2 rounded-full hover:bg-indigo-500 hover:text-white transition-colors duration-200"
-                    >
-                      {tag.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+          )}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {products.map((product) => (
             <ProductCard
@@ -263,15 +263,15 @@ const App: React.FC = () => {
   const getTitle = () => {
     switch (view.type) {
       case "home":
-        return "All Products";
+        return "Все товары";
       case "category":
-        return `Category: ${view.categoryName}`;
+        return `Категория: ${view.categoryName}`;
       case "tag":
-        return `Tag: ${view.tagName}`;
+        return `Тег: ${view.tagName}`;
       case "product":
-        return "Product Details";
+        return "Описание товара";
       default:
-        return "pushkind-front";
+        return "Витрина";
     }
   };
 
@@ -293,7 +293,7 @@ const App: React.FC = () => {
               className="flex items-center text-indigo-600 hover:text-indigo-800 font-semibold mr-4"
             >
               <ArrowLeftIcon className="w-5 h-5 mr-1" />
-              Back
+              Назад
             </button>
           )}
           <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
