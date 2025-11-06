@@ -22,6 +22,7 @@ export interface Product {
   priceCents: number | null;
   tags: Tag[];
   imageUrls: string[];
+  amount: number | null;
 }
 
 export interface User {

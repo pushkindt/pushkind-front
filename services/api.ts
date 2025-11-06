@@ -107,7 +107,7 @@ const MOCK_PRODUCTS: Product[] = [
     description:
       "Погрузитесь в мир чистого звука с этими стильными беспроводными наушниками. Долгое время работы и удобная посадка.",
     units: "шт.",
-    currency: "USD",
+    currency: "RUB",
     imageUrls: [
       "https://picsum.photos/seed/product101/600/600",
       "https://picsum.photos/seed/product101-alt/600/600",
@@ -115,6 +115,7 @@ const MOCK_PRODUCTS: Product[] = [
     categoryId: 1,
     tags: [tagNewArrival, tagBestseller],
     priceCents: 24999,
+    amount: 10,
   },
   {
     id: 102,
@@ -123,7 +124,7 @@ const MOCK_PRODUCTS: Product[] = [
     description:
       "Классическая и удобная футболка из 100% органического хлопка. Идеальна для повседневной носки.",
     units: "шт.",
-    currency: "USD",
+    currency: "RUB",
     imageUrls: [
       "https://picsum.photos/seed/product102/600/600",
       "https://picsum.photos/seed/product102-alt/600/600",
@@ -131,6 +132,7 @@ const MOCK_PRODUCTS: Product[] = [
     categoryId: 2,
     tags: [tagEcoFriendly],
     priceCents: 2500,
+    amount: 10,
   },
   {
     id: 103,
@@ -139,7 +141,7 @@ const MOCK_PRODUCTS: Product[] = [
     description:
       "Свежевыпеченный хлеб на закваске с хрустящей коркой и мягким мякишем. Изготовлен из локальных ингредиентов.",
     units: "буханка",
-    currency: "USD",
+    currency: "RUB",
     imageUrls: [
       "https://picsum.photos/seed/product103/600/600",
       "https://picsum.photos/seed/product103-alt/600/600",
@@ -147,6 +149,7 @@ const MOCK_PRODUCTS: Product[] = [
     categoryId: 3,
     tags: [tagBestseller],
     priceCents: 750,
+    amount: 1,
   },
   {
     id: 104,
@@ -155,7 +158,7 @@ const MOCK_PRODUCTS: Product[] = [
     description:
       "Осветите рабочее место стильной и функциональной светодиодной лампой. Регулировка яркости обеспечивает комфорт.",
     units: "шт.",
-    currency: "USD",
+    currency: "RUB",
     imageUrls: [
       "https://picsum.photos/seed/product104/600/600",
       "https://picsum.photos/seed/product104-alt/600/600",
@@ -163,6 +166,7 @@ const MOCK_PRODUCTS: Product[] = [
     categoryId: 4,
     tags: [tagNewArrival],
     priceCents: 5999,
+    amount: 10,
   },
   {
     id: 105,
@@ -171,7 +175,7 @@ const MOCK_PRODUCTS: Product[] = [
     description:
       "Больше никакой разряженной техники — емкий пауэрбанк заряжает сразу несколько устройств.",
     units: "шт.",
-    currency: "USD",
+    currency: "RUB",
     imageUrls: [
       "https://picsum.photos/seed/product105/600/600",
       "https://picsum.photos/seed/product105-alt/600/600",
@@ -179,6 +183,7 @@ const MOCK_PRODUCTS: Product[] = [
     categoryId: 1,
     tags: [],
     priceCents: 4500,
+    amount: 10,
   },
   {
     id: 106,
@@ -187,7 +192,7 @@ const MOCK_PRODUCTS: Product[] = [
     description:
       "Оставайтесь сухими и в комфорте в любую погоду – водонепроницаемая и дышащая куртка сейчас со скидкой!",
     units: "шт.",
-    currency: "USD",
+    currency: "RUB",
     imageUrls: [
       "https://picsum.photos/seed/product106/600/600",
       "https://picsum.photos/seed/product106-alt/600/600",
@@ -195,6 +200,7 @@ const MOCK_PRODUCTS: Product[] = [
     categoryId: 2,
     tags: [tagOnSale],
     priceCents: 12000,
+    amount: 10,
   },
   {
     id: 107,
@@ -203,7 +209,7 @@ const MOCK_PRODUCTS: Product[] = [
     description:
       "Насыщенная ароматная арабика одного происхождения. Этично выращена и профессионально обжарена.",
     units: "пакет",
-    currency: "USD",
+    currency: "RUB",
     imageUrls: [
       "https://picsum.photos/seed/product107/600/600",
       "https://picsum.photos/seed/product107-alt/600/600",
@@ -211,6 +217,7 @@ const MOCK_PRODUCTS: Product[] = [
     categoryId: 3,
     tags: [tagBestseller, tagEcoFriendly],
     priceCents: 1899,
+    amount: 1,
   },
   {
     id: 108,
@@ -219,7 +226,7 @@ const MOCK_PRODUCTS: Product[] = [
     description:
       "Улучшите осанку и комфорт благодаря полностью регулируемому эргономичному креслу. Бестселлер не случайно.",
     units: "шт.",
-    currency: "USD",
+    currency: "RUB",
     imageUrls: [
       "https://picsum.photos/seed/product108/600/600",
       "https://picsum.photos/seed/product108-alt/600/600",
@@ -227,6 +234,7 @@ const MOCK_PRODUCTS: Product[] = [
     categoryId: 4,
     tags: [tagBestseller],
     priceCents: 35000,
+    amount: 10,
   },
 ];
 

@@ -165,7 +165,7 @@ const App: React.FC = () => {
                     {formattedPrice}
                     {selectedProduct.priceCents !== null &&
                       selectedProduct.units
-                      ? ` / ${selectedProduct.units}`
+                      ? ` / ${selectedProduct.amount} ${selectedProduct.units}`
                       : ""}
                   </span>
                 </div>

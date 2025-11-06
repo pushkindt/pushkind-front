@@ -17,9 +17,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const formattedPrice =
     product.priceCents !== null
       ? new Intl.NumberFormat("ru-RU", {
-          style: "currency",
-          currency: product.currency,
-        }).format(product.priceCents / 100)
+        style: "currency",
+        currency: product.currency,
+      }).format(product.priceCents / 100)
       : "Цена недоступна";
   const hasTag = (tagId: number) =>
     product.tags.some((tag) => tag.id === tagId);
@@ -72,7 +72,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <span className="text-xl font-bold text-gray-900">
               {formattedPrice}
               {product.priceCents !== null && product.units
-                ? ` / ${product.units}`
+                ? ` / ${product.amount} ${product.units}`
                 : ""}
             </span>
           </div>
