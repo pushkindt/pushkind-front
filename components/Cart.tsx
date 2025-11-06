@@ -92,9 +92,9 @@ const Cart: React.FC<CartProps> = ({
                           <p className="ml-4">
                             {item.priceCents !== null
                               ? formatCurrency(
-                                item.priceCents * item.quantity,
-                                item.currency,
-                              )
+                                  item.priceCents * item.quantity,
+                                  item.currency,
+                                )
                               : "N/A"}
                           </p>
                         </div>

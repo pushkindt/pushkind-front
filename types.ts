@@ -17,8 +17,8 @@ export interface Product {
   name: string;
   sku: string | null;
   description: string;
-  units: string | null,
-  currency: string,
+  units: string | null;
+  currency: string;
   priceCents: number | null;
   tags: Tag[];
   imageUrls: string[];

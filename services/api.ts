@@ -240,11 +240,7 @@ const MOCK_USERS: User[] = [
 const simulateDelay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 const BASE_API_URL = API_URL.replace(/\/$/, "");
-const logMockRequest = (
-  method: string,
-  path: string,
-  details?: unknown,
-) => {
+const logMockRequest = (method: string, path: string, details?: unknown) => {
   const url = `${BASE_API_URL}/${HUB_ID}${path}`;
   if (details !== undefined) {
     console.log(`[mock:${method}] ${url}`, details);
@@ -295,13 +291,20 @@ export const fetchTags = async (): Promise<Tag[]> => {
   const url = `${BASE_API_URL}/${HUB_ID}/tags`;
 
   try {
-    const response = await fetch(url, { headers: { Accept: "application/json" } });
+    const response = await fetch(url, {
+      headers: { Accept: "application/json" },
+    });
     if (!response.ok) {
-      throw new Error(`Failed to fetch tags: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Failed to fetch tags: ${response.status} ${response.statusText}`,
+      );
     }
     return (await response.json()) as Tag[];
   } catch (error) {
-    console.error("Failed to fetch tags from API, falling back to mock data.", error);
+    console.error(
+      "Failed to fetch tags from API, falling back to mock data.",
+      error,
+    );
     return MOCK_TAGS;
   }
 };
@@ -335,9 +338,7 @@ export const fetchProductById = async (
   return product;
 };
 
-export const sendOtp = async (
-  phone: string,
-): Promise<{ success: boolean }> => {
+export const sendOtp = async (phone: string): Promise<{ success: boolean }> => {
   logMockRequest("POST", "/auth/otp", { phone });
   await simulateDelay(1000);
   const userExists = MOCK_USERS.some((u) => u.phone === phone);
