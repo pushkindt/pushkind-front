@@ -164,7 +164,8 @@ const App: React.FC = () => {
                   <span className="text-3xl font-bold text-gray-900">
                     {formattedPrice}
                     {selectedProduct.priceCents !== null &&
-                      selectedProduct.units
+                      selectedProduct.units &&
+                      selectedProduct.amount !== null
                       ? ` / ${selectedProduct.amount} ${selectedProduct.units}`
                       : ""}
                   </span>

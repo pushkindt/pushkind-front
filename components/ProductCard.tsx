@@ -71,7 +71,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <div>
             <span className="text-xl font-bold text-gray-900">
               {formattedPrice}
-              {product.priceCents !== null && product.units
+              {product.priceCents !== null && product.units && product.amount !== null
                 ? ` / ${product.amount} ${product.units}`
                 : ""}
             </span>
