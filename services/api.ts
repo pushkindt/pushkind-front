@@ -403,6 +403,7 @@ export const fetchProductById = async (
 };
 
 export const sendOtp = async (phone: string): Promise<{ success: boolean }> => {
+  const payloadPhone = phone.startsWith("+") ? phone : `+${phone}`;
   const url = `${BASE_API_URL}/${HUB_ID}/auth/otp`;
 
   try {
@@ -412,7 +413,7 @@ export const sendOtp = async (phone: string): Promise<{ success: boolean }> => {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
-      body: JSON.stringify({ phone }),
+      body: JSON.stringify({ phone: payloadPhone }),
     });
 
     if (!response.ok) {
@@ -427,7 +428,7 @@ export const sendOtp = async (phone: string): Promise<{ success: boolean }> => {
       "Не удалось отправить OTP через API, возвращаю демо-ответ.",
       error,
     );
-    logMockRequest("POST", "/auth/otp", { phone });
+    logMockRequest("POST", "/auth/otp", { phone: payloadPhone });
     await simulateDelay(1000);
     const userExists = MOCK_USERS.some((u) => u.phone === phone);
     if (userExists) {
