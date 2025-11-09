@@ -71,7 +71,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ""))}
-            placeholder="5551234567"
+            placeholder="79876543210"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             disabled={isLoading}
           />

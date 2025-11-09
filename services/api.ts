@@ -403,15 +403,40 @@ export const fetchProductById = async (
 };
 
 export const sendOtp = async (phone: string): Promise<{ success: boolean }> => {
-  logMockRequest("POST", "/auth/otp", { phone });
-  await simulateDelay(1000);
-  const userExists = MOCK_USERS.some((u) => u.phone === phone);
-  if (userExists) {
-    // In a real app, an OTP like '123456' would be sent via SMS
-    console.log(`Демо-код для ${phone}: 123456`);
-    return { success: true };
+  const url = `${BASE_API_URL}/${HUB_ID}/auth/otp`;
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({ phone }),
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Не удалось отправить код: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    return (await response.json()) as { success: boolean };
+  } catch (error) {
+    console.error(
+      "Не удалось отправить OTP через API, возвращаю демо-ответ.",
+      error,
+    );
+    logMockRequest("POST", "/auth/otp", { phone });
+    await simulateDelay(1000);
+    const userExists = MOCK_USERS.some((u) => u.phone === phone);
+    if (userExists) {
+      // In a real app, an OTP like '123456' would be sent via SMS
+      console.log(`Демо-код для ${phone}: 123456`);
+      return { success: true };
+    }
+    return { success: false };
   }
-  return { success: false };
 };
 
 export const verifyOtp = async (
