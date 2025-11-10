@@ -444,7 +444,7 @@ export const sendOtp = async (phone: string): Promise<{ success: boolean }> => {
     );
     logMockRequest("POST", "/auth/otp", { phone: payloadPhone });
     await simulateDelay(1000);
-    const userExists = MOCK_USERS.some((u) => u.phone === phone);
+    const userExists = MOCK_USERS.some((u) => u.phone === payloadPhone);
     if (userExists) {
       // In a real app, an OTP like '123456' would be sent via SMS
       console.log(`Демо-код для ${phone}: 123456`);
@@ -458,13 +458,65 @@ export const verifyOtp = async (
   phone: string,
   otp: string,
 ): Promise<{ success: boolean; user?: User }> => {
-  logMockRequest("POST", "/auth/otp/verify", { phone, otp });
-  await simulateDelay(1000);
-  if (otp === "123456") {
-    const user = MOCK_USERS.find((u) => u.phone === phone);
-    if (user) {
-      return { success: true, user };
+  const payloadPhone = phone.startsWith("+") ? phone : `+${phone}`;
+  const url = `${BASE_API_URL}/${HUB_ID}/auth/otp/verify`;
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({ phone: payloadPhone, otp }),
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Не удалось подтвердить код: ${response.status} ${response.statusText}`,
+      );
     }
+
+    const data = (await response.json()) as {
+      success: boolean;
+      customer?: {
+        id: number;
+        hub_id: number;
+        name: string;
+        email: string | null;
+        phone: string;
+        price_level_id: number | null;
+      };
+    };
+
+    if (data.customer) {
+
+      const user: User = {
+        id: data.customer.id,
+        hub_id: data.customer.hub_id,
+        name: data.customer.name,
+        email: data.customer.email,
+        phone: data.customer.phone,
+        price_level_id: data.customer.price_level_id,
+      };
+
+      return { success: data.success, user };
+    }
+
+    return { success: data.success };
+  } catch (error) {
+    console.error(
+      "Не удалось подтвердить OTP через API, использую демо-модель.",
+      error,
+    );
+    logMockRequest("POST", "/auth/otp/verify", { phone: payloadPhone, otp });
+    await simulateDelay(1000);
+    if (otp === "123456") {
+      const user = MOCK_USERS.find((u) => u.phone === payloadPhone);
+      if (user) {
+        return { success: true, user };
+      }
+    }
+    return { success: false };
   }
-  return { success: false };
 };
