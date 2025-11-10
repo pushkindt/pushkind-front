@@ -1,0 +1,53 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+vi.mock("../constants", () => ({
+  API_URL: "https://example.com/",
+  HUB_ID: "hub",
+}));
+
+import { fetchCategories } from "./api";
+
+const mockFetch = vi.fn<Parameters<typeof fetch>, ReturnType<typeof fetch>>();
+
+const jsonResponse = () =>
+  new Response(JSON.stringify([]), {
+    status: 200,
+    headers: { "Content-Type": "application/json" },
+  });
+
+describe("fetchCategories", () => {
+  const baseUrl = "https://example.com/hub/categories";
+
+  beforeEach(() => {
+    mockFetch.mockResolvedValue(jsonResponse() as ReturnType<typeof fetch>);
+    globalThis.fetch = mockFetch as unknown as typeof fetch;
+  });
+
+  afterEach(() => {
+    mockFetch.mockReset();
+  });
+
+  it("omits the parentId query when no argument is provided", async () => {
+    await fetchCategories();
+
+    expect(mockFetch).toHaveBeenCalledWith(baseUrl, {
+      headers: { Accept: "application/json" },
+    });
+  });
+
+  it("keeps the URL clean when parentId is null", async () => {
+    await fetchCategories(null);
+
+    expect(mockFetch).toHaveBeenCalledWith(baseUrl, {
+      headers: { Accept: "application/json" },
+    });
+  });
+
+  it("adds the parentId query parameter when a finite number is provided", async () => {
+    await fetchCategories(42);
+
+    expect(mockFetch).toHaveBeenCalledWith(`${baseUrl}?parentId=42`, {
+      headers: { Accept: "application/json" },
+    });
+  });
+});

@@ -15,11 +15,8 @@ export const fetchCategories = async (
   parentId?: number | null,
 ): Promise<Category[]> => {
   const url = new URL(buildUrl("/categories"));
-  if (parentId !== undefined) {
-    url.searchParams.set(
-      "parentId",
-      parentId === null ? "null" : String(parentId),
-    );
+  if (typeof parentId === "number" && Number.isFinite(parentId)) {
+    url.searchParams.set("parentId", String(parentId));
   }
 
   try {
