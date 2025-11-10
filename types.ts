@@ -26,10 +26,12 @@ export interface Product {
 }
 
 export interface User {
-  id: string;
-  phone: string;
+  id: number;
+  hub_id: number;
   name: string;
-  priceLevel: "default" | "silver" | "gold";
+  email: string | null;
+  phone: string;
+  price_level_id: number | null;
 }
 
 export interface CartItem extends Product {

@@ -239,8 +239,22 @@ const MOCK_PRODUCTS: Product[] = [
 ];
 
 const MOCK_USERS: User[] = [
-  { id: "user-1", phone: "5551112222", name: "Алиса", priceLevel: "gold" },
-  { id: "user-2", phone: "5553334444", name: "Борис", priceLevel: "silver" },
+  {
+    id: 1,
+    hub_id: 1,
+    name: "Алиса",
+    email: null,
+    phone: "+75551112222",
+    price_level_id: 1,
+  },
+  {
+    id: 2,
+    hub_id: 1,
+    name: "Борис",
+    email: "boris@example.com",
+    phone: "+75553334444",
+    price_level_id: 2,
+  },
 ];
 
 // --- MOCK API LOGIC ---
@@ -329,7 +343,7 @@ export const fetchProducts = async (
     url.searchParams.set("tagId", String(filter.tagId));
   }
   if (user?.id) {
-    url.searchParams.set("userId", user.id);
+    url.searchParams.set("userId", String(user.id));
   }
 
   try {
@@ -371,7 +385,7 @@ export const fetchProductById = async (
 ): Promise<Product | undefined> => {
   const url = new URL(`${BASE_API_URL}/${HUB_ID}/products/${productId}`);
   if (user?.id) {
-    url.searchParams.set("userId", user.id);
+    url.searchParams.set("userId", String(user.id));
   }
 
   try {
