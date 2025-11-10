@@ -5,6 +5,7 @@ import Header from "./components/Header";
 import LoginModal from "./components/LoginModal";
 import Cart from "./components/Cart";
 import ProductCard from "./components/ProductCard";
+import ToastContainer from "./components/ToastContainer";
 import { SpinnerIcon, ArrowLeftIcon } from "./components/Icons";
 
 const App: React.FC = () => {
@@ -319,6 +320,7 @@ const App: React.FC = () => {
         onRemoveItem={handleRemoveFromCart}
         onLoginClick={() => setIsLoginModalOpen(true)}
       />
+      <ToastContainer />
     </div>
   );
 };

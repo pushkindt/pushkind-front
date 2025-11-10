@@ -31,7 +31,6 @@ export interface User {
   name: string;
   email: string | null;
   phone: string;
-  price_level_id: number | null;
 }
 
 export interface CartItem extends Product {
