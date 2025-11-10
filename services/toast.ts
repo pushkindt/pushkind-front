@@ -7,12 +7,30 @@ export interface ToastMessage {
   duration: number;
 }
 
+export interface ToastSubscription {
+  onShow: (toast: ToastMessage) => void;
+  onDismiss?: (toastId: string) => void;
+}
+
 const TOAST_DURATION_MS = 4000;
 
-const listeners = new Set<(toast: ToastMessage) => void>();
+const listeners = new Set<ToastSubscription>();
+const timers = new Map<string, ReturnType<typeof setTimeout>>();
 
 const createToastId = () =>
   `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+
+const notifyShow = (toast: ToastMessage) => {
+  listeners.forEach((listener) => {
+    listener.onShow(toast);
+  });
+};
+
+const notifyDismiss = (toastId: string) => {
+  listeners.forEach((listener) => {
+    listener.onDismiss?.(toastId);
+  });
+};
 
 export const showToast = (message: string, type: ToastType = "info") => {
   const toast: ToastMessage = {
@@ -21,12 +39,38 @@ export const showToast = (message: string, type: ToastType = "info") => {
     type,
     duration: TOAST_DURATION_MS,
   };
-  listeners.forEach((listener) => listener(toast));
+
+  notifyShow(toast);
+
+  const timeoutId = globalThis.setTimeout(() => {
+    timers.delete(toast.id);
+    notifyDismiss(toast.id);
+  }, toast.duration);
+
+  timers.set(toast.id, timeoutId);
+
+  return toast.id;
+};
+
+export const dismissToast = (toastId: string) => {
+  const timeoutId = timers.get(toastId);
+  if (timeoutId) {
+    globalThis.clearTimeout(timeoutId);
+    timers.delete(toastId);
+  }
+
+  notifyDismiss(toastId);
 };
 
 export const registerToastListener = (
-  listener: (toast: ToastMessage) => void,
+  listener: ToastSubscription | ToastSubscription["onShow"],
 ) => {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
+  const subscription: ToastSubscription =
+    typeof listener === "function" ? { onShow: listener } : listener;
+
+  listeners.add(subscription);
+
+  return () => {
+    listeners.delete(subscription);
+  };
 };

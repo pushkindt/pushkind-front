@@ -1,5 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
-import { registerToastListener, ToastMessage } from "../services/toast";
+import React, { useEffect, useState } from "react";
+import {
+  dismissToast,
+  registerToastListener,
+  ToastMessage,
+} from "../services/toast";
 
 const typeStyles: Record<ToastMessage["type"], string> = {
   info: "border-slate-200 bg-white text-slate-900",
@@ -8,32 +12,22 @@ const typeStyles: Record<ToastMessage["type"], string> = {
 
 const ToastContainer: React.FC = () => {
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
-  const timerMap = useRef(new Map<string, ReturnType<typeof setTimeout>>());
 
   useEffect(() => {
-    const unregister = registerToastListener((toast) => {
-      setToasts((prev) => [...prev, toast]);
-      const timeoutId = window.setTimeout(() => {
-        setToasts((current) => current.filter((item) => item.id !== toast.id));
-        timerMap.current.delete(toast.id);
-      }, toast.duration);
-      timerMap.current.set(toast.id, timeoutId);
+    const unregister = registerToastListener({
+      onShow: (toast) => {
+        setToasts((prev) => [...prev, toast]);
+      },
+      onDismiss: (toastId) => {
+        setToasts((current) => current.filter((item) => item.id !== toastId));
+      },
     });
 
-    return () => {
-      unregister();
-      timerMap.current.forEach((timeout) => window.clearTimeout(timeout));
-      timerMap.current.clear();
-    };
+    return unregister;
   }, []);
 
   const handleRemove = (id: string) => {
-    setToasts((current) => current.filter((toast) => toast.id !== id));
-    const timeout = timerMap.current.get(id);
-    if (timeout) {
-      window.clearTimeout(timeout);
-      timerMap.current.delete(id);
-    }
+    dismissToast(id);
   };
 
   if (!toasts.length) {
