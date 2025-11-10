@@ -30,7 +30,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
     if (success) {
       setStep("otp");
     } else {
-      setError("Не удалось найти учетную запись с этим номером.");
+      setError("Не удалось отправить SMS на этот номер. Попробуйте позже.");
     }
   };
 
