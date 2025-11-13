@@ -37,6 +37,8 @@ export interface CartItem extends Product {
   quantity: number;
 }
 
+export type ProductLayout = "grid" | "list";
+
 export type View =
   | { type: "home" }
   | { type: "category"; categoryId: number; categoryName: string }

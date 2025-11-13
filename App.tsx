@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
-import type { User, Product, Category, Tag, CartItem, View } from "./types";
+import type {
+  User,
+  Product,
+  Category,
+  Tag,
+  CartItem,
+  View,
+  ProductLayout,
+} from "./types";
 import * as api from "./services/api";
 import Header from "./components/Header";
 import LoginModal from "./components/LoginModal";
@@ -19,6 +27,8 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [productLayout, setProductLayout] =
+    useState<ProductLayout>("grid");
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -120,9 +130,9 @@ const App: React.FC = () => {
       const formattedPrice =
         selectedProduct.priceCents !== null
           ? new Intl.NumberFormat("ru-RU", {
-              style: "currency",
-              currency: selectedProduct.currency,
-            }).format(selectedProduct.priceCents / 100)
+            style: "currency",
+            currency: selectedProduct.currency,
+          }).format(selectedProduct.priceCents / 100)
           : "Цена недоступна";
 
       return (
@@ -161,15 +171,17 @@ const App: React.FC = () => {
                 </p>
               </div>
               <div className="mt-6">
-                <div className="flex items-baseline mb-4">
+                <div className="flex items-baseline mb-4 space-x-2">
                   <span className="text-3xl font-bold text-gray-900">
                     {formattedPrice}
-                    {selectedProduct.priceCents !== null &&
-                    selectedProduct.units &&
-                    selectedProduct.amount !== null
-                      ? ` / ${selectedProduct.amount} ${selectedProduct.units}`
-                      : ""}
                   </span>
+                  {selectedProduct.priceCents !== null &&
+                    selectedProduct.units &&
+                    selectedProduct.amount !== null && (
+                      <span className="text-sm text-gray-600">
+                        за {selectedProduct.amount} {selectedProduct.units}
+                      </span>
+                    )}
                 </div>
                 <button
                   onClick={() => handleAddToCart(selectedProduct)}
@@ -188,69 +200,76 @@ const App: React.FC = () => {
       <>
         {(view.type === "home" ||
           (view.type === "category" && categories.length > 0)) && (
-          <div className="mb-12">
-            {view.type === "home" && (
-              <h2 className="text-3xl font-bold text-gray-800 mb-6">
-                Категории
-              </h2>
-            )}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {categories.map((category) => (
-                <div
-                  key={category.id}
-                  onClick={() =>
-                    setView({
-                      type: "category",
-                      categoryId: category.id,
-                      categoryName: category.name,
-                    })
-                  }
-                  className="relative rounded-lg overflow-hidden shadow-lg cursor-pointer group transform hover:scale-105 transition-transform duration-300"
-                >
-                  <img
-                    src={category.imageUrl ?? "/placeholder.png"}
-                    alt={category.name}
-                    className="w-full h-40 object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
-                    <h3 className="text-white text-2xl font-bold">
-                      {category.name}
-                    </h3>
+            <div className="mb-12">
+              {view.type === "home" && (
+                <h2 className="text-3xl font-bold text-gray-800 mb-6">
+                  Категории
+                </h2>
+              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {categories.map((category) => (
+                  <div
+                    key={category.id}
+                    onClick={() =>
+                      setView({
+                        type: "category",
+                        categoryId: category.id,
+                        categoryName: category.name,
+                      })
+                    }
+                    className="relative rounded-lg overflow-hidden shadow-lg cursor-pointer group transform hover:scale-105 transition-transform duration-300"
+                  >
+                    <img
+                      src={category.imageUrl ?? "/placeholder.png"}
+                      alt={category.name}
+                      className="w-full h-40 object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
+                      <h3 className="text-white text-2xl font-bold">
+                        {category.name}
+                      </h3>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {view.type === "home" && (
+                <div className="mt-8">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-4">
+                    Фильтр по тегам
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {tags.map((tag) => (
+                      <button
+                        key={tag.id}
+                        onClick={() =>
+                          setView({
+                            type: "tag",
+                            tagId: tag.id,
+                            tagName: tag.name,
+                          })
+                        }
+                        className="bg-gray-200 text-gray-700 px-4 py-2 rounded-full hover:bg-indigo-500 hover:text-white transition-colors duration-200"
+                      >
+                        {tag.name}
+                      </button>
+                    ))}
                   </div>
                 </div>
-              ))}
+              )}
             </div>
-            {view.type === "home" && (
-              <div className="mt-8">
-                <h3 className="text-2xl font-bold text-gray-800 mb-4">
-                  Фильтр по тегам
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {tags.map((tag) => (
-                    <button
-                      key={tag.id}
-                      onClick={() =>
-                        setView({
-                          type: "tag",
-                          tagId: tag.id,
-                          tagName: tag.name,
-                        })
-                      }
-                      className="bg-gray-200 text-gray-700 px-4 py-2 rounded-full hover:bg-indigo-500 hover:text-white transition-colors duration-200"
-                    >
-                      {tag.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          )}
+        <div
+          className={
+            productLayout === "grid"
+              ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+              : "flex flex-col gap-6"
+          }
+        >
           {products.map((product) => (
             <ProductCard
               key={product.id}
               product={product}
+              layout={productLayout}
               onProductClick={(id) =>
                 setView({ type: "product", productId: id })
               }
@@ -288,7 +307,7 @@ const App: React.FC = () => {
       />
 
       <main className="container mx-auto p-4 sm:p-6 lg:p-8">
-        <div className="flex items-center mb-6">
+        <div className="flex flex-wrap items-center gap-4 mb-6">
           {view.type !== "home" && (
             <button
               onClick={() => setView({ type: "home" })}
@@ -298,9 +317,25 @@ const App: React.FC = () => {
               Назад
             </button>
           )}
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-            {getTitle()}
-          </h1>
+          <div className="flex items-center gap-4 flex-wrap">
+            <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+              {getTitle()}
+            </h1>
+            <div className="flex items-center gap-2 bg-white rounded-full shadow px-2 py-1">
+              {(["grid", "list"] as ProductLayout[]).map((layoutOption) => (
+                <button
+                  key={layoutOption}
+                  onClick={() => setProductLayout(layoutOption)}
+                  className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors duration-200 ${productLayout === layoutOption
+                      ? "bg-indigo-600 text-white"
+                      : "text-gray-600 hover:text-gray-900"
+                    }`}
+                >
+                  {layoutOption === "grid" ? "Сетка" : "Список"}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {renderContent()}
