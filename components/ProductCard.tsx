@@ -27,10 +27,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
     product.tags.some((tag) => tag.id === tagId);
 
   const isList = layout === "list";
+  const descriptionVisible = !isList && Boolean(product.description);
 
   return (
     <div
-      className={`bg-white rounded-lg shadow-md overflow-hidden transform hover:-translate-y-1 transition-all duration-300 group ${isList ? "sm:flex" : ""}`}
+      className={`bg-white rounded-lg shadow-md overflow-hidden transform hover:-translate-y-1 transition-all duration-300 group ${isList ? "sm:flex sm:items-center" : ""}`}
     >
       <div className={`relative ${isList ? "sm:w-1/3" : ""}`}>
         <div
@@ -38,7 +39,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           className="cursor-pointer h-full"
         >
           <img
-            className={`w-full object-cover ${isList ? "h-48 sm:h-full" : "h-48"}`}
+            className={`w-full object-cover ${isList ? "h-32 sm:h-32 md:h-40" : "h-48"}`}
             src={primaryImage}
             alt={product.name}
           />
@@ -57,7 +58,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
       </div>
       <div
-        className={`p-4 flex flex-col flex-grow ${isList ? "sm:w-2/3" : ""}`}
+        className={`flex flex-col flex-grow ${isList ? "sm:w-2/3 p-3 gap-1" : "p-4"}`}
       >
         <h3
           onClick={() => onProductClick(product.id)}
@@ -70,12 +71,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
             Артикул: {product.sku}
           </p>
         )}
-        {product.description && (
+        {descriptionVisible && (
           <p className="text-sm text-gray-500 mt-1 flex-grow">
             {product.description.substring(0, 50)}...
           </p>
         )}
-        <div className="mt-4 flex items-center justify-between space-x-2">
+        <div
+          className={`flex items-center justify-between space-x-2 ${isList ? "mt-2" : "mt-4"}`}
+        >
           <span className="text-xl font-bold text-gray-900">{formattedPrice}</span>
           {product.priceCents !== null &&
             product.units &&
@@ -87,7 +90,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
         <button
           onClick={() => onAddToCart(product)}
-          className="mt-4 w-full bg-indigo-600 text-white py-2 px-4 rounded-md font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
+          className={`w-full bg-indigo-600 text-white rounded-md font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 ${
+            isList ? "py-2 text-sm" : "py-2 px-4"
+          }`}
         >
           Добавить в корзину
         </button>
