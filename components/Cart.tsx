@@ -78,7 +78,7 @@ const Cart: React.FC<CartProps> = ({
                     <img
                       src={
                         item.imageUrls[0] ??
-                        "https://picsum.photos/seed/product-placeholder/200/200"
+                        "/placeholder.png"
                       }
                       alt={item.name}
                       className="w-20 h-20 object-cover rounded-md"
@@ -90,9 +90,9 @@ const Cart: React.FC<CartProps> = ({
                           <p className="ml-4">
                             {item.priceCents !== null
                               ? formatCurrency(
-                                  item.priceCents * item.quantity,
-                                  item.currency,
-                                )
+                                item.priceCents * item.quantity,
+                                item.currency,
+                              )
                               : "Нет данных"}
                           </p>
                         </div>
