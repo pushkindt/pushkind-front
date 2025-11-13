@@ -1,4 +1,9 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+} from "react";
 import type {
   User,
   Product,
@@ -29,6 +34,9 @@ const App: React.FC = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [productLayout, setProductLayout] =
     useState<ProductLayout>("grid");
+  const [isAddFeedbackActive, setIsAddFeedbackActive] = useState(false);
+  const addToCartFeedbackTimeoutRef =
+    useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -73,6 +81,14 @@ const App: React.FC = () => {
     fetchData();
   }, [fetchData]);
 
+  useEffect(() => {
+    return () => {
+      if (addToCartFeedbackTimeoutRef.current) {
+        clearTimeout(addToCartFeedbackTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleLoginSuccess = (loggedInUser: User) => {
     setUser(loggedInUser);
     setIsLoginModalOpen(false);
@@ -90,6 +106,18 @@ const App: React.FC = () => {
       }
       return [...prevCart, { ...product, quantity: 1 }];
     });
+  };
+
+  const handleAddToCartWithFeedback = (product: Product) => {
+    handleAddToCart(product);
+    setIsAddFeedbackActive(true);
+    if (addToCartFeedbackTimeoutRef.current) {
+      clearTimeout(addToCartFeedbackTimeoutRef.current);
+    }
+    addToCartFeedbackTimeoutRef.current = setTimeout(() => {
+      setIsAddFeedbackActive(false);
+      addToCartFeedbackTimeoutRef.current = null;
+    }, 1000);
   };
 
   const handleUpdateCartQuantity = (productId: number, quantity: number) => {
@@ -184,8 +212,11 @@ const App: React.FC = () => {
                     )}
                 </div>
                 <button
-                  onClick={() => handleAddToCart(selectedProduct)}
-                  className="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-indigo-700 text-lg"
+                  onClick={() => handleAddToCartWithFeedback(selectedProduct)}
+                  className={`w-full text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors duration-300 ${isAddFeedbackActive
+                    ? "bg-green-500 hover:bg-green-600"
+                    : "bg-indigo-600 hover:bg-indigo-700"
+                  }`}
                 >
                   Добавить в корзину
                 </button>

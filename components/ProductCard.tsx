@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import type { Product, ProductLayout } from "../types";
 
 interface ProductCardProps {
@@ -25,6 +25,29 @@ const ProductCard: React.FC<ProductCardProps> = ({
       : "Цена недоступна";
   const hasTag = (tagId: number) =>
     product.tags.some((tag) => tag.id === tagId);
+  const [isButtonFeedbackActive, setButtonFeedbackActive] = useState(false);
+  const buttonFeedbackTimeoutRef =
+    useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleAddClick = () => {
+    onAddToCart(product);
+    setButtonFeedbackActive(true);
+    if (buttonFeedbackTimeoutRef.current) {
+      clearTimeout(buttonFeedbackTimeoutRef.current);
+    }
+    buttonFeedbackTimeoutRef.current = setTimeout(() => {
+      setButtonFeedbackActive(false);
+      buttonFeedbackTimeoutRef.current = null;
+    }, 1000);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (buttonFeedbackTimeoutRef.current) {
+        clearTimeout(buttonFeedbackTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const isList = layout === "list";
   const descriptionVisible = !isList && Boolean(product.description);
@@ -89,10 +112,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
             )}
         </div>
         <button
-          onClick={() => onAddToCart(product)}
-          className={`w-full bg-indigo-600 text-white rounded-md font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 ${
-            isList ? "py-2 text-sm" : "py-2 px-4"
-          }`}
+          onClick={handleAddClick}
+          className={`w-full text-white rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-300 ${isButtonFeedbackActive
+              ? "bg-green-500 hover:bg-green-600 focus:ring-green-500"
+              : "bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
+            } ${isList ? "py-2 text-sm" : "py-2 px-4"}`}
         >
           Добавить в корзину
         </button>
