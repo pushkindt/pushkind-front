@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
-import type { User, Product, Category, Tag, CartItem, View } from "./types";
+import type {
+  User,
+  Product,
+  Category,
+  Tag,
+  CartItem,
+  View,
+  ProductLayout,
+} from "./types";
 import * as api from "./services/api";
 import Header from "./components/Header";
 import LoginModal from "./components/LoginModal";
@@ -19,6 +27,8 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [productLayout, setProductLayout] =
+    useState<ProductLayout>("grid");
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -246,11 +256,18 @@ const App: React.FC = () => {
             )}
           </div>
         )}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div
+          className={
+            productLayout === "grid"
+              ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+              : "flex flex-col gap-6"
+          }
+        >
           {products.map((product) => (
             <ProductCard
               key={product.id}
               product={product}
+              layout={productLayout}
               onProductClick={(id) =>
                 setView({ type: "product", productId: id })
               }
@@ -288,7 +305,7 @@ const App: React.FC = () => {
       />
 
       <main className="container mx-auto p-4 sm:p-6 lg:p-8">
-        <div className="flex items-center mb-6">
+        <div className="flex flex-wrap items-center gap-4 mb-6">
           {view.type !== "home" && (
             <button
               onClick={() => setView({ type: "home" })}
@@ -298,9 +315,26 @@ const App: React.FC = () => {
               Назад
             </button>
           )}
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-            {getTitle()}
-          </h1>
+          <div className="flex items-center gap-4 flex-wrap">
+            <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+              {getTitle()}
+            </h1>
+            <div className="flex items-center gap-2 bg-white rounded-full shadow px-2 py-1">
+              {(["grid", "list"] as ProductLayout[]).map((layoutOption) => (
+                <button
+                  key={layoutOption}
+                  onClick={() => setProductLayout(layoutOption)}
+                  className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors duration-200 ${
+                    productLayout === layoutOption
+                      ? "bg-indigo-600 text-white"
+                      : "text-gray-600 hover:text-gray-900"
+                  }`}
+                >
+                  {layoutOption === "grid" ? "Сетка" : "Список"}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {renderContent()}

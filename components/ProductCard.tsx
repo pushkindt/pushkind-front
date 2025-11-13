@@ -1,14 +1,16 @@
 import React from "react";
-import type { Product } from "../types";
+import type { Product, ProductLayout } from "../types";
 
 interface ProductCardProps {
   product: Product;
+  layout: ProductLayout;
   onProductClick: (productId: number) => void;
   onAddToCart: (product: Product) => void;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
   product,
+  layout,
   onProductClick,
   onAddToCart,
 }) => {
@@ -24,15 +26,19 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const hasTag = (tagId: number) =>
     product.tags.some((tag) => tag.id === tagId);
 
+  const isList = layout === "list";
+
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden transform hover:-translate-y-1 transition-all duration-300 group">
-      <div className="relative">
+    <div
+      className={`bg-white rounded-lg shadow-md overflow-hidden transform hover:-translate-y-1 transition-all duration-300 group ${isList ? "sm:flex" : ""}`}
+    >
+      <div className={`relative ${isList ? "sm:w-1/3" : ""}`}>
         <div
           onClick={() => onProductClick(product.id)}
-          className="cursor-pointer"
+          className="cursor-pointer h-full"
         >
           <img
-            className="w-full h-48 object-cover"
+            className={`w-full object-cover ${isList ? "h-48 sm:h-full" : "h-48"}`}
             src={primaryImage}
             alt={product.name}
           />
@@ -50,7 +56,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
           )}
         </div>
       </div>
-      <div className="p-4 flex flex-col flex-grow">
+      <div
+        className={`p-4 flex flex-col flex-grow ${isList ? "sm:w-2/3" : ""}`}
+      >
         <h3
           onClick={() => onProductClick(product.id)}
           className="text-lg font-semibold text-gray-800 truncate cursor-pointer hover:text-indigo-600"
