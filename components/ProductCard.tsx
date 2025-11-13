@@ -15,7 +15,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   onAddToCart,
 }) => {
   const primaryImage =
-    product.imageUrls.length > 0 ? product.imageUrls[0] : "placeholder.png";
+    product.imageUrls.length > 0 ? product.imageUrls[0] : "/placeholder.png";
   const formattedPrice =
     product.priceCents !== null
       ? new Intl.NumberFormat("ru-RU", {
@@ -114,8 +114,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <button
           onClick={handleAddClick}
           className={`w-full text-white rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-300 ${isButtonFeedbackActive
-              ? "bg-green-500 hover:bg-green-600 focus:ring-green-500"
-              : "bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
+            ? "bg-green-500 hover:bg-green-600 focus:ring-green-500"
+            : "bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
             } ${isList ? "py-2 text-sm" : "py-2 px-4"}`}
         >
           Добавить в корзину
