@@ -41,4 +41,34 @@ describe("ProductCard", () => {
         const img = screen.getByAltText("Test Product") as HTMLImageElement;
         expect(img.src).toContain("placeholder.png");
     });
+
+    it("renders list layout with metadata and placeholder image", () => {
+        const listProduct = {
+            ...mockProduct,
+            description: "Detailed list description",
+            imageUrls: [],
+        };
+
+        const { container } = render(
+            <ProductCard
+                product={listProduct}
+                layout="list"
+                onProductClick={vi.fn()}
+                onAddToCart={vi.fn()}
+            />,
+        );
+
+        const wrapper = container.firstChild as HTMLElement;
+        expect(wrapper.className).toContain("sm:flex");
+
+        expect(screen.getByText(/Артикул: SKU123/i)).toBeTruthy();
+        expect(screen.getByText(/за 1 kg/i)).toBeTruthy();
+
+        const img = screen.getByAltText("Test Product") as HTMLImageElement;
+        expect(img.src).toContain("placeholder.png");
+
+        expect(
+            screen.queryByText(/Detailed list description/),
+        ).toBeNull();
+    });
 });
