@@ -19,9 +19,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const formattedPrice =
     product.priceCents !== null
       ? new Intl.NumberFormat("ru-RU", {
-          style: "currency",
-          currency: product.currency,
-        }).format(product.priceCents / 100)
+        style: "currency",
+        currency: product.currency,
+      }).format(product.priceCents / 100)
       : "Цена недоступна";
   const hasTag = (tagId: number) =>
     product.tags.some((tag) => tag.id === tagId);
@@ -75,17 +75,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
             {product.description.substring(0, 50)}...
           </p>
         )}
-        <div className="mt-4 flex items-baseline justify-between">
-          <div>
-            <span className="text-xl font-bold text-gray-900">
-              {formattedPrice}
-              {product.priceCents !== null &&
-              product.units &&
-              product.amount !== null
-                ? ` / ${product.amount} ${product.units}`
-                : ""}
-            </span>
-          </div>
+        <div className="mt-4 flex items-center justify-between space-x-2">
+          <span className="text-xl font-bold text-gray-900">{formattedPrice}</span>
+          {product.priceCents !== null &&
+            product.units &&
+            product.amount !== null && (
+              <span className="text-sm text-gray-600">
+                за {product.amount} {product.units}
+              </span>
+            )}
         </div>
         <button
           onClick={() => onAddToCart(product)}
