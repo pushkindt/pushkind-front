@@ -3,14 +3,14 @@ import type { Product, ProductLayout } from "../types";
 
 interface ProductCardProps {
   product: Product;
-  layout: ProductLayout;
+  layout?: ProductLayout;
   onProductClick: (productId: number) => void;
   onAddToCart: (product: Product) => void;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
   product,
-  layout,
+  layout = "grid",
   onProductClick,
   onAddToCart,
 }) => {
