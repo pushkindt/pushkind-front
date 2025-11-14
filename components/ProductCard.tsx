@@ -15,11 +15,25 @@ const ProductCard: React.FC<ProductCardProps> = ({
   onAddToCart,
 }) => {
   const appendResizedSuffix = (url: string) => {
-    const lastDotIndex = url.lastIndexOf(".");
-    if (lastDotIndex === -1) {
-      return `${url}_resized`;
+    const queryStart = url.search(/[?#]/);
+    const baseUrl = queryStart === -1 ? url : url.slice(0, queryStart);
+    const suffix = queryStart === -1 ? "" : url.slice(queryStart);
+    const lastSlashIndex = baseUrl.lastIndexOf("/");
+    const fileName =
+      lastSlashIndex === -1 ? baseUrl : baseUrl.slice(lastSlashIndex + 1);
+    if (!fileName) {
+      return url;
     }
-    return `${url.slice(0, lastDotIndex)}_resized${url.slice(lastDotIndex)}`;
+    const lastDotInFileName = fileName.lastIndexOf(".");
+    if (lastDotInFileName <= 0) {
+      return url;
+    }
+
+    const dotIndex = lastSlashIndex === -1
+      ? lastDotInFileName
+      : lastSlashIndex + 1 + lastDotInFileName;
+
+    return `${baseUrl.slice(0, dotIndex)}_resized${baseUrl.slice(dotIndex)}${suffix}`;
   };
 
   const primaryImage =
