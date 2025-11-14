@@ -1,5 +1,6 @@
 import React from "react";
 import type { CartItem, User } from "../types";
+import { formatPrice, getPrimaryImage } from "../utils/formatPrice";
 import { PlusIcon, MinusIcon, TrashIcon, XIcon } from "./Icons";
 
 interface CartProps {
@@ -27,11 +28,12 @@ const Cart: React.FC<CartProps> = ({
   }, 0);
   const subtotalCurrency = cartItems[0]?.currency ?? "USD";
   const hasPricedItems = cartItems.some((item) => item.priceCents !== null);
-  const formatCurrency = (valueInCents: number, currency: string) =>
-    new Intl.NumberFormat("ru-RU", {
-      style: "currency",
-      currency,
-    }).format(valueInCents / 100);
+  const priceFallback = { fallback: "Нет данных" } as const;
+  const subtotalDisplay = formatPrice(
+    hasPricedItems ? subtotalCents : null,
+    subtotalCurrency,
+    priceFallback,
+  );
 
   const handleCheckout = () => {
     alert("Начат процесс оформления заказа! (демо)");
@@ -76,10 +78,7 @@ const Cart: React.FC<CartProps> = ({
                 {cartItems.map((item) => (
                   <li key={item.id} className="flex py-4">
                     <img
-                      src={
-                        item.imageUrls[0] ??
-                        "/placeholder.png"
-                      }
+                      src={getPrimaryImage(item.imageUrls)}
                       alt={item.name}
                       className="w-20 h-20 object-cover rounded-md"
                     />
@@ -88,12 +87,13 @@ const Cart: React.FC<CartProps> = ({
                         <div className="flex justify-between text-base font-medium text-gray-900">
                           <h3>{item.name}</h3>
                           <p className="ml-4">
-                            {item.priceCents !== null
-                              ? formatCurrency(
-                                item.priceCents * item.quantity,
-                                item.currency,
-                              )
-                              : "Нет данных"}
+                            {formatPrice(
+                              item.priceCents !== null
+                                ? item.priceCents * item.quantity
+                                : null,
+                              item.currency,
+                              priceFallback,
+                            )}
                           </p>
                         </div>
                         {item.sku && (
@@ -147,11 +147,7 @@ const Cart: React.FC<CartProps> = ({
             <div className="border-t border-gray-200 p-4">
               <div className="flex justify-between text-lg font-medium text-gray-900">
                 <p>Итого</p>
-                <p>
-                  {hasPricedItems
-                    ? formatCurrency(subtotalCents, subtotalCurrency)
-                    : "Нет данных"}
-                </p>
+                <p>{subtotalDisplay}</p>
               </div>
               <p className="mt-0.5 text-sm text-gray-500">
                 Стоимость доставки и налоги рассчитываются при оформлении
