@@ -14,8 +14,18 @@ const ProductCard: React.FC<ProductCardProps> = ({
   onProductClick,
   onAddToCart,
 }) => {
+  const appendResizedSuffix = (url: string) => {
+    const lastDotIndex = url.lastIndexOf(".");
+    if (lastDotIndex === -1) {
+      return `${url}_resized`;
+    }
+    return `${url.slice(0, lastDotIndex)}_resized${url.slice(lastDotIndex)}`;
+  };
+
   const primaryImage =
-    product.imageUrls.length > 0 ? product.imageUrls[0] : "/placeholder.png";
+    product.imageUrls.length > 0
+      ? appendResizedSuffix(product.imageUrls[0])
+      : "/placeholder.png";
   const formattedPrice =
     product.priceCents !== null
       ? new Intl.NumberFormat("ru-RU", {
