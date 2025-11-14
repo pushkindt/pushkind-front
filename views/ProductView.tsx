@@ -1,5 +1,11 @@
 import React from "react";
 import type { Category, Product } from "../types";
+import {
+  appendResizedSuffix,
+  formatPrice,
+  formatUnitPrice,
+  PLACEHOLDER_IMAGE,
+} from "../utils/formatPrice";
 
 interface ProductViewProps {
   product: Product | null;
@@ -22,15 +28,18 @@ const ProductView: React.FC<ProductViewProps> = ({
     return <p className="text-center text-gray-500">Товар не найден.</p>;
   }
 
-  const imageUrls = product.imageUrls.length > 0
-    ? product.imageUrls
-    : ["placeholder.png"];
-  const formattedPrice = product.priceCents !== null
-    ? new Intl.NumberFormat("ru-RU", {
-        style: "currency",
-        currency: product.currency,
-      }).format(product.priceCents / 100)
-    : "Цена недоступна";
+  const baseImageUrls =
+    product.imageUrls.length > 0
+      ? product.imageUrls
+      : [PLACEHOLDER_IMAGE];
+  const imageUrls = baseImageUrls.map((url) =>
+    url === PLACEHOLDER_IMAGE ? url : appendResizedSuffix(url),
+  );
+  const formattedPrice = formatPrice(product.priceCents, product.currency);
+  const unitPriceLabel =
+    product.priceCents !== null
+      ? formatUnitPrice(product.amount, product.units)
+      : null;
 
   const boundedImageIndex = Math.min(activeImageIndex, imageUrls.length - 1);
   const activeImage = imageUrls[boundedImageIndex];
@@ -118,10 +127,8 @@ const ProductView: React.FC<ProductViewProps> = ({
           <div className="mt-6">
             <div className="flex items-baseline mb-4 space-x-2">
               <span className="text-3xl font-bold text-gray-900">{formattedPrice}</span>
-              {product.priceCents !== null && product.units && product.amount !== null && (
-                <span className="text-sm text-gray-600">
-                  за {product.amount} {product.units}
-                </span>
+              {unitPriceLabel && (
+                <span className="text-sm text-gray-600">{unitPriceLabel}</span>
               )}
             </div>
             <button

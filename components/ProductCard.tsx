@@ -1,6 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Product, ProductLayout } from "../types";
+import {
+  formatPrice,
+  formatUnitPrice,
+  getPrimaryImage,
+} from "../utils/formatPrice";
 
 interface ProductCardProps {
   product: Product;
@@ -14,39 +19,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
   onAddToCart,
 }) => {
   const navigate = useNavigate();
-  const appendResizedSuffix = (url: string) => {
-    const queryStart = url.search(/[?#]/);
-    const baseUrl = queryStart === -1 ? url : url.slice(0, queryStart);
-    const suffix = queryStart === -1 ? "" : url.slice(queryStart);
-    const lastSlashIndex = baseUrl.lastIndexOf("/");
-    const fileName =
-      lastSlashIndex === -1 ? baseUrl : baseUrl.slice(lastSlashIndex + 1);
-    if (!fileName) {
-      return url;
-    }
-    const lastDotInFileName = fileName.lastIndexOf(".");
-    if (lastDotInFileName <= 0) {
-      return url;
-    }
-
-    const dotIndex = lastSlashIndex === -1
-      ? lastDotInFileName
-      : lastSlashIndex + 1 + lastDotInFileName;
-
-    return `${baseUrl.slice(0, dotIndex)}_resized${baseUrl.slice(dotIndex)}${suffix}`;
-  };
-
-  const primaryImage =
-    product.imageUrls.length > 0
-      ? appendResizedSuffix(product.imageUrls[0])
-      : "/placeholder.png";
-  const formattedPrice =
+  const primaryImage = getPrimaryImage(product.imageUrls);
+  const formattedPrice = formatPrice(product.priceCents, product.currency);
+  const unitPriceLabel =
     product.priceCents !== null
-      ? new Intl.NumberFormat("ru-RU", {
-        style: "currency",
-        currency: product.currency,
-      }).format(product.priceCents / 100)
-      : "Цена недоступна";
+      ? formatUnitPrice(product.amount, product.units)
+      : null;
   const hasTag = (tagId: number) =>
     product.tags.some((tag) => tag.id === tagId);
   const [isButtonFeedbackActive, setButtonFeedbackActive] = useState(false);
@@ -127,13 +105,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
           className={`flex items-center justify-between space-x-2 ${isList ? "mt-2" : "mt-4"}`}
         >
           <span className="text-xl font-bold text-gray-900">{formattedPrice}</span>
-          {product.priceCents !== null &&
-            product.units &&
-            product.amount !== null && (
-              <span className="text-sm text-gray-600">
-                за {product.amount} {product.units}
-              </span>
-            )}
+          {unitPriceLabel && (
+            <span className="text-sm text-gray-600">{unitPriceLabel}</span>
+          )}
         </div>
         <button
           onClick={handleAddClick}
