@@ -204,12 +204,7 @@ const App: React.FC = () => {
     }
 
     if (view.type === "tag") {
-      return (
-        <TagView
-          products={products}
-          productLayout={productLayout}
-        />
-      );
+      return <TagView products={products} productLayout={productLayout} />;
     }
 
     return (

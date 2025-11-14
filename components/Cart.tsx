@@ -21,12 +21,7 @@ interface CartProps {
  * Slide-over cart drawer that summarizes the shopper's selections and
  * dispatches login or checkout intents based on authentication state.
  */
-const Cart: React.FC<CartProps> = ({
-  isOpen,
-  onClose,
-  user,
-  onLoginClick,
-}) => {
+const Cart: React.FC<CartProps> = ({ isOpen, onClose, user, onLoginClick }) => {
   const {
     items,
     updateQuantity,

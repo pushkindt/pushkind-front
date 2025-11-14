@@ -2,11 +2,7 @@
  * @file useViewNavigation.ts derives navigation helpers from the router.
  */
 import { useMemo } from "react";
-import {
-  matchPath,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+import { matchPath, useLocation, useNavigate } from "react-router-dom";
 import type { View } from "../types";
 
 /** Safely parses an ID from a route parameter string. */
