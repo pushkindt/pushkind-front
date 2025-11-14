@@ -5,7 +5,7 @@ import type { Category, Product, User } from "../types";
 const useProductDetail = (productId: number | null, user: User | null) => {
   const [product, setProduct] = useState<Product | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(productId !== null);
 
   const fetchProductDetail = useCallback(async () => {
     if (!productId) {
