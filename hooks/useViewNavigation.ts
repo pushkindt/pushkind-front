@@ -16,11 +16,13 @@ const useViewNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const categoryMatch = matchPath("/categories/:categoryId", location.pathname);
-  const tagMatch = matchPath("/tags/:tagId", location.pathname);
-  const productMatch = matchPath("/products/:productId", location.pathname);
-
   const view = useMemo<View>(() => {
+    const categoryMatch = matchPath(
+      "/categories/:categoryId",
+      location.pathname,
+    );
+    const tagMatch = matchPath("/tags/:tagId", location.pathname);
+    const productMatch = matchPath("/products/:productId", location.pathname);
     const state = (location.state ?? {}) as Record<string, unknown>;
 
     if (productMatch?.params.productId) {
@@ -54,7 +56,7 @@ const useViewNavigation = () => {
     }
 
     return { type: "home" };
-  }, [categoryMatch, location.state, productMatch, tagMatch]);
+  }, [location.pathname, location.state]);
 
   const goHome = () => navigate("/");
   const goToCategory = (categoryId: number, categoryName?: string) =>
