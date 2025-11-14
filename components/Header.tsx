@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import type { User } from "../types";
 import { ShoppingCartIcon, UserIcon } from "./Icons";
 
@@ -7,7 +8,6 @@ interface HeaderProps {
   cartItemCount: number;
   onLoginClick: () => void;
   onCartClick: () => void;
-  onHomeClick: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -15,15 +15,15 @@ const Header: React.FC<HeaderProps> = ({
   cartItemCount,
   onLoginClick,
   onCartClick,
-  onHomeClick,
 }) => {
+  const navigate = useNavigate();
   return (
     <header className="bg-white shadow-md sticky top-0 z-40">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <button
-              onClick={onHomeClick}
+              onClick={() => navigate("/")}
               className="text-2xl font-bold text-gray-800 hover:text-indigo-600 transition-colors"
             >
               Витрина

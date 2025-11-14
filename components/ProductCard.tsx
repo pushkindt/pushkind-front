@@ -1,19 +1,19 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import type { Product, ProductLayout } from "../types";
 
 interface ProductCardProps {
   product: Product;
   layout?: ProductLayout;
-  onProductClick: (productId: number) => void;
   onAddToCart: (product: Product) => void;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
   product,
   layout = "grid",
-  onProductClick,
   onAddToCart,
 }) => {
+  const navigate = useNavigate();
   const appendResizedSuffix = (url: string) => {
     const queryStart = url.search(/[?#]/);
     const baseUrl = queryStart === -1 ? url : url.slice(0, queryStart);
@@ -82,7 +82,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
     >
       <div className={`relative ${isList ? "sm:w-1/3" : ""}`}>
         <div
-          onClick={() => onProductClick(product.id)}
+          onClick={() => navigate(`/products/${product.id}`)}
           className="cursor-pointer h-full"
         >
           <img
@@ -108,7 +108,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         className={`flex flex-col flex-grow ${isList ? "sm:w-2/3 p-3 gap-1" : "p-4"}`}
       >
         <h3
-          onClick={() => onProductClick(product.id)}
+          onClick={() => navigate(`/products/${product.id}`)}
           className="text-lg font-semibold text-gray-800 truncate cursor-pointer hover:text-indigo-600"
         >
           {product.name}

@@ -1,6 +1,8 @@
+import React from "react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { MemoryRouter } from "react-router-dom";
 import App from "./App";
 import * as api from "./services/api";
 
@@ -48,7 +50,11 @@ describe("App", () => {
 
     it("switches from grid to list layout when the selector is clicked", async () => {
         const user = userEvent.setup();
-        render(<App />);
+        render(
+            <MemoryRouter>
+                <App />
+            </MemoryRouter>,
+        );
 
         await screen.findByText("Sample Product");
 

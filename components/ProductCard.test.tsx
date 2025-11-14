@@ -1,6 +1,11 @@
+import React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import ProductCard from "./ProductCard";
+
+const renderWithRouter = (ui: React.ReactNode) =>
+    render(<MemoryRouter>{ui}</MemoryRouter>);
 
 describe("ProductCard", () => {
     const mockProduct = {
@@ -18,12 +23,8 @@ describe("ProductCard", () => {
     };
 
     it("renders product name and price", () => {
-        render(
-            <ProductCard
-                product={mockProduct}
-                onProductClick={vi.fn()}
-                onAddToCart={vi.fn()}
-            />,
+        renderWithRouter(
+            <ProductCard product={mockProduct} onAddToCart={vi.fn()} />,
         );
         expect(screen.getByText("Test Product")).toBeTruthy();
         expect(screen.getByText(/100/)).toBeTruthy();
@@ -31,12 +32,8 @@ describe("ProductCard", () => {
 
     it("shows placeholder when no image", () => {
         const noImageProduct = { ...mockProduct, imageUrls: [] };
-        render(
-            <ProductCard
-                product={noImageProduct}
-                onProductClick={vi.fn()}
-                onAddToCart={vi.fn()}
-            />,
+        renderWithRouter(
+            <ProductCard product={noImageProduct} onAddToCart={vi.fn()} />,
         );
         const img = screen.getByAltText("Test Product") as HTMLImageElement;
         expect(img.src).toContain("placeholder.png");
@@ -49,13 +46,8 @@ describe("ProductCard", () => {
             imageUrls: [],
         };
 
-        const { container } = render(
-            <ProductCard
-                product={listProduct}
-                layout="list"
-                onProductClick={vi.fn()}
-                onAddToCart={vi.fn()}
-            />,
+        const { container } = renderWithRouter(
+            <ProductCard product={listProduct} layout="list" onAddToCart={vi.fn()} />,
         );
 
         const wrapper = container.firstChild as HTMLElement;
