@@ -2,7 +2,7 @@
  * @file App.tsx orchestrates the storefront shell, composing navigation-aware
  * views, shared overlays, and top-level layout elements.
  */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { User, Product, Tag, ProductLayout } from "./types";
 import Header from "./components/Header";
 import LoginModal from "./components/LoginModal";
@@ -84,6 +84,7 @@ const App: React.FC = () => {
   const tags: Tag[] = catalogData.tags;
   const products: Product[] = catalogData.products;
   const selectedProduct = isProductView ? productDetailData.product : null;
+  const sessionRequestIdRef = useRef<symbol | null>(null);
 
   useEffect(() => {
     // Reset the gallery position whenever a new product is loaded.
@@ -94,6 +95,9 @@ const App: React.FC = () => {
     let isMounted = true;
 
     const restoreUserFromSession = async () => {
+      const requestId = Symbol("sessionRestore");
+      sessionRequestIdRef.current = requestId;
+
       const cachedUser = loadPersistedUser();
       if (cachedUser && isMounted) {
         setUser(cachedUser);
@@ -104,6 +108,10 @@ const App: React.FC = () => {
         return;
       }
 
+      if (sessionRequestIdRef.current !== requestId) {
+        return;
+      }
+
       if (sessionUser) {
         setUser(sessionUser);
         persistUser(sessionUser);
@@ -111,12 +119,14 @@ const App: React.FC = () => {
         setUser(null);
         persistUser(null);
       }
+      sessionRequestIdRef.current = null;
     };
 
     restoreUserFromSession();
 
     return () => {
       isMounted = false;
+      sessionRequestIdRef.current = null;
     };
   }, []);
 
@@ -128,6 +138,7 @@ const App: React.FC = () => {
     setUser(loggedInUser);
     persistUser(loggedInUser);
     setIsLoginModalOpen(false);
+    sessionRequestIdRef.current = null;
   };
 
   /**
