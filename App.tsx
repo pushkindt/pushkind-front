@@ -37,6 +37,7 @@ const App: React.FC = () => {
   const [isAddFeedbackActive, setIsAddFeedbackActive] = useState(false);
   const addToCartFeedbackTimeoutRef =
     useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -88,6 +89,10 @@ const App: React.FC = () => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    setActiveImageIndex(0);
+  }, [selectedProduct?.id]);
 
   const handleLoginSuccess = (loggedInUser: User) => {
     setUser(loggedInUser);
@@ -154,7 +159,6 @@ const App: React.FC = () => {
         selectedProduct.imageUrls.length > 0
           ? selectedProduct.imageUrls
           : ["placeholder.png"];
-      const activeImage = imageUrls[0];
       const formattedPrice =
         selectedProduct.priceCents !== null
           ? new Intl.NumberFormat("ru-RU", {
@@ -163,15 +167,68 @@ const App: React.FC = () => {
           }).format(selectedProduct.priceCents / 100)
           : "Цена недоступна";
 
+      const boundedImageIndex = Math.min(activeImageIndex, imageUrls.length - 1);
+      const activeImage = imageUrls[boundedImageIndex];
+      const hasMultipleImages = imageUrls.length > 1;
+
       return (
-        <div className="bg-white rounded-lg shadow-xl overflow-hidden max-w-4xl mx-auto">
-          <div className="md:flex">
-            <div className="md:flex-shrink-0">
-              <img
-                className="h-64 w-full object-cover md:h-full md:w-80"
-                src={activeImage}
-                alt={selectedProduct.name}
-              />
+        <div className="bg-white rounded-lg shadow-xl overflow-hidden max-w-5xl mx-auto">
+          <div className="md:flex gap-6">
+            <div className="md:flex-shrink-0 md:w-1/2">
+              <div className="relative">
+                <img
+                  className="h-96 w-full object-cover rounded-lg shadow-sm"
+                  src={activeImage}
+                  alt={`${selectedProduct.name} ${boundedImageIndex + 1}`}
+                />
+                {hasMultipleImages && (
+                  <div className="absolute inset-x-0 bottom-2 flex justify-between px-4">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setActiveImageIndex((prev) =>
+                          (prev - 1 + imageUrls.length) % imageUrls.length,
+                        )
+                      }
+                      className="bg-white bg-opacity-70 text-gray-700 rounded-full px-3 py-1 shadow"
+                    >
+                      ←
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setActiveImageIndex((prev) =>
+                          (prev + 1) % imageUrls.length,
+                        )
+                      }
+                      className="bg-white bg-opacity-70 text-gray-700 rounded-full px-3 py-1 shadow"
+                    >
+                      →
+                    </button>
+                  </div>
+                )}
+              </div>
+              {hasMultipleImages && (
+                <div className="flex gap-2 mt-4 flex-wrap">
+                  {imageUrls.map((url, index) => (
+                    <button
+                      key={`${selectedProduct.id}-thumb-${index}`}
+                      type="button"
+                      onClick={() => setActiveImageIndex(index)}
+                      className={`border rounded-lg overflow-hidden transition-transform duration-200 ${boundedImageIndex === index
+                        ? "border-indigo-600 scale-105"
+                        : "border-gray-200 hover:scale-105"
+                        }`}
+                    >
+                      <img
+                        className="h-16 w-24 object-cover"
+                        src={url}
+                        alt={`${selectedProduct.name} thumbnail ${index + 1}`}
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="p-8 flex flex-col justify-between">
               <div>
