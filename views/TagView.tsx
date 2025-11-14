@@ -5,14 +5,9 @@ import type { Product, ProductLayout } from "../types";
 interface TagViewProps {
   products: Product[];
   productLayout: ProductLayout;
-  onAddToCart: (product: Product) => void;
 }
 
-const TagView: React.FC<TagViewProps> = ({
-  products,
-  productLayout,
-  onAddToCart,
-}) => {
+const TagView: React.FC<TagViewProps> = ({ products, productLayout }) => {
   return (
     <div
       data-testid="product-layout"
@@ -27,7 +22,6 @@ const TagView: React.FC<TagViewProps> = ({
           key={product.id}
           product={product}
           layout={productLayout}
-          onAddToCart={onAddToCart}
         />
       ))}
     </div>

@@ -1,37 +1,34 @@
 import React from "react";
-import type { CartItem, User } from "../types";
+import type { User } from "../types";
 import { formatPrice, getPrimaryImage } from "../utils/formatPrice";
 import { PlusIcon, MinusIcon, TrashIcon, XIcon } from "./Icons";
+import { useCart } from "../contexts/CartContext";
 
 interface CartProps {
   isOpen: boolean;
   onClose: () => void;
-  cartItems: CartItem[];
   user: User | null;
-  onUpdateQuantity: (productId: number, newQuantity: number) => void;
-  onRemoveItem: (productId: number) => void;
   onLoginClick: () => void;
 }
 
 const Cart: React.FC<CartProps> = ({
   isOpen,
   onClose,
-  cartItems,
   user,
-  onUpdateQuantity,
-  onRemoveItem,
   onLoginClick,
 }) => {
-  const subtotalCents = cartItems.reduce((acc, item) => {
-    if (item.priceCents === null) return acc;
-    return acc + item.priceCents * item.quantity;
-  }, 0);
-  const subtotalCurrency = cartItems[0]?.currency ?? "USD";
-  const hasPricedItems = cartItems.some((item) => item.priceCents !== null);
+  const {
+    items,
+    updateQuantity,
+    removeItem,
+    subtotalCents,
+    subtotalCurrency,
+    hasPricedItems,
+  } = useCart();
   const priceFallback = { fallback: "Нет данных" } as const;
   const subtotalDisplay = formatPrice(
     hasPricedItems ? subtotalCents : null,
-    subtotalCurrency,
+    subtotalCurrency ?? "USD",
     priceFallback,
   );
 
@@ -58,7 +55,7 @@ const Cart: React.FC<CartProps> = ({
               <XIcon className="w-6 h-6" />
             </button>
           </div>
-          {cartItems.length === 0 ? (
+          {items.length === 0 ? (
             <div className="flex-grow flex flex-col items-center justify-center text-center p-4">
               <img
                 src="https://picsum.photos/seed/emptycart/200/200"
@@ -75,7 +72,7 @@ const Cart: React.FC<CartProps> = ({
           ) : (
             <div className="flex-grow overflow-y-auto p-4">
               <ul className="divide-y divide-gray-200">
-                {cartItems.map((item) => (
+                {items.map((item) => (
                   <li key={item.id} className="flex py-4">
                     <img
                       src={getPrimaryImage(item.imageUrls)}
@@ -111,7 +108,7 @@ const Cart: React.FC<CartProps> = ({
                         <div className="flex items-center border border-gray-300 rounded-md">
                           <button
                             onClick={() =>
-                              onUpdateQuantity(item.id, item.quantity - 1)
+                              updateQuantity(item.id, item.quantity - 1)
                             }
                             className="p-1 text-gray-600 hover:text-indigo-600 disabled:text-gray-300"
                             disabled={item.quantity <= 1}
@@ -123,7 +120,7 @@ const Cart: React.FC<CartProps> = ({
                           </span>
                           <button
                             onClick={() =>
-                              onUpdateQuantity(item.id, item.quantity + 1)
+                              updateQuantity(item.id, item.quantity + 1)
                             }
                             className="p-1 text-gray-600 hover:text-indigo-600"
                           >
@@ -131,7 +128,7 @@ const Cart: React.FC<CartProps> = ({
                           </button>
                         </div>
                         <button
-                          onClick={() => onRemoveItem(item.id)}
+                          onClick={() => removeItem(item.id)}
                           className="font-medium text-red-600 hover:text-red-800 flex items-center"
                         >
                           <TrashIcon className="w-4 h-4 mr-1" /> Удалить
@@ -143,7 +140,7 @@ const Cart: React.FC<CartProps> = ({
               </ul>
             </div>
           )}
-          {cartItems.length > 0 && (
+          {items.length > 0 && (
             <div className="border-t border-gray-200 p-4">
               <div className="flex justify-between text-lg font-medium text-gray-900">
                 <p>Итого</p>

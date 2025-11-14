@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import type { Product, ProductLayout } from "../types";
 import {
@@ -6,17 +6,17 @@ import {
   formatUnitPrice,
   getPrimaryImage,
 } from "../utils/formatPrice";
+import { useCart } from "../contexts/CartContext";
+import useTransientFlag from "../hooks/useTransientFlag";
 
 interface ProductCardProps {
   product: Product;
   layout?: ProductLayout;
-  onAddToCart: (product: Product) => void;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
   product,
   layout = "grid",
-  onAddToCart,
 }) => {
   const navigate = useNavigate();
   const primaryImage = getPrimaryImage(product.imageUrls);
@@ -27,29 +27,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
       : null;
   const hasTag = (tagId: number) =>
     product.tags.some((tag) => tag.id === tagId);
-  const [isButtonFeedbackActive, setButtonFeedbackActive] = useState(false);
-  const buttonFeedbackTimeoutRef =
-    useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { addItem } = useCart();
+  const { isActive: isButtonFeedbackActive, activate: triggerButtonFeedback } =
+    useTransientFlag();
 
   const handleAddClick = () => {
-    onAddToCart(product);
-    setButtonFeedbackActive(true);
-    if (buttonFeedbackTimeoutRef.current) {
-      clearTimeout(buttonFeedbackTimeoutRef.current);
-    }
-    buttonFeedbackTimeoutRef.current = setTimeout(() => {
-      setButtonFeedbackActive(false);
-      buttonFeedbackTimeoutRef.current = null;
-    }, 1000);
+    addItem(product);
+    triggerButtonFeedback();
   };
-
-  useEffect(() => {
-    return () => {
-      if (buttonFeedbackTimeoutRef.current) {
-        clearTimeout(buttonFeedbackTimeoutRef.current);
-      }
-    };
-  }, []);
 
   const isList = layout === "list";
   const descriptionVisible = !isList && Boolean(product.description);

@@ -7,7 +7,6 @@ interface CategoryViewProps {
   products: Product[];
   productLayout: ProductLayout;
   onCategorySelect: (categoryId: number, categoryName?: string) => void;
-  onAddToCart: (product: Product) => void;
 }
 
 const CategoryView: React.FC<CategoryViewProps> = ({
@@ -15,7 +14,6 @@ const CategoryView: React.FC<CategoryViewProps> = ({
   products,
   productLayout,
   onCategorySelect,
-  onAddToCart,
 }) => {
   return (
     <>
@@ -55,7 +53,6 @@ const CategoryView: React.FC<CategoryViewProps> = ({
             key={product.id}
             product={product}
             layout={productLayout}
-            onAddToCart={onAddToCart}
           />
         ))}
       </div>
