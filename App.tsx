@@ -21,9 +21,149 @@ import ProductCard from "./components/ProductCard";
 import ToastContainer from "./components/ToastContainer";
 import { SpinnerIcon, ArrowLeftIcon } from "./components/Icons";
 
+const DEFAULT_VIEW: View = { type: "home" };
+
+const serializeViewParams = (view: View) => {
+  const params = new URLSearchParams();
+  if (view.type === "home") {
+    return params;
+  }
+  params.set("view", view.type);
+  if (view.type === "category") {
+    params.set("categoryId", view.categoryId.toString());
+    params.set("categoryName", view.categoryName);
+  } else if (view.type === "tag") {
+    params.set("tagId", view.tagId.toString());
+    params.set("tagName", view.tagName);
+  } else if (view.type === "product") {
+    params.set("productId", view.productId.toString());
+  }
+  return params;
+};
+
+const buildUrlForView = (view: View) => {
+  if (typeof window === "undefined") {
+    return "";
+  }
+  const query = serializeViewParams(view).toString();
+  const basePath = window.location.pathname || "/";
+  return query ? `${basePath}?${query}` : basePath;
+};
+
+const parseViewFromParams = (params: URLSearchParams): View | null => {
+  const type = params.get("view");
+  if (!type || type === "home") {
+    return DEFAULT_VIEW;
+  }
+  if (type === "category") {
+    const categoryId = Number(params.get("categoryId"));
+    if (Number.isNaN(categoryId)) {
+      return null;
+    }
+    return {
+      type: "category",
+      categoryId,
+      categoryName: params.get("categoryName") ?? "",
+    };
+  }
+  if (type === "tag") {
+    const tagId = Number(params.get("tagId"));
+    if (Number.isNaN(tagId)) {
+      return null;
+    }
+    return {
+      type: "tag",
+      tagId,
+      tagName: params.get("tagName") ?? "",
+    };
+  }
+  if (type === "product") {
+    const productId = Number(params.get("productId"));
+    if (Number.isNaN(productId)) {
+      return null;
+    }
+    return {
+      type: "product",
+      productId,
+    };
+  }
+  return null;
+};
+
+const deserializeViewFromString = (value?: string | null): View | null => {
+  if (!value) {
+    return null;
+  }
+  const trimmed = value.startsWith("?") || value.startsWith("#")
+    ? value.slice(1)
+    : value;
+  if (!trimmed) {
+    return null;
+  }
+  return parseViewFromParams(new URLSearchParams(trimmed));
+};
+
+const normalizeView = (raw: unknown): View | null => {
+  if (!raw || typeof raw !== "object" || !("type" in raw)) {
+    return null;
+  }
+  const candidate = raw as Partial<View> & { type?: string };
+  if (candidate.type === "home") {
+    return DEFAULT_VIEW;
+  }
+  if (
+    candidate.type === "category" &&
+    typeof candidate.categoryId === "number"
+  ) {
+    return {
+      type: "category",
+      categoryId: candidate.categoryId,
+      categoryName: candidate.categoryName ?? "",
+    };
+  }
+  if (candidate.type === "tag" && typeof candidate.tagId === "number") {
+    return {
+      type: "tag",
+      tagId: candidate.tagId,
+      tagName: candidate.tagName ?? "",
+    };
+  }
+  if (
+    candidate.type === "product" &&
+    typeof candidate.productId === "number"
+  ) {
+    return {
+      type: "product",
+      productId: candidate.productId,
+    };
+  }
+  return null;
+};
+
+const parseViewFromHistoryState = (state: unknown): View | null => {
+  if (!state || typeof state !== "object") {
+    return null;
+  }
+  if ("view" in state) {
+    return normalizeView((state as { view?: unknown }).view);
+  }
+  return normalizeView(state);
+};
+
+const getViewFromWindowLocation = (): View => {
+  if (typeof window === "undefined") {
+    return DEFAULT_VIEW;
+  }
+  return (
+    deserializeViewFromString(window.location.search) ??
+    deserializeViewFromString(window.location.hash) ??
+    DEFAULT_VIEW
+  );
+};
+
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
-  const [view, setView] = useState<View>({ type: "home" });
+  const [view, setView] = useState<View>(() => getViewFromWindowLocation());
   const [categories, setCategories] = useState<Category[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -37,6 +177,29 @@ const App: React.FC = () => {
   const [isAddFeedbackActive, setIsAddFeedbackActive] = useState(false);
   const addToCartFeedbackTimeoutRef =
     useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isHandlingPopStateRef = useRef(false);
+
+  const navigate = useCallback(
+    (nextView: View, options: { replace?: boolean } = {}) => {
+      setView(nextView);
+      if (typeof window === "undefined") {
+        isHandlingPopStateRef.current = false;
+        return;
+      }
+      if (isHandlingPopStateRef.current) {
+        isHandlingPopStateRef.current = false;
+        return;
+      }
+      const url = buildUrlForView(nextView);
+      const state = { view: nextView };
+      if (options.replace) {
+        window.history.replaceState(state, "", url);
+      } else {
+        window.history.pushState(state, "", url);
+      }
+    },
+    [],
+  );
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -87,6 +250,20 @@ const App: React.FC = () => {
         clearTimeout(addToCartFeedbackTimeoutRef.current);
       }
     };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+    const handlePopState = (event: PopStateEvent) => {
+      const viewFromState = parseViewFromHistoryState(event.state);
+      const nextView = viewFromState ?? getViewFromWindowLocation();
+      isHandlingPopStateRef.current = true;
+      setView(nextView);
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
   const handleLoginSuccess = (loggedInUser: User) => {
@@ -242,7 +419,7 @@ const App: React.FC = () => {
                   <div
                     key={category.id}
                     onClick={() =>
-                      setView({
+                      navigate({
                         type: "category",
                         categoryId: category.id,
                         categoryName: category.name,
@@ -273,7 +450,7 @@ const App: React.FC = () => {
                       <button
                         key={tag.id}
                         onClick={() =>
-                          setView({
+                          navigate({
                             type: "tag",
                             tagId: tag.id,
                             tagName: tag.name,
@@ -303,7 +480,7 @@ const App: React.FC = () => {
               product={product}
               layout={productLayout}
               onProductClick={(id) =>
-                setView({ type: "product", productId: id })
+                navigate({ type: "product", productId: id })
               }
               onAddToCart={handleAddToCart}
             />
@@ -335,14 +512,14 @@ const App: React.FC = () => {
         cartItemCount={cartItemCount}
         onLoginClick={() => setIsLoginModalOpen(true)}
         onCartClick={() => setIsCartOpen(true)}
-        onHomeClick={() => setView({ type: "home" })}
+        onHomeClick={() => navigate({ type: "home" })}
       />
 
       <main className="container mx-auto p-4 sm:p-6 lg:p-8">
         <div className="flex flex-wrap items-center gap-4 mb-6">
           {view.type !== "home" && (
             <button
-              onClick={() => setView({ type: "home" })}
+              onClick={() => navigate({ type: "home" })}
               className="flex items-center text-indigo-600 hover:text-indigo-800 font-semibold mr-4"
             >
               <ArrowLeftIcon className="w-5 h-5 mr-1" />
