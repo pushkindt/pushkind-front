@@ -1,15 +1,25 @@
+/**
+ * @file LoginModal.tsx implements the OTP authentication flow UI.
+ */
 import React, { useState } from "react";
 import { sendOtp, verifyOtp } from "../services/api";
 import type { User } from "../types";
 import Modal from "./Modal";
 import { SpinnerIcon } from "./Icons";
 
+/**
+ * Props consumed by the OTP login modal.
+ */
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
   onLoginSuccess: (user: User) => void;
 }
 
+/**
+ * Two-step modal that first requests a phone number and then validates the OTP
+ * sent to the customer.
+ */
 const LoginModal: React.FC<LoginModalProps> = ({
   isOpen,
   onClose,
@@ -21,6 +31,9 @@ const LoginModal: React.FC<LoginModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+  /**
+   * Requests an OTP code for the provided phone number.
+   */
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -34,6 +47,9 @@ const LoginModal: React.FC<LoginModalProps> = ({
     }
   };
 
+  /**
+   * Verifies the OTP code and propagates the authenticated user upward.
+   */
   const handleOtpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -48,6 +64,9 @@ const LoginModal: React.FC<LoginModalProps> = ({
     }
   };
 
+  /**
+   * Returns the modal to its initial state and closes it.
+   */
   const resetState = () => {
     setStep("phone");
     setPhone("");

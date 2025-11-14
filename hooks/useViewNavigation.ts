@@ -1,3 +1,6 @@
+/**
+ * @file useViewNavigation.ts derives navigation helpers from the router.
+ */
 import { useMemo } from "react";
 import {
   matchPath,
@@ -6,12 +9,17 @@ import {
 } from "react-router-dom";
 import type { View } from "../types";
 
+/** Safely parses an ID from a route parameter string. */
 const parseId = (value: string | undefined): number | null => {
   if (!value) return null;
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
 };
 
+/**
+ * Converts the current location into a typed view descriptor and exposes
+ * helper callbacks for navigation.
+ */
 const useViewNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();

@@ -23,11 +23,14 @@ Pushkind Frontend is the client-facing storefront for the Pushkind Orders platfo
 - Serve as a reference implementation for future Pushkind storefront experiences.
 
 ## Key Features
-- **OTP-based authentication:** Customers enter their phone number and confirm access via SMS to unlock ordering.
-- **Product browsing:** Categories, tags, and hub metadata help customers find the right products quickly.
-- **Cart management:** Customers can add items, adjust quantities, and review totals before checkout.
-- **Order submission:** Authenticated users can submit cart contents directly to the Pushkind Orders API.
-- **Toast notifications:** Global toasts inform customers about successful actions and errors.
+- **OTP-based authentication:** Customers enter their phone number and confirm access via SMS to unlock ordering. The flow is split into two guided steps inside `LoginModal` with input masking, optimistic feedback, and error messaging.
+- **Rich catalog discovery:** `HomeView`, `CategoryView`, and `TagView` expose curated sections, image-led hero cards, and quick tag filters so shoppers can jump between curated slices of inventory.
+- **Detailed product sheets:** `ProductView` showcases image galleries with keyboard-accessible pagination, unit-price callouts, SKU metadata, and contextual category breadcrumbs.
+- **Cart management:** Customers can add items from any layout, adjust quantities inline, inspect totals, and remove entries. A transient feedback hook (`useTransientFlag`) reinforces add-to-cart actions.
+- **Order readiness:** Authenticated users can initiate checkout from the drawer, while guests are prompted to log in before confirming purchases.
+- **Global toast notifications:** `ToastContainer` listens to the lightweight toast service and surfaces success/error events from API helpers anywhere in the app.
+- **Responsive, accessible UI:** Tailwind utility classes, focus styles, and semantic markup maintain parity across mobile/desktop breakpoints.
+- **Type-safe data layer:** Shared interfaces live in `types.ts` and every service call is wrapped with fetch helpers plus defensive fallbacks.
 
 ## Technology Stack
 - **Framework:** [React 19](https://react.dev/) with functional components and hooks.
@@ -37,11 +40,13 @@ Pushkind Frontend is the client-facing storefront for the Pushkind Orders platfo
 - **State management:** Local component state and hooks; shared domain types live in `types.ts`.
 
 ## Application Architecture
-- **Entry point:** `index.tsx` mounts the root React tree into `index.html` using Vite's hydration pipeline.
-- **Root composition:** `App.tsx` orchestrates layout, routing between storefront states, and manages providers and global UI scaffolding.
-- **UI components:** Reusable UI pieces reside in `components/`, including cart, header, modal, and product card implementations.
-- **Domain constants & types:** `constants.ts` and `types.ts` centralize shared enumerations, configuration values, and domain interfaces.
-- **API integration:** `services/api.ts` wraps HTTP requests to the Pushkind Orders backend, providing typed, reusable helpers.
+- **Entry point:** `index.tsx` boots the React tree, wires `BrowserRouter`, and hydrates the cart context before handing off to `AppRoutes`.
+- **Navigation & state:** `useViewNavigation` reads the current URL and distills it into a `View` union so `App.tsx` can render the correct screen without brittle route logic.
+- **Data fetching hooks:** `useCatalogData` and `useProductDetail` manage server requests, loading states, and error boundaries per view, keeping components pure and focused.
+- **UI components:** Layout primitives (`Layout`, `Header`, `Cart`, `Modal`, `ToastContainer`) encapsulate visual structure, while `ProductCard` powers both grid and list presentations.
+- **Domain constants & types:** `constants.ts` validates environment variables during startup, and `types.ts` centralizes contracts for categories, tags, products, users, cart items, and layout variants.
+- **API integration:** `services/api.ts` collects every HTTP call, adds query composition helpers, normalizes phone numbers, and surfaces toast-based error feedback.
+- **Cross-cutting services:** `services/toast.ts` exposes a simple publish/subscribe pattern used by network helpers and UI components to show transient notifications.
 - **Static assets:** The `public/` directory hosts favicon, manifest, and static images served without bundling.
 
 ## Environment Configuration
@@ -64,7 +69,7 @@ npm install
 ```bash
 npm run dev
 ```
-The Vite dev server runs at [http://localhost:5173](http://localhost:5173) with hot module replacement (HMR).
+The Vite dev server runs at [http://localhost:5173](http://localhost:5173) with hot module replacement (HMR). Start it together with the Pushkind Orders API (or mocked endpoints) so catalog and auth requests succeed locally.
 
 ## Available Scripts
 | Command | Description |
@@ -78,8 +83,12 @@ The Vite dev server runs at [http://localhost:5173](http://localhost:5173) with 
 .
 ├── App.tsx               # Root component rendering the storefront experience
 ├── components/           # Reusable UI components (cart, header, modals, product cards, icons)
+├── contexts/             # React context providers (Cart state lives here)
+├── hooks/                # Focused hooks for navigation, catalog data, product detail, and UI feedback
+├── services/             # API + toast utilities with matching tests
+├── utils/                # Pure formatting helpers shared across components
+├── views/                # Route-level UI slices (home, category, tag, product)
 ├── constants.ts          # Static domain constants and configuration helpers
-├── services/api.ts       # API wrapper functions that communicate with Pushkind Orders
 ├── types.ts              # Shared TypeScript interfaces and type definitions
 ├── public/               # Static assets served as-is (favicon, manifest, images)
 ├── index.tsx             # React entry point bootstrapping the app
@@ -87,6 +96,14 @@ The Vite dev server runs at [http://localhost:5173](http://localhost:5173) with 
 ├── vite.config.ts        # Vite build and dev server configuration
 └── tsconfig.json         # TypeScript compiler configuration
 ```
+
+## Experience Flow
+1. **Landing / Home view:** Visitors see featured categories, curated tag filters, and the latest products. Adding to cart is instant thanks to the shared context.
+2. **Category view:** Selecting a category narrows the catalog and updates the hero ribbon while preserving layout preferences.
+3. **Tag view:** Tag filters highlight cross-category collections such as promotions or seasonal offerings.
+4. **Product view:** Customers drill into detailed descriptions, rotate through image galleries, and initiate purchases via the CTA.
+5. **Authentication:** The OTP modal captures a phone number, sends a verification code, and hydrates the user profile upon success.
+6. **Cart & checkout:** The cart drawer summarizes selections, enforces login before checkout, and surfaces totals along with messaging.
 
 ## Development Workflow
 1. Create a feature branch from the latest `main`.
@@ -108,8 +125,9 @@ The Vite dev server runs at [http://localhost:5173](http://localhost:5173) with 
 - The application relies on the Pushkind Orders API for dynamic data; verify network access from the hosting environment.
 
 ## Troubleshooting
-- **Environment variable issues:** Confirm `.env.local` is loaded and variables use the `VITE_` prefix.
-- **API connectivity problems:** Check `services/api.ts` for request helpers and inspect browser network logs for failures.
+- **Environment variable issues:** Confirm `.env.local` is loaded, variables use the `VITE_` prefix, and `constants.ts` validation passes on boot.
+- **API connectivity problems:** Check `services/api.ts` for request helpers, inspect browser network logs, and confirm the configured hub has published data.
+- **Authentication glitches:** Use a known-good phone number in staging, and inspect server responses for OTP throttling errors.
 - **Build failures:** Run `npm install` to ensure dependencies match `package-lock.json`, then re-run `npm run build`.
 
 ## Contributing

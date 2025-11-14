@@ -1,3 +1,8 @@
+/**
+ * @file types.ts contains shared domain interfaces used across the app.
+ */
+
+/** Domain category metadata. */
 export interface Category {
   id: number;
   parentId: number | null;
@@ -6,11 +11,13 @@ export interface Category {
   imageUrl: string | null;
 }
 
+/** Product tag metadata. */
 export interface Tag {
   id: number;
   name: string;
 }
 
+/** Storefront product representation. */
 export interface Product {
   id: number;
   categoryId: number | null;
@@ -25,6 +32,7 @@ export interface Product {
   amount: number | null;
 }
 
+/** Authenticated customer profile. */
 export interface User {
   id: number;
   hub_id: number;
@@ -33,12 +41,17 @@ export interface User {
   phone: string;
 }
 
+/** Product plus quantity stored inside the cart. */
 export interface CartItem extends Product {
   quantity: number;
 }
 
+/** Supported product layout toggles. */
 export type ProductLayout = "grid" | "list";
 
+/**
+ * Typed representation of the current navigation target rendered by `App`.
+ */
 export type View =
   | { type: "home" }
   | { type: "category"; categoryId: number; categoryName: string }

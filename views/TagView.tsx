@@ -1,12 +1,19 @@
+/**
+ * @file TagView.tsx renders the product list filtered by a tag.
+ */
 import React from "react";
 import ProductCard from "../components/ProductCard";
 import type { Product, ProductLayout } from "../types";
 
+/** Props accepted by `TagView`. */
 interface TagViewProps {
   products: Product[];
   productLayout: ProductLayout;
 }
 
+/**
+ * Tag-specific view that mirrors the catalog layout controls.
+ */
 const TagView: React.FC<TagViewProps> = ({ products, productLayout }) => {
   return (
     <div

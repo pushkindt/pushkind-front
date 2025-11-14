@@ -1,3 +1,6 @@
+/**
+ * @file index.tsx hydrates the React app and registers routing/providers.
+ */
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";

@@ -1,8 +1,14 @@
+/**
+ * @file Header.tsx renders the sticky global navigation bar.
+ */
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import type { User } from "../types";
 import { ShoppingCartIcon, UserIcon } from "./Icons";
 
+/**
+ * Props consumed by the `Header` component.
+ */
 interface HeaderProps {
   user: User | null;
   cartItemCount: number;
@@ -10,6 +16,9 @@ interface HeaderProps {
   onCartClick: () => void;
 }
 
+/**
+ * Sticky header that exposes navigation, login entry points, and cart access.
+ */
 const Header: React.FC<HeaderProps> = ({
   user,
   cartItemCount,

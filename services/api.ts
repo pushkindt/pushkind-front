@@ -1,16 +1,22 @@
+/**
+ * @file api.ts wraps Pushkind backend endpoints with typed helper functions.
+ */
 import { API_URL, HUB_ID } from "../constants";
 import { showToast } from "./toast";
 import type { Category, Product, Tag, User } from "../types";
 
 const BASE_API_URL = API_URL.replace(/\/$/, "");
 
+/** Shows a toast and logs an error for failed API interactions. */
 const handleApiError = (message: string, error: unknown) => {
   console.error(message, error);
   showToast(message, "error");
 };
 
+/** Builds an absolute API URL for the current hub. */
 const buildUrl = (path: string) => `${BASE_API_URL}/${HUB_ID}${path}`;
 
+/** Fetches categories optionally filtered by a parent id. */
 export const fetchCategories = async (
   parentId?: number | null,
 ): Promise<Category[]> => {
@@ -37,6 +43,7 @@ export const fetchCategories = async (
   }
 };
 
+/** Fetches all available tags for the storefront. */
 export const fetchTags = async (): Promise<Tag[]> => {
   try {
     const response = await fetch(buildUrl("/tags"), {
@@ -56,6 +63,7 @@ export const fetchTags = async (): Promise<Tag[]> => {
   }
 };
 
+/** Fetches a list of products optionally filtered by category or tag. */
 export const fetchProducts = async (
   user: User | null,
   filter: { categoryId?: number; tagId?: number } = {},
@@ -89,6 +97,7 @@ export const fetchProducts = async (
   }
 };
 
+/** Fetches a single product by id, returning undefined when not found. */
 export const fetchProductById = async (
   user: User | null,
   productId: number,
@@ -120,9 +129,11 @@ export const fetchProductById = async (
   }
 };
 
+/** Prefixes a phone number with `+` if it is missing. */
 const normalizePhone = (phone: string) =>
   phone.startsWith("+") ? phone : `+${phone}`;
 
+/** Sends an OTP challenge to the provided phone number. */
 export const sendOtp = async (phone: string): Promise<{ success: boolean }> => {
   const payloadPhone = normalizePhone(phone);
   try {
@@ -148,6 +159,7 @@ export const sendOtp = async (phone: string): Promise<{ success: boolean }> => {
   }
 };
 
+/** Verifies a previously requested OTP code. */
 export const verifyOtp = async (
   phone: string,
   otp: string,

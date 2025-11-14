@@ -1,3 +1,7 @@
+/**
+ * @file App.tsx orchestrates the storefront shell, composing navigation-aware
+ * views, shared overlays, and top-level layout elements.
+ */
 import React, { useEffect, useState } from "react";
 import type { User, Product, Tag, ProductLayout } from "./types";
 import Header from "./components/Header";
@@ -16,6 +20,10 @@ import useProductDetail from "./hooks/useProductDetail";
 import { useCart } from "./contexts/CartContext";
 import useTransientFlag from "./hooks/useTransientFlag";
 
+/**
+ * Root storefront component that wires navigation, catalog data, cart actions,
+ * and global overlays into a single cohesive experience.
+ */
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -46,19 +54,32 @@ const App: React.FC = () => {
   const selectedProduct = isProductView ? productDetailData.product : null;
 
   useEffect(() => {
+    // Reset the gallery position whenever a new product is loaded.
     setActiveImageIndex(0);
   }, [selectedProduct?.id]);
 
+  /**
+   * Persists the authenticated user and hides the login modal once the OTP
+   * challenge succeeds.
+   */
   const handleLoginSuccess = (loggedInUser: User) => {
     setUser(loggedInUser);
     setIsLoginModalOpen(false);
   };
 
+  /**
+   * Adds a product to the cart and triggers a transient feedback animation so
+   * customers receive immediate confirmation.
+   */
   const handleAddToCartWithFeedback = (product: Product) => {
     addItem(product);
     triggerAddFeedback();
   };
 
+  /**
+   * Derives the heading for the current view using cached navigation metadata
+   * when available.
+   */
   const getTitle = () => {
     switch (view.type) {
       case "home":
@@ -82,6 +103,10 @@ const App: React.FC = () => {
     }
   };
 
+  /**
+   * Selects which view component to render based on the current route-aware
+   * descriptor returned from the navigation hook.
+   */
   const renderView = () => {
     if (isLoading) {
       return (

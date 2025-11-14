@@ -19,6 +19,22 @@ Run `npx eslint .` and `npx prettier --write .` after every change to keep linti
 
 Use TypeScript with React functional components and hooks. Match the existing four-space indentation, single-quote imports, and PascalCase component names. Keep props and helper functions camelCased, and centralize shared types in `types.ts` instead of redefining inline interfaces. Prefer clear, composable functions over large effect handlers, and separate view logic from API calls by expanding `services/api.ts` when new endpoints appear.
 
+### React Craftsmanship Principles
+
+- Build components that are small, pure, focused, and predictable.
+- Keep local state minimal and lift it only when data or behavior must be shared.
+- Favor the unidirectional dataflow mantra: data flows down, events flow up.
+- Treat hooks as logic primitives—compose them rather than embedding imperative branches in JSX.
+- Avoid excessive prop drilling; reach for context sparingly and only when state must be global.
+- Memoize only when a profiling signal shows a real benefit.
+- Reserve `useEffect` for genuine side effects and keep them tidy.
+- Co-locate files with their components, colocate tests, and treat JSX as declarative templates (no complex logic inline).
+- Prefer composition over configuration, and rely on TypeScript for type-safety throughout the tree.
+- Embrace server-driven UI for data fetching when it improves performance, and wrap complex flows with declarative state machines.
+- Always design for accessibility (a11y), think in UI states, and add behavior-focused tests instead of implementation tests.
+- Use error boundaries, Suspense, and consistent CSS modules scoped to the component boundary for resilience.
+- Document every exported symbol with docstrings or meaningful comments so future contributors understand intent instantly.
+
 ## Testing Guidelines
 
 Automated tests are not yet configured. When adding coverage, align with the Vite ecosystem by introducing Vitest plus React Testing Library. Place specs alongside source files using the `ComponentName.test.tsx` pattern and include both success and error-path assertions for `services/api.ts`. Until a dedicated test script exists, run `npm run build` as the minimum regression check before opening a pull request.

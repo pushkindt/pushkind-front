@@ -1,13 +1,22 @@
+/**
+ * @file useCatalogData.ts centralizes fetching for category, tag, and product
+ * data used across home, category, and tag views.
+ */
 import { useCallback, useEffect, useState } from "react";
 import * as api from "../services/api";
 import type { Category, Product, Tag, User, View } from "../types";
 
+/**
+ * Fetches catalog metadata (categories, tags, products) for the current view
+ * and exposes derived loading state.
+ */
 const useCatalogData = (view: View, user: User | null) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  /** Loads all catalog data for the current view. */
   const fetchCatalogData = useCallback(async () => {
     if (view.type === "product") {
       setCategories([]);

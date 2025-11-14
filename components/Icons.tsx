@@ -1,5 +1,9 @@
+/**
+ * @file Icons.tsx houses lightweight SVG icon components.
+ */
 import React from "react";
 
+/** Shopping cart outline icon. */
 export const ShoppingCartIcon = ({ className }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -17,6 +21,7 @@ export const ShoppingCartIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+/** User avatar outline icon. */
 export const UserIcon = ({ className }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -34,6 +39,7 @@ export const UserIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+/** Close (X) icon used for modals and drawers. */
 export const XIcon = ({ className }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -51,6 +57,7 @@ export const XIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+/** Plus icon used for increment buttons. */
 export const PlusIcon = ({ className }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -68,6 +75,7 @@ export const PlusIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+/** Minus icon used for decrement buttons. */
 export const MinusIcon = ({ className }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -85,6 +93,7 @@ export const MinusIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+/** Trash can icon signaling destructive actions. */
 export const TrashIcon = ({ className }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -102,6 +111,7 @@ export const TrashIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+/** Back arrow icon used for breadcrumb navigation. */
 export const ArrowLeftIcon = ({ className }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -119,6 +129,7 @@ export const ArrowLeftIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+/** Loading spinner icon with Tailwind-driven animation. */
 export const SpinnerIcon = ({ className }: { className?: string }) => (
   <svg
     className={`animate-spin ${className}`}

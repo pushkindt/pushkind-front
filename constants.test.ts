@@ -1,3 +1,6 @@
+/**
+ * @file constants.test.ts ensures runtime env validation exports values.
+ */
 import { describe, expect, it } from "vitest";
 
 describe("constants", () => {

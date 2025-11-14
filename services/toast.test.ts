@@ -1,3 +1,6 @@
+/**
+ * @file toast.test.ts checks the toast pub/sub implementation.
+ */
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { dismissToast, registerToastListener, showToast } from "./toast";
 

@@ -1,3 +1,6 @@
+/**
+ * @file ProductCard.tsx renders the reusable grid/list card for a product.
+ */
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import type { Product, ProductLayout } from "../types";
@@ -9,11 +12,18 @@ import {
 import { useCart } from "../contexts/CartContext";
 import useTransientFlag from "../hooks/useTransientFlag";
 
+/**
+ * Props accepted by the `ProductCard` component.
+ */
 interface ProductCardProps {
   product: Product;
   layout?: ProductLayout;
 }
 
+/**
+ * Responsive product tile that adapts to grid/list layouts and exposes add to
+ * cart actions.
+ */
 const ProductCard: React.FC<ProductCardProps> = ({
   product,
   layout = "grid",
@@ -31,6 +41,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const { isActive: isButtonFeedbackActive, activate: triggerButtonFeedback } =
     useTransientFlag();
 
+  /**
+   * Adds the product to the cart while triggering transient button feedback.
+   */
   const handleAddClick = () => {
     addItem(product);
     triggerButtonFeedback();

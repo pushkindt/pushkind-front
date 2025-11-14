@@ -1,3 +1,6 @@
+/**
+ * @file ProductCard.test.tsx validates the grid/list card behaviors.
+ */
 import React from "react";
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
@@ -5,6 +8,7 @@ import { MemoryRouter } from "react-router-dom";
 import ProductCard from "./ProductCard";
 import { CartProvider } from "../contexts/CartContext";
 
+/** Wraps ProductCard with router + cart context for testing. */
 const renderWithRouter = (ui: React.ReactNode) =>
     render(
         <MemoryRouter>

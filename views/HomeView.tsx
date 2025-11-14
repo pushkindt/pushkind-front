@@ -1,3 +1,6 @@
+/**
+ * @file HomeView.tsx renders the default storefront landing experience.
+ */
 import React from "react";
 import ProductCard from "../components/ProductCard";
 import type {
@@ -7,6 +10,9 @@ import type {
   Tag,
 } from "../types";
 
+/**
+ * Props passed to the `HomeView` component.
+ */
 interface HomeViewProps {
   categories: Category[];
   tags: Tag[];
@@ -16,6 +22,10 @@ interface HomeViewProps {
   onTagSelect: (tagId: number, tagName?: string) => void;
 }
 
+/**
+ * Default landing view with highlighted categories, tags, and the latest
+ * products.
+ */
 const HomeView: React.FC<HomeViewProps> = ({
   categories,
   tags,

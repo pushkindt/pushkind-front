@@ -1,3 +1,6 @@
+/**
+ * @file ProductView.tsx displays full product details and gallery controls.
+ */
 import React from "react";
 import type { Category, Product } from "../types";
 import {
@@ -7,6 +10,9 @@ import {
   PLACEHOLDER_IMAGE,
 } from "../utils/formatPrice";
 
+/**
+ * Props accepted by the `ProductView` component.
+ */
 interface ProductViewProps {
   product: Product | null;
   categories: Category[];
@@ -16,6 +22,10 @@ interface ProductViewProps {
   onImageIndexChange: React.Dispatch<React.SetStateAction<number>>;
 }
 
+/**
+ * Detail page layout that surfaces imagery, pricing, metadata, and add-to-cart
+ * actions for a single product.
+ */
 const ProductView: React.FC<ProductViewProps> = ({
   product,
   categories,
