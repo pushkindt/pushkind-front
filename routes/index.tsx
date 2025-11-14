@@ -10,6 +10,7 @@ const AppRoutes: React.FC = () => {
         <Route path="categories/:categoryId" element={<AppContent />} />
         <Route path="tags/:tagId" element={<AppContent />} />
         <Route path="products/:productId" element={<AppContent />} />
+        <Route path="*" element={<AppContent />} />
       </Route>
     </Routes>
   );
