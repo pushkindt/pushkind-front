@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import App from "./App";
+import AppRoutes from "./routes";
 import * as api from "./services/api";
 
 vi.mock("./services/api", () => ({
@@ -52,7 +52,7 @@ describe("App", () => {
         const user = userEvent.setup();
         render(
             <MemoryRouter>
-                <App />
+                <AppRoutes />
             </MemoryRouter>,
         );
 

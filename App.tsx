@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import { Outlet, useOutletContext } from "react-router-dom";
 import type {
   User,
   Product,
@@ -6,6 +7,7 @@ import type {
   Tag,
   CartItem,
   ProductLayout,
+  View,
 } from "./types";
 import * as api from "./services/api";
 import Header from "./components/Header";
@@ -15,6 +17,25 @@ import ProductCard from "./components/ProductCard";
 import ToastContainer from "./components/ToastContainer";
 import { SpinnerIcon, ArrowLeftIcon } from "./components/Icons";
 import useViewNavigation from "./hooks/useViewNavigation";
+
+type AppOutletContext = {
+  view: View;
+  goHome: () => void;
+  goToCategory: (categoryId: number, categoryName?: string) => void;
+  goToTag: (tagId: number, tagName?: string) => void;
+  isLoading: boolean;
+  categories: Category[];
+  tags: Tag[];
+  products: Product[];
+  selectedProduct: Product | null;
+  handleAddToCart: (product: Product) => void;
+  handleAddToCartWithFeedback: (product: Product) => void;
+  productLayout: ProductLayout;
+  setProductLayout: React.Dispatch<React.SetStateAction<ProductLayout>>;
+  isAddFeedbackActive: boolean;
+  activeImageIndex: number;
+  setActiveImageIndex: React.Dispatch<React.SetStateAction<number>>;
+};
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -139,6 +160,77 @@ const App: React.FC = () => {
 
   const cartItemCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
+  const outletContext: AppOutletContext = {
+    view,
+    goHome,
+    goToCategory,
+    goToTag,
+    isLoading,
+    categories,
+    tags,
+    products,
+    selectedProduct,
+    handleAddToCart,
+    handleAddToCartWithFeedback,
+    productLayout,
+    setProductLayout,
+    isAddFeedbackActive,
+    activeImageIndex,
+    setActiveImageIndex,
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 font-sans">
+      <Header
+        user={user}
+        cartItemCount={cartItemCount}
+        onLoginClick={() => setIsLoginModalOpen(true)}
+        onCartClick={() => setIsCartOpen(true)}
+      />
+
+      <main className="container mx-auto p-4 sm:p-6 lg:p-8">
+        <Outlet context={outletContext} />
+      </main>
+
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onLoginSuccess={handleLoginSuccess}
+      />
+      <Cart
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        cartItems={cart}
+        user={user}
+        onUpdateQuantity={handleUpdateCartQuantity}
+        onRemoveItem={handleRemoveFromCart}
+        onLoginClick={() => setIsLoginModalOpen(true)}
+      />
+      <ToastContainer />
+    </div>
+    );
+};
+
+const AppContent: React.FC = () => {
+  const {
+    view,
+    goHome,
+    goToCategory,
+    goToTag,
+    isLoading,
+    categories,
+    tags,
+    products,
+    selectedProduct,
+    handleAddToCart,
+    handleAddToCartWithFeedback,
+    productLayout,
+    setProductLayout,
+    isAddFeedbackActive,
+    activeImageIndex,
+    setActiveImageIndex,
+  } = useOutletContext<AppOutletContext>();
+
   const renderContent = () => {
     if (isLoading) {
       return (
@@ -158,9 +250,9 @@ const App: React.FC = () => {
       const formattedPrice =
         selectedProduct.priceCents !== null
           ? new Intl.NumberFormat("ru-RU", {
-            style: "currency",
-            currency: selectedProduct.currency,
-          }).format(selectedProduct.priceCents / 100)
+              style: "currency",
+              currency: selectedProduct.currency,
+            }).format(selectedProduct.priceCents / 100)
           : "Цена недоступна";
 
       const boundedImageIndex = Math.min(activeImageIndex, imageUrls.length - 1);
@@ -211,10 +303,11 @@ const App: React.FC = () => {
                       key={`${selectedProduct.id}-thumb-${index}`}
                       type="button"
                       onClick={() => setActiveImageIndex(index)}
-                      className={`border rounded-lg overflow-hidden transition-transform duration-200 ${boundedImageIndex === index
-                        ? "border-indigo-600 scale-105"
-                        : "border-gray-200 hover:scale-105"
-                        }`}
+                      className={`border rounded-lg overflow-hidden transition-transform duration-200 ${
+                        boundedImageIndex === index
+                          ? "border-indigo-600 scale-105"
+                          : "border-gray-200 hover:scale-105"
+                      }`}
                     >
                       <img
                         className="h-16 w-24 object-cover"
@@ -229,10 +322,7 @@ const App: React.FC = () => {
             <div className="p-8 flex flex-col justify-between">
               <div>
                 <div className="uppercase tracking-wide text-sm text-indigo-500 font-semibold">
-                  {
-                    categories.find((c) => c.id === selectedProduct.categoryId)
-                      ?.name
-                  }
+                  {categories.find((c) => c.id === selectedProduct.categoryId)?.name}
                 </div>
                 <h1 className="block mt-1 text-3xl leading-tight font-extrabold text-black">
                   {selectedProduct.name}
@@ -247,15 +337,11 @@ const App: React.FC = () => {
                     Единицы: {selectedProduct.units}
                   </p>
                 )}
-                <p className="mt-4 text-gray-600">
-                  {selectedProduct.description}
-                </p>
+                <p className="mt-4 text-gray-600">{selectedProduct.description}</p>
               </div>
               <div className="mt-6">
                 <div className="flex items-baseline mb-4 space-x-2">
-                  <span className="text-3xl font-bold text-gray-900">
-                    {formattedPrice}
-                  </span>
+                  <span className="text-3xl font-bold text-gray-900">{formattedPrice}</span>
                   {selectedProduct.priceCents !== null &&
                     selectedProduct.units &&
                     selectedProduct.amount !== null && (
@@ -266,9 +352,10 @@ const App: React.FC = () => {
                 </div>
                 <button
                   onClick={() => handleAddToCartWithFeedback(selectedProduct)}
-                  className={`w-full text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors duration-300 ${isAddFeedbackActive
-                    ? "bg-green-500 hover:bg-green-600"
-                    : "bg-indigo-600 hover:bg-indigo-700"
+                  className={`w-full text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors duration-300 ${
+                    isAddFeedbackActive
+                      ? "bg-green-500 hover:bg-green-600"
+                      : "bg-indigo-600 hover:bg-indigo-700"
                   }`}
                 >
                   Добавить в корзину
@@ -284,56 +371,46 @@ const App: React.FC = () => {
       <>
         {(view.type === "home" ||
           (view.type === "category" && categories.length > 0)) && (
-            <div className="mb-12">
-              {view.type === "home" && (
-                <h2 className="text-3xl font-bold text-gray-800 mb-6">
-                  Категории
-                </h2>
-              )}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {categories.map((category) => (
-              <div
-                key={category.id}
-                onClick={() =>
-                  goToCategory(category.id, category.name)
-                }
-                    className="relative rounded-lg overflow-hidden shadow-lg cursor-pointer group transform hover:scale-105 transition-transform duration-300"
-                  >
-                    <img
-                      src={category.imageUrl ?? "/placeholder.png"}
-                      alt={category.name}
-                      className="w-full h-40 object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
-                      <h3 className="text-white text-2xl font-bold">
-                        {category.name}
-                      </h3>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {view.type === "home" && (
-                <div className="mt-8">
-                  <h3 className="text-2xl font-bold text-gray-800 mb-4">
-                    Фильтр по тегам
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {tags.map((tag) => (
-                      <button
-                        key={tag.id}
-                        onClick={() =>
-                          goToTag(tag.id, tag.name)
-                        }
-                        className="bg-gray-200 text-gray-700 px-4 py-2 rounded-full hover:bg-indigo-500 hover:text-white transition-colors duration-200"
-                      >
-                        {tag.name}
-                      </button>
-                    ))}
+          <div className="mb-12">
+            {view.type === "home" && (
+              <h2 className="text-3xl font-bold text-gray-800 mb-6">Категории</h2>
+            )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {categories.map((category) => (
+                <div
+                  key={category.id}
+                  onClick={() => goToCategory(category.id, category.name)}
+                  className="relative rounded-lg overflow-hidden shadow-lg cursor-pointer group transform hover:scale-105 transition-transform duration-300"
+                >
+                  <img
+                    src={category.imageUrl ?? "/placeholder.png"}
+                    alt={category.name}
+                    className="w-full h-40 object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
+                    <h3 className="text-white text-2xl font-bold">{category.name}</h3>
                   </div>
                 </div>
-              )}
+              ))}
             </div>
-          )}
+            {view.type === "home" && (
+              <div className="mt-8">
+                <h3 className="text-2xl font-bold text-gray-800 mb-4">Фильтр по тегам</h3>
+                <div className="flex flex-wrap gap-2">
+                  {tags.map((tag) => (
+                    <button
+                      key={tag.id}
+                      onClick={() => goToTag(tag.id, tag.name)}
+                      className="bg-gray-200 text-gray-700 px-4 py-2 rounded-full hover:bg-indigo-500 hover:text-white transition-colors duration-200"
+                    >
+                      {tag.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
         <div
           data-testid="product-layout"
           className={
@@ -379,66 +456,43 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 font-sans">
-      <Header
-        user={user}
-        cartItemCount={cartItemCount}
-        onLoginClick={() => setIsLoginModalOpen(true)}
-        onCartClick={() => setIsCartOpen(true)}
-      />
-
-      <main className="container mx-auto p-4 sm:p-6 lg:p-8">
-        <div className="flex flex-wrap items-center gap-4 mb-6">
-          {view.type !== "home" && (
-            <button
-              onClick={goHome}
-              className="flex items-center text-indigo-600 hover:text-indigo-800 font-semibold mr-4"
-            >
-              <ArrowLeftIcon className="w-5 h-5 mr-1" />
-              Назад
-            </button>
-          )}
-          <div className="flex items-center gap-4 flex-wrap">
-            <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-              {getTitle()}
-            </h1>
-            <div className="flex items-center gap-2 bg-white rounded-full shadow px-2 py-1">
-              {(["grid", "list"] as ProductLayout[]).map((layoutOption) => (
-                <button
-                  key={layoutOption}
-                  onClick={() => setProductLayout(layoutOption)}
-                  className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors duration-200 ${productLayout === layoutOption
-                      ? "bg-indigo-600 text-white"
-                      : "text-gray-600 hover:text-gray-900"
-                    }`}
-                >
-                  {layoutOption === "grid" ? "Сетка" : "Список"}
-                </button>
-              ))}
-            </div>
+    <>
+      <div className="flex flex-wrap items-center gap-4 mb-6">
+        {view.type !== "home" && (
+          <button
+            onClick={goHome}
+            className="flex items-center text-indigo-600 hover:text-indigo-800 font-semibold mr-4"
+          >
+            <ArrowLeftIcon className="w-5 h-5 mr-1" />
+            Назад
+          </button>
+        )}
+        <div className="flex items-center gap-4 flex-wrap">
+          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+            {getTitle()}
+          </h1>
+          <div className="flex items-center gap-2 bg-white rounded-full shadow px-2 py-1">
+            {(["grid", "list"] as ProductLayout[]).map((layoutOption) => (
+              <button
+                key={layoutOption}
+                onClick={() => setProductLayout(layoutOption)}
+                className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors duration-200 ${
+                  productLayout === layoutOption
+                    ? "bg-indigo-600 text-white"
+                    : "text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                {layoutOption === "grid" ? "Сетка" : "Список"}
+              </button>
+            ))}
           </div>
         </div>
+      </div>
 
-        {renderContent()}
-      </main>
-
-      <LoginModal
-        isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-        onLoginSuccess={handleLoginSuccess}
-      />
-      <Cart
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        cartItems={cart}
-        user={user}
-        onUpdateQuantity={handleUpdateCartQuantity}
-        onRemoveItem={handleRemoveFromCart}
-        onLoginClick={() => setIsLoginModalOpen(true)}
-      />
-      <ToastContainer />
-    </div>
-    );
+      {renderContent()}
+    </>
+  );
 };
 
 export default App;
+export { AppContent };
