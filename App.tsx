@@ -1,17 +1,13 @@
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-} from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { Outlet, useOutletContext } from "react-router-dom";
 import type {
   User,
   Product,
   Category,
   Tag,
   CartItem,
-  View,
   ProductLayout,
+  View,
 } from "./types";
 import * as api from "./services/api";
 import Header from "./components/Header";
@@ -20,107 +16,29 @@ import Cart from "./components/Cart";
 import ProductCard from "./components/ProductCard";
 import ToastContainer from "./components/ToastContainer";
 import { SpinnerIcon, ArrowLeftIcon } from "./components/Icons";
+import useViewNavigation from "./hooks/useViewNavigation";
 
-const DEFAULT_VIEW: View = { type: "home" };
-const isBrowser = typeof window !== "undefined";
-
-const paramsToView = (params: URLSearchParams): View => {
-  const viewType = params.get("view");
-  if (viewType === "category") {
-    const categoryId = Number(params.get("categoryId"));
-    if (Number.isFinite(categoryId)) {
-      return {
-        type: "category",
-        categoryId,
-        categoryName: params.get("categoryName") ?? "",
-      };
-    }
-  } else if (viewType === "tag") {
-    const tagId = Number(params.get("tagId"));
-    if (Number.isFinite(tagId)) {
-      return {
-        type: "tag",
-        tagId,
-        tagName: params.get("tagName") ?? "",
-      };
-    }
-  } else if (viewType === "product") {
-    const productId = Number(params.get("productId"));
-    if (Number.isFinite(productId)) {
-      return { type: "product", productId };
-    }
-  }
-  return DEFAULT_VIEW;
-};
-
-const viewToQueryString = (view: View): string => {
-  const params = new URLSearchParams();
-  switch (view.type) {
-    case "category":
-      params.set("view", "category");
-      params.set("categoryId", String(view.categoryId));
-      params.set("categoryName", view.categoryName);
-      break;
-    case "tag":
-      params.set("view", "tag");
-      params.set("tagId", String(view.tagId));
-      params.set("tagName", view.tagName);
-      break;
-    case "product":
-      params.set("view", "product");
-      params.set("productId", String(view.productId));
-      break;
-    default:
-      break;
-  }
-  return params.toString();
-};
-
-const getViewFromUrl = (): View => {
-  if (!isBrowser) return DEFAULT_VIEW;
-  const params = new URLSearchParams(window.location.search);
-  return paramsToView(params);
-};
-
-const buildUrlForView = (view: View): string => {
-  if (!isBrowser) return "";
-  const queryString = viewToQueryString(view);
-  const hash = window.location.hash ?? "";
-  return `${window.location.pathname}${queryString ? `?${queryString}` : ""}${hash}`;
-};
-
-const replaceStateWithView = (nextView: View) => {
-  if (!isBrowser) return;
-  window.history.replaceState(nextView, "", buildUrlForView(nextView));
-};
-
-const isViewState = (value: unknown): value is View => {
-  if (!value || typeof value !== "object") return false;
-  const view = value as View;
-  if (view.type === "home") return true;
-  if (view.type === "product") {
-    return typeof view.productId === "number";
-  }
-  if (view.type === "category") {
-    return (
-      typeof view.categoryId === "number" && typeof view.categoryName === "string"
-    );
-  }
-  if (view.type === "tag") {
-    return typeof view.tagId === "number" && typeof view.tagName === "string";
-  }
-  return false;
+type AppOutletContext = {
+  view: View;
+  goHome: () => void;
+  goToCategory: (categoryId: number, categoryName?: string) => void;
+  goToTag: (tagId: number, tagName?: string) => void;
+  isLoading: boolean;
+  categories: Category[];
+  tags: Tag[];
+  products: Product[];
+  selectedProduct: Product | null;
+  handleAddToCart: (product: Product) => void;
+  handleAddToCartWithFeedback: (product: Product) => void;
+  productLayout: ProductLayout;
+  setProductLayout: React.Dispatch<React.SetStateAction<ProductLayout>>;
+  isAddFeedbackActive: boolean;
+  activeImageIndex: number;
+  setActiveImageIndex: React.Dispatch<React.SetStateAction<number>>;
 };
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
-  const [view, setView] = useState<View>(() => {
-    const initialView = getViewFromUrl();
-    if (isBrowser) {
-      replaceStateWithView(initialView);
-    }
-    return initialView;
-  });
   const [categories, setCategories] = useState<Category[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -136,17 +54,7 @@ const App: React.FC = () => {
     useRef<ReturnType<typeof setTimeout> | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
-  const navigateTo = useCallback(
-    (nextView: View, options?: { replace?: boolean }) => {
-      setView(nextView);
-      if (!isBrowser) return;
-      const method: "pushState" | "replaceState" = options?.replace
-        ? "replaceState"
-        : "pushState";
-      window.history[method](nextView, "", buildUrlForView(nextView));
-    },
-    [],
-  );
+  const { view, goHome, goToCategory, goToTag } = useViewNavigation();
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -190,21 +98,6 @@ const App: React.FC = () => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
-  useEffect(() => {
-    if (!isBrowser) return undefined;
-    const handlePopState = (event: PopStateEvent) => {
-      if (isViewState(event.state)) {
-        setView(event.state);
-      } else {
-        setView(getViewFromUrl());
-      }
-    };
-    window.addEventListener("popstate", handlePopState);
-    return () => {
-      window.removeEventListener("popstate", handlePopState);
-    };
-  }, []);
 
   useEffect(() => {
     return () => {
@@ -267,6 +160,77 @@ const App: React.FC = () => {
 
   const cartItemCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
+  const outletContext: AppOutletContext = {
+    view,
+    goHome,
+    goToCategory,
+    goToTag,
+    isLoading,
+    categories,
+    tags,
+    products,
+    selectedProduct,
+    handleAddToCart,
+    handleAddToCartWithFeedback,
+    productLayout,
+    setProductLayout,
+    isAddFeedbackActive,
+    activeImageIndex,
+    setActiveImageIndex,
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 font-sans">
+      <Header
+        user={user}
+        cartItemCount={cartItemCount}
+        onLoginClick={() => setIsLoginModalOpen(true)}
+        onCartClick={() => setIsCartOpen(true)}
+      />
+
+      <main className="container mx-auto p-4 sm:p-6 lg:p-8">
+        <Outlet context={outletContext} />
+      </main>
+
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onLoginSuccess={handleLoginSuccess}
+      />
+      <Cart
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        cartItems={cart}
+        user={user}
+        onUpdateQuantity={handleUpdateCartQuantity}
+        onRemoveItem={handleRemoveFromCart}
+        onLoginClick={() => setIsLoginModalOpen(true)}
+      />
+      <ToastContainer />
+    </div>
+    );
+};
+
+const AppContent: React.FC = () => {
+  const {
+    view,
+    goHome,
+    goToCategory,
+    goToTag,
+    isLoading,
+    categories,
+    tags,
+    products,
+    selectedProduct,
+    handleAddToCart,
+    handleAddToCartWithFeedback,
+    productLayout,
+    setProductLayout,
+    isAddFeedbackActive,
+    activeImageIndex,
+    setActiveImageIndex,
+  } = useOutletContext<AppOutletContext>();
+
   const renderContent = () => {
     if (isLoading) {
       return (
@@ -286,9 +250,9 @@ const App: React.FC = () => {
       const formattedPrice =
         selectedProduct.priceCents !== null
           ? new Intl.NumberFormat("ru-RU", {
-            style: "currency",
-            currency: selectedProduct.currency,
-          }).format(selectedProduct.priceCents / 100)
+              style: "currency",
+              currency: selectedProduct.currency,
+            }).format(selectedProduct.priceCents / 100)
           : "Цена недоступна";
 
       const boundedImageIndex = Math.min(activeImageIndex, imageUrls.length - 1);
@@ -339,10 +303,11 @@ const App: React.FC = () => {
                       key={`${selectedProduct.id}-thumb-${index}`}
                       type="button"
                       onClick={() => setActiveImageIndex(index)}
-                      className={`border rounded-lg overflow-hidden transition-transform duration-200 ${boundedImageIndex === index
-                        ? "border-indigo-600 scale-105"
-                        : "border-gray-200 hover:scale-105"
-                        }`}
+                      className={`border rounded-lg overflow-hidden transition-transform duration-200 ${
+                        boundedImageIndex === index
+                          ? "border-indigo-600 scale-105"
+                          : "border-gray-200 hover:scale-105"
+                      }`}
                     >
                       <img
                         className="h-16 w-24 object-cover"
@@ -357,10 +322,7 @@ const App: React.FC = () => {
             <div className="p-8 flex flex-col justify-between">
               <div>
                 <div className="uppercase tracking-wide text-sm text-indigo-500 font-semibold">
-                  {
-                    categories.find((c) => c.id === selectedProduct.categoryId)
-                      ?.name
-                  }
+                  {categories.find((c) => c.id === selectedProduct.categoryId)?.name}
                 </div>
                 <h1 className="block mt-1 text-3xl leading-tight font-extrabold text-black">
                   {selectedProduct.name}
@@ -375,15 +337,11 @@ const App: React.FC = () => {
                     Единицы: {selectedProduct.units}
                   </p>
                 )}
-                <p className="mt-4 text-gray-600">
-                  {selectedProduct.description}
-                </p>
+                <p className="mt-4 text-gray-600">{selectedProduct.description}</p>
               </div>
               <div className="mt-6">
                 <div className="flex items-baseline mb-4 space-x-2">
-                  <span className="text-3xl font-bold text-gray-900">
-                    {formattedPrice}
-                  </span>
+                  <span className="text-3xl font-bold text-gray-900">{formattedPrice}</span>
                   {selectedProduct.priceCents !== null &&
                     selectedProduct.units &&
                     selectedProduct.amount !== null && (
@@ -394,9 +352,10 @@ const App: React.FC = () => {
                 </div>
                 <button
                   onClick={() => handleAddToCartWithFeedback(selectedProduct)}
-                  className={`w-full text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors duration-300 ${isAddFeedbackActive
-                    ? "bg-green-500 hover:bg-green-600"
-                    : "bg-indigo-600 hover:bg-indigo-700"
+                  className={`w-full text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors duration-300 ${
+                    isAddFeedbackActive
+                      ? "bg-green-500 hover:bg-green-600"
+                      : "bg-indigo-600 hover:bg-indigo-700"
                   }`}
                 >
                   Добавить в корзину
@@ -412,64 +371,46 @@ const App: React.FC = () => {
       <>
         {(view.type === "home" ||
           (view.type === "category" && categories.length > 0)) && (
-            <div className="mb-12">
-              {view.type === "home" && (
-                <h2 className="text-3xl font-bold text-gray-800 mb-6">
-                  Категории
-                </h2>
-              )}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {categories.map((category) => (
-                  <div
-                    key={category.id}
-                    onClick={() =>
-                      navigateTo({
-                        type: "category",
-                        categoryId: category.id,
-                        categoryName: category.name,
-                      })
-                    }
-                    className="relative rounded-lg overflow-hidden shadow-lg cursor-pointer group transform hover:scale-105 transition-transform duration-300"
-                  >
-                    <img
-                      src={category.imageUrl ?? "/placeholder.png"}
-                      alt={category.name}
-                      className="w-full h-40 object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
-                      <h3 className="text-white text-2xl font-bold">
-                        {category.name}
-                      </h3>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {view.type === "home" && (
-                <div className="mt-8">
-                  <h3 className="text-2xl font-bold text-gray-800 mb-4">
-                    Фильтр по тегам
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {tags.map((tag) => (
-                      <button
-                        key={tag.id}
-                        onClick={() =>
-                          navigateTo({
-                            type: "tag",
-                            tagId: tag.id,
-                            tagName: tag.name,
-                          })
-                        }
-                        className="bg-gray-200 text-gray-700 px-4 py-2 rounded-full hover:bg-indigo-500 hover:text-white transition-colors duration-200"
-                      >
-                        {tag.name}
-                      </button>
-                    ))}
+          <div className="mb-12">
+            {view.type === "home" && (
+              <h2 className="text-3xl font-bold text-gray-800 mb-6">Категории</h2>
+            )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {categories.map((category) => (
+                <div
+                  key={category.id}
+                  onClick={() => goToCategory(category.id, category.name)}
+                  className="relative rounded-lg overflow-hidden shadow-lg cursor-pointer group transform hover:scale-105 transition-transform duration-300"
+                >
+                  <img
+                    src={category.imageUrl ?? "/placeholder.png"}
+                    alt={category.name}
+                    className="w-full h-40 object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
+                    <h3 className="text-white text-2xl font-bold">{category.name}</h3>
                   </div>
                 </div>
-              )}
+              ))}
             </div>
-          )}
+            {view.type === "home" && (
+              <div className="mt-8">
+                <h3 className="text-2xl font-bold text-gray-800 mb-4">Фильтр по тегам</h3>
+                <div className="flex flex-wrap gap-2">
+                  {tags.map((tag) => (
+                    <button
+                      key={tag.id}
+                      onClick={() => goToTag(tag.id, tag.name)}
+                      className="bg-gray-200 text-gray-700 px-4 py-2 rounded-full hover:bg-indigo-500 hover:text-white transition-colors duration-200"
+                    >
+                      {tag.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
         <div
           data-testid="product-layout"
           className={
@@ -483,9 +424,6 @@ const App: React.FC = () => {
               key={product.id}
               product={product}
               layout={productLayout}
-              onProductClick={(id) =>
-                navigateTo({ type: "product", productId: id })
-              }
               onAddToCart={handleAddToCart}
             />
           ))}
@@ -499,9 +437,17 @@ const App: React.FC = () => {
       case "home":
         return "Все товары";
       case "category":
-        return `Категория: ${view.categoryName}`;
+        return `Категория: ${
+          categories.find((c) => c.id === view.categoryId)?.name ||
+          view.categoryName ||
+          view.categoryId
+        }`;
       case "tag":
-        return `Тег: ${view.tagName}`;
+        return `Тег: ${
+          tags.find((tag) => tag.id === view.tagId)?.name ||
+          view.tagName ||
+          view.tagId
+        }`;
       case "product":
         return "Описание товара";
       default:
@@ -510,67 +456,43 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 font-sans">
-      <Header
-        user={user}
-        cartItemCount={cartItemCount}
-        onLoginClick={() => setIsLoginModalOpen(true)}
-        onCartClick={() => setIsCartOpen(true)}
-        onHomeClick={() => navigateTo({ type: "home" })}
-      />
-
-      <main className="container mx-auto p-4 sm:p-6 lg:p-8">
-        <div className="flex flex-wrap items-center gap-4 mb-6">
-          {view.type !== "home" && (
-            <button
-              onClick={() => navigateTo({ type: "home" })}
-              className="flex items-center text-indigo-600 hover:text-indigo-800 font-semibold mr-4"
-            >
-              <ArrowLeftIcon className="w-5 h-5 mr-1" />
-              Назад
-            </button>
-          )}
-          <div className="flex items-center gap-4 flex-wrap">
-            <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-              {getTitle()}
-            </h1>
-            <div className="flex items-center gap-2 bg-white rounded-full shadow px-2 py-1">
-              {(["grid", "list"] as ProductLayout[]).map((layoutOption) => (
-                <button
-                  key={layoutOption}
-                  onClick={() => setProductLayout(layoutOption)}
-                  className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors duration-200 ${productLayout === layoutOption
-                      ? "bg-indigo-600 text-white"
-                      : "text-gray-600 hover:text-gray-900"
-                    }`}
-                >
-                  {layoutOption === "grid" ? "Сетка" : "Список"}
-                </button>
-              ))}
-            </div>
+    <>
+      <div className="flex flex-wrap items-center gap-4 mb-6">
+        {view.type !== "home" && (
+          <button
+            onClick={goHome}
+            className="flex items-center text-indigo-600 hover:text-indigo-800 font-semibold mr-4"
+          >
+            <ArrowLeftIcon className="w-5 h-5 mr-1" />
+            Назад
+          </button>
+        )}
+        <div className="flex items-center gap-4 flex-wrap">
+          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+            {getTitle()}
+          </h1>
+          <div className="flex items-center gap-2 bg-white rounded-full shadow px-2 py-1">
+            {(["grid", "list"] as ProductLayout[]).map((layoutOption) => (
+              <button
+                key={layoutOption}
+                onClick={() => setProductLayout(layoutOption)}
+                className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors duration-200 ${
+                  productLayout === layoutOption
+                    ? "bg-indigo-600 text-white"
+                    : "text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                {layoutOption === "grid" ? "Сетка" : "Список"}
+              </button>
+            ))}
           </div>
         </div>
+      </div>
 
-        {renderContent()}
-      </main>
-
-      <LoginModal
-        isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-        onLoginSuccess={handleLoginSuccess}
-      />
-      <Cart
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        cartItems={cart}
-        user={user}
-        onUpdateQuantity={handleUpdateCartQuantity}
-        onRemoveItem={handleRemoveFromCart}
-        onLoginClick={() => setIsLoginModalOpen(true)}
-      />
-      <ToastContainer />
-    </div>
+      {renderContent()}
+    </>
   );
 };
 
 export default App;
+export { AppContent };

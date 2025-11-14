@@ -1,7 +1,9 @@
+import React from "react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import App from "./App";
+import { MemoryRouter } from "react-router-dom";
+import AppRoutes from "./routes";
 import * as api from "./services/api";
 
 vi.mock("./services/api", () => ({
@@ -48,7 +50,11 @@ describe("App", () => {
 
     it("switches from grid to list layout when the selector is clicked", async () => {
         const user = userEvent.setup();
-        render(<App />);
+        render(
+            <MemoryRouter>
+                <AppRoutes />
+            </MemoryRouter>,
+        );
 
         await screen.findByText("Sample Product");
 
