@@ -13,3 +13,5 @@ if (!apiUrl) {
 
 export const HUB_ID = hubId;
 export const API_URL = apiUrl;
+
+export const USER_STORAGE_KEY = "pushkind-user";

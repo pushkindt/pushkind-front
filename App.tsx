@@ -19,6 +19,38 @@ import useCatalogData from "./hooks/useCatalogData";
 import useProductDetail from "./hooks/useProductDetail";
 import { useCart } from "./contexts/CartContext";
 import useTransientFlag from "./hooks/useTransientFlag";
+import { fetchCurrentUser } from "./services/api";
+import { USER_STORAGE_KEY } from "./constants";
+
+const loadPersistedUser = (): User | null => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const storedValue = window.localStorage.getItem(USER_STORAGE_KEY);
+  if (!storedValue) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(storedValue) as User;
+  } catch {
+    window.localStorage.removeItem(USER_STORAGE_KEY);
+    return null;
+  }
+};
+
+const persistUser = (nextUser: User | null) => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  if (nextUser) {
+    window.localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(nextUser));
+  } else {
+    window.localStorage.removeItem(USER_STORAGE_KEY);
+  }
+};
 
 /**
  * Root storefront component that wires navigation, catalog data, cart actions,
@@ -58,12 +90,43 @@ const App: React.FC = () => {
     setActiveImageIndex(0);
   }, [selectedProduct?.id]);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    const restoreUserFromSession = async () => {
+      const cachedUser = loadPersistedUser();
+      if (cachedUser && isMounted) {
+        setUser(cachedUser);
+      }
+
+      const sessionUser = await fetchCurrentUser();
+      if (!isMounted) {
+        return;
+      }
+
+      if (sessionUser) {
+        setUser(sessionUser);
+        persistUser(sessionUser);
+      } else {
+        setUser(null);
+        persistUser(null);
+      }
+    };
+
+    restoreUserFromSession();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   /**
    * Persists the authenticated user and hides the login modal once the OTP
    * challenge succeeds.
    */
   const handleLoginSuccess = (loggedInUser: User) => {
     setUser(loggedInUser);
+    persistUser(loggedInUser);
     setIsLoginModalOpen(false);
   };
 
