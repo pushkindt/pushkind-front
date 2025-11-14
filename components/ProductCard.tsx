@@ -102,17 +102,20 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <div
           className={`flex items-center justify-between space-x-2 ${isList ? "mt-2" : "mt-4"}`}
         >
-          <span className="text-xl font-bold text-gray-900">{formattedPrice}</span>
+          <span className="text-xl font-bold text-gray-900">
+            {formattedPrice}
+          </span>
           {unitPriceLabel && (
             <span className="text-sm text-gray-600">{unitPriceLabel}</span>
           )}
         </div>
         <button
           onClick={handleAddClick}
-          className={`w-full text-white rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-300 ${isButtonFeedbackActive
-            ? "bg-green-500 hover:bg-green-600 focus:ring-green-500"
-            : "bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
-            } ${isList ? "py-2 text-sm" : "py-2 px-4"}`}
+          className={`w-full text-white rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-300 ${
+            isButtonFeedbackActive
+              ? "bg-green-500 hover:bg-green-600 focus:ring-green-500"
+              : "bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
+          } ${isList ? "py-2 text-sm" : "py-2 px-4"}`}
         >
           Добавить в корзину
         </button>

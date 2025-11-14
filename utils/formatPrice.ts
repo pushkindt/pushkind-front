@@ -7,9 +7,9 @@ export interface FormatPriceOptions extends Intl.NumberFormatOptions {
   fallback?: string;
 }
 
-const DEFAULT_LOCALE = 'ru-RU';
-const DEFAULT_FALLBACK = 'Цена недоступна';
-const PLACEHOLDER_IMAGE = '/placeholder.png';
+const DEFAULT_LOCALE = "ru-RU";
+const DEFAULT_FALLBACK = "Цена недоступна";
+const PLACEHOLDER_IMAGE = "/placeholder.png";
 
 /**
  * Formats a cent-denominated amount into a localized currency string.
@@ -19,15 +19,18 @@ export const formatPrice = (
   currency: string,
   options: FormatPriceOptions = {},
 ): string => {
-  const { locale = DEFAULT_LOCALE, fallback = DEFAULT_FALLBACK, ...intlOptions } =
-    options;
+  const {
+    locale = DEFAULT_LOCALE,
+    fallback = DEFAULT_FALLBACK,
+    ...intlOptions
+  } = options;
 
   if (priceCents === null || Number.isNaN(priceCents)) {
     return fallback;
   }
 
   return new Intl.NumberFormat(locale, {
-    style: 'currency',
+    style: "currency",
     currency,
     ...intlOptions,
   }).format(priceCents / 100);
@@ -45,7 +48,7 @@ export const formatUnitPrice = (
     return null;
   }
 
-  const prefix = options.prefix ?? 'за';
+  const prefix = options.prefix ?? "за";
   return `${prefix} ${amount} ${units}`;
 };
 
@@ -57,8 +60,8 @@ export const appendResizedSuffix = (url: string): string => {
 
   const queryStart = url.search(/[?#]/);
   const baseUrl = queryStart === -1 ? url : url.slice(0, queryStart);
-  const suffix = queryStart === -1 ? '' : url.slice(queryStart);
-  const lastSlashIndex = baseUrl.lastIndexOf('/');
+  const suffix = queryStart === -1 ? "" : url.slice(queryStart);
+  const lastSlashIndex = baseUrl.lastIndexOf("/");
   const fileName =
     lastSlashIndex === -1 ? baseUrl : baseUrl.slice(lastSlashIndex + 1);
 
@@ -66,7 +69,7 @@ export const appendResizedSuffix = (url: string): string => {
     return url;
   }
 
-  const lastDotInFileName = fileName.lastIndexOf('.');
+  const lastDotInFileName = fileName.lastIndexOf(".");
   if (lastDotInFileName <= 0) {
     return url;
   }

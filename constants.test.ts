@@ -4,9 +4,9 @@
 import { describe, expect, it } from "vitest";
 
 describe("constants", () => {
-    it("exports HUB_ID and API_URL", async () => {
-        const constants = await import("./constants");
-        expect(constants.HUB_ID).toBeDefined();
-        expect(constants.API_URL).toBeDefined();
-    });
+  it("exports HUB_ID and API_URL", async () => {
+    const constants = await import("./constants");
+    expect(constants.HUB_ID).toBeDefined();
+    expect(constants.API_URL).toBeDefined();
+  });
 });

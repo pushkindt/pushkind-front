@@ -3,12 +3,7 @@
  */
 import React from "react";
 import ProductCard from "../components/ProductCard";
-import type {
-  Category,
-  Product,
-  ProductLayout,
-  Tag,
-} from "../types";
+import type { Category, Product, ProductLayout, Tag } from "../types";
 
 /**
  * Props passed to the `HomeView` component.
@@ -51,13 +46,17 @@ const HomeView: React.FC<HomeViewProps> = ({
                 className="w-full h-40 object-cover"
               />
               <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
-                <h3 className="text-white text-2xl font-bold">{category.name}</h3>
+                <h3 className="text-white text-2xl font-bold">
+                  {category.name}
+                </h3>
               </div>
             </div>
           ))}
         </div>
         <div className="mt-8">
-          <h3 className="text-2xl font-bold text-gray-800 mb-4">Фильтр по тегам</h3>
+          <h3 className="text-2xl font-bold text-gray-800 mb-4">
+            Фильтр по тегам
+          </h3>
           <div className="flex flex-wrap gap-2">
             {tags.map((tag) => (
               <button

@@ -2,7 +2,7 @@
  * @file App.tsx orchestrates the storefront shell, composing navigation-aware
  * views, shared overlays, and top-level layout elements.
  */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { User, Product, Tag, ProductLayout } from "./types";
 import Header from "./components/Header";
 import LoginModal from "./components/LoginModal";
@@ -19,6 +19,38 @@ import useCatalogData from "./hooks/useCatalogData";
 import useProductDetail from "./hooks/useProductDetail";
 import { useCart } from "./contexts/CartContext";
 import useTransientFlag from "./hooks/useTransientFlag";
+import { fetchCurrentUser } from "./services/api";
+import { USER_STORAGE_KEY } from "./constants";
+
+const loadPersistedUser = (): User | null => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const storedValue = window.localStorage.getItem(USER_STORAGE_KEY);
+  if (!storedValue) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(storedValue) as User;
+  } catch {
+    window.localStorage.removeItem(USER_STORAGE_KEY);
+    return null;
+  }
+};
+
+const persistUser = (nextUser: User | null) => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  if (nextUser) {
+    window.localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(nextUser));
+  } else {
+    window.localStorage.removeItem(USER_STORAGE_KEY);
+  }
+};
 
 /**
  * Root storefront component that wires navigation, catalog data, cart actions,
@@ -52,11 +84,51 @@ const App: React.FC = () => {
   const tags: Tag[] = catalogData.tags;
   const products: Product[] = catalogData.products;
   const selectedProduct = isProductView ? productDetailData.product : null;
+  const sessionRequestIdRef = useRef<symbol | null>(null);
 
   useEffect(() => {
     // Reset the gallery position whenever a new product is loaded.
     setActiveImageIndex(0);
   }, [selectedProduct?.id]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const restoreUserFromSession = async () => {
+      const requestId = Symbol("sessionRestore");
+      sessionRequestIdRef.current = requestId;
+
+      const cachedUser = loadPersistedUser();
+      if (cachedUser && isMounted) {
+        setUser(cachedUser);
+      }
+
+      const sessionUser = await fetchCurrentUser();
+      if (!isMounted) {
+        return;
+      }
+
+      if (sessionRequestIdRef.current !== requestId) {
+        return;
+      }
+
+      if (sessionUser) {
+        setUser(sessionUser);
+        persistUser(sessionUser);
+      } else {
+        setUser(null);
+        persistUser(null);
+      }
+      sessionRequestIdRef.current = null;
+    };
+
+    restoreUserFromSession();
+
+    return () => {
+      isMounted = false;
+      sessionRequestIdRef.current = null;
+    };
+  }, []);
 
   /**
    * Persists the authenticated user and hides the login modal once the OTP
@@ -64,7 +136,9 @@ const App: React.FC = () => {
    */
   const handleLoginSuccess = (loggedInUser: User) => {
     setUser(loggedInUser);
+    persistUser(loggedInUser);
     setIsLoginModalOpen(false);
+    sessionRequestIdRef.current = null;
   };
 
   /**
@@ -141,12 +215,7 @@ const App: React.FC = () => {
     }
 
     if (view.type === "tag") {
-      return (
-        <TagView
-          products={products}
-          productLayout={productLayout}
-        />
-      );
+      return <TagView products={products} productLayout={productLayout} />;
     }
 
     return (

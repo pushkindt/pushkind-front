@@ -34,6 +34,7 @@ describe("fetchCategories", () => {
     await fetchCategories();
 
     expect(mockFetch).toHaveBeenCalledWith(baseUrl, {
+      credentials: "include",
       headers: { Accept: "application/json" },
     });
   });
@@ -42,6 +43,7 @@ describe("fetchCategories", () => {
     await fetchCategories(null);
 
     expect(mockFetch).toHaveBeenCalledWith(baseUrl, {
+      credentials: "include",
       headers: { Accept: "application/json" },
     });
   });
@@ -50,6 +52,7 @@ describe("fetchCategories", () => {
     await fetchCategories(42);
 
     expect(mockFetch).toHaveBeenCalledWith(`${baseUrl}?parentId=42`, {
+      credentials: "include",
       headers: { Accept: "application/json" },
     });
   });

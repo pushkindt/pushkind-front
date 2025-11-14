@@ -39,9 +39,7 @@ const ProductView: React.FC<ProductViewProps> = ({
   }
 
   const baseImageUrls =
-    product.imageUrls.length > 0
-      ? product.imageUrls
-      : [PLACEHOLDER_IMAGE];
+    product.imageUrls.length > 0 ? product.imageUrls : [PLACEHOLDER_IMAGE];
   const imageUrls = baseImageUrls.map((url) =>
     url === PLACEHOLDER_IMAGE ? url : appendResizedSuffix(url),
   );
@@ -54,7 +52,9 @@ const ProductView: React.FC<ProductViewProps> = ({
   const boundedImageIndex = Math.min(activeImageIndex, imageUrls.length - 1);
   const activeImage = imageUrls[boundedImageIndex];
   const hasMultipleImages = imageUrls.length > 1;
-  const categoryName = categories.find((c) => c.id === product.categoryId)?.name;
+  const categoryName = categories.find(
+    (c) => c.id === product.categoryId,
+  )?.name;
 
   return (
     <div className="bg-white rounded-lg shadow-xl overflow-hidden max-w-5xl mx-auto">
@@ -71,8 +71,9 @@ const ProductView: React.FC<ProductViewProps> = ({
                 <button
                   type="button"
                   onClick={() =>
-                    onImageIndexChange((prev) =>
-                      (prev - 1 + imageUrls.length) % imageUrls.length,
+                    onImageIndexChange(
+                      (prev) =>
+                        (prev - 1 + imageUrls.length) % imageUrls.length,
                     )
                   }
                   className="bg-white bg-opacity-70 text-gray-700 rounded-full px-3 py-1 shadow"
@@ -82,9 +83,7 @@ const ProductView: React.FC<ProductViewProps> = ({
                 <button
                   type="button"
                   onClick={() =>
-                    onImageIndexChange((prev) =>
-                      (prev + 1) % imageUrls.length,
-                    )
+                    onImageIndexChange((prev) => (prev + 1) % imageUrls.length)
                   }
                   className="bg-white bg-opacity-70 text-gray-700 rounded-full px-3 py-1 shadow"
                 >
@@ -136,7 +135,9 @@ const ProductView: React.FC<ProductViewProps> = ({
           </div>
           <div className="mt-6">
             <div className="flex items-baseline mb-4 space-x-2">
-              <span className="text-3xl font-bold text-gray-900">{formattedPrice}</span>
+              <span className="text-3xl font-bold text-gray-900">
+                {formattedPrice}
+              </span>
               {unitPriceLabel && (
                 <span className="text-sm text-gray-600">{unitPriceLabel}</span>
               )}

@@ -28,6 +28,7 @@ export const fetchCategories = async (
   try {
     const response = await fetch(url.toString(), {
       headers: { Accept: "application/json" },
+      credentials: "include",
     });
 
     if (!response.ok) {
@@ -48,6 +49,7 @@ export const fetchTags = async (): Promise<Tag[]> => {
   try {
     const response = await fetch(buildUrl("/tags"), {
       headers: { Accept: "application/json" },
+      credentials: "include",
     });
 
     if (!response.ok) {
@@ -82,6 +84,7 @@ export const fetchProducts = async (
   try {
     const response = await fetch(url.toString(), {
       headers: { Accept: "application/json" },
+      credentials: "include",
     });
 
     if (!response.ok) {
@@ -110,6 +113,7 @@ export const fetchProductById = async (
   try {
     const response = await fetch(url.toString(), {
       headers: { Accept: "application/json" },
+      credentials: "include",
     });
 
     if (response.status === 404) {
@@ -129,6 +133,73 @@ export const fetchProductById = async (
   }
 };
 
+/** Loads the authenticated customer when the session cookie is present. */
+export const fetchCurrentUser = async (): Promise<User | null> => {
+  try {
+    const response = await fetch(buildUrl("/auth/session"), {
+      headers: { Accept: "application/json" },
+      credentials: "include",
+    });
+
+    if (response.status === 401) {
+      return null;
+    }
+
+    if (!response.ok) {
+      throw new Error(
+        `Не удалось загрузить сессию: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    const payload = await response.json();
+    const candidate = extractCustomerFromPayload(payload);
+    return candidate;
+  } catch (error) {
+    handleApiError("Не удалось загрузить сессию.", error);
+    return null;
+  }
+};
+
+const extractCustomerFromPayload = (payload: unknown): User | null => {
+  if (!payload || typeof payload !== "object") {
+    return null;
+  }
+
+  const record = payload as Record<string, unknown>;
+  const nestedCustomer = record.customer;
+  const customerRecord =
+    nestedCustomer && typeof nestedCustomer === "object"
+      ? (nestedCustomer as Record<string, unknown>)
+      : record;
+
+  return mapRecordToUser(customerRecord);
+};
+
+const mapRecordToUser = (record: Record<string, unknown>): User | null => {
+  if (
+    typeof record.id !== "number" ||
+    typeof record.hub_id !== "number" ||
+    typeof record.name !== "string" ||
+    typeof record.phone !== "string"
+  ) {
+    return null;
+  }
+
+  const emailValue = record.email;
+  const email =
+    emailValue === null || typeof emailValue === "string"
+      ? (emailValue as string | null)
+      : null;
+
+  return {
+    id: record.id,
+    hub_id: record.hub_id,
+    name: record.name,
+    email,
+    phone: record.phone,
+  };
+};
+
 /** Prefixes a phone number with `+` if it is missing. */
 const normalizePhone = (phone: string) =>
   phone.startsWith("+") ? phone : `+${phone}`;
@@ -143,6 +214,7 @@ export const sendOtp = async (phone: string): Promise<{ success: boolean }> => {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
+      credentials: "include",
       body: JSON.stringify({ phone: payloadPhone }),
     });
 
@@ -172,6 +244,7 @@ export const verifyOtp = async (
         "Content-Type": "application/json",
         Accept: "application/json",
       },
+      credentials: "include",
       body: JSON.stringify({ phone: payloadPhone, otp }),
     });
 
