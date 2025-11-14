@@ -261,6 +261,12 @@ const App: React.FC = () => {
       const nextView = viewFromState ?? getViewFromWindowLocation();
       isHandlingPopStateRef.current = true;
       setView(nextView);
+      // Allow future navigations to update history once this popstate handling
+      // cycle completes. Use a microtask to avoid clearing the flag before any
+      // synchronous logic triggered by setView can run.
+      Promise.resolve().then(() => {
+        isHandlingPopStateRef.current = false;
+      });
     };
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
