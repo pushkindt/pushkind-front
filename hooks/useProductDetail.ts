@@ -1,12 +1,20 @@
+/**
+ * @file useProductDetail.ts fetches data required for the product details page.
+ */
 import { useCallback, useEffect, useState } from "react";
 import * as api from "../services/api";
 import type { Category, Product, User } from "../types";
 
+/**
+ * Fetches the detailed product payload and supporting category metadata for
+ * the product detail view.
+ */
 const useProductDetail = (productId: number | null, user: User | null) => {
   const [product, setProduct] = useState<Product | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(productId !== null);
 
+  /** Loads detail data for the active product id. */
   const fetchProductDetail = useCallback(async () => {
     if (!productId) {
       setProduct(null);

@@ -1,3 +1,6 @@
+/**
+ * @file api.test.ts verifies API helper URL building behavior.
+ */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../constants", () => ({

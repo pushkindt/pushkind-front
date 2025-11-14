@@ -1,7 +1,13 @@
+/**
+ * @file CategoryView.tsx renders nested categories and associated products.
+ */
 import React from "react";
 import ProductCard from "../components/ProductCard";
 import type { Category, Product, ProductLayout } from "../types";
 
+/**
+ * Props consumed by `CategoryView`.
+ */
 interface CategoryViewProps {
   categories: Category[];
   products: Product[];
@@ -9,6 +15,10 @@ interface CategoryViewProps {
   onCategorySelect: (categoryId: number, categoryName?: string) => void;
 }
 
+/**
+ * Category-focused view that shows sibling categories (for drill-down) and the
+ * filtered product list.
+ */
 const CategoryView: React.FC<CategoryViewProps> = ({
   categories,
   products,

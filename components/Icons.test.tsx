@@ -1,3 +1,6 @@
+/**
+ * @file Icons.test.tsx ensures exported SVG icons render without crashing.
+ */
 import { describe, expect, it } from "vitest";
 import { render } from "@testing-library/react";
 import { ShoppingCartIcon, UserIcon, XIcon } from "./Icons";

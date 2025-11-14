@@ -1,6 +1,12 @@
+/**
+ * @file Modal.tsx provides a reusable animated dialog shell.
+ */
 import React, { ReactNode } from "react";
 import { XIcon } from "./Icons";
 
+/**
+ * Props required to render the modal dialog.
+ */
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -8,6 +14,9 @@ interface ModalProps {
   children: ReactNode;
 }
 
+/**
+ * Portal-friendly modal window with backdrop handling and exit affordances.
+ */
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
   if (!isOpen) return null;
 

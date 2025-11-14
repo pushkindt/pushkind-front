@@ -1,3 +1,6 @@
+/**
+ * @file ToastContainer.tsx subscribes to toast events and renders them.
+ */
 import React, { useEffect, useState } from "react";
 import {
   dismissToast,
@@ -10,6 +13,10 @@ const typeStyles: Record<ToastMessage["type"], string> = {
   error: "border-rose-200 bg-rose-50 text-rose-800",
 };
 
+/**
+ * Portal container that listens to the toast service and renders dismissible
+ * banners.
+ */
 const ToastContainer: React.FC = () => {
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
@@ -26,6 +33,9 @@ const ToastContainer: React.FC = () => {
     return unregister;
   }, []);
 
+  /**
+   * Removes a toast by delegating to the service.
+   */
   const handleRemove = (id: string) => {
     dismissToast(id);
   };

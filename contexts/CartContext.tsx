@@ -1,3 +1,6 @@
+/**
+ * @file CartContext.tsx stores cart state and exposes mutation helpers.
+ */
 import React, {
   createContext,
   useCallback,
@@ -7,6 +10,9 @@ import React, {
 } from "react";
 import type { CartItem, Product } from "../types";
 
+/**
+ * Shape of the cart context consumers receive.
+ */
 interface CartContextValue {
   items: CartItem[];
   addItem: (product: Product) => void;
@@ -18,15 +24,21 @@ interface CartContextValue {
   hasPricedItems: boolean;
 }
 
+/** React context that holds cart data. */
 const CartContext = createContext<CartContextValue | undefined>(undefined);
 
+/** Props accepted by the `CartProvider`. */
 interface CartProviderProps {
   children: React.ReactNode;
 }
 
+/**
+ * Provider component that keeps cart state in sync for the entire app.
+ */
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>([]);
 
+  /** Adds a product to the cart, incrementing quantity when necessary. */
   const addItem = useCallback((product: Product) => {
     setItems((prevItems) => {
       const existingItem = prevItems.find((item) => item.id === product.id);
@@ -41,10 +53,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     });
   }, []);
 
+  /** Removes a product entirely from the cart. */
   const removeItem = useCallback((productId: number) => {
     setItems((prevItems) => prevItems.filter((item) => item.id !== productId));
   }, []);
 
+  /** Adjusts the quantity of a specific product, removing it if below 1. */
   const updateQuantity = useCallback(
     (productId: number, quantity: number) => {
       if (quantity <= 0) {
@@ -109,6 +123,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };
 
+/** Hook that guarantees the cart context is available. */
 export const useCart = () => {
   const context = useContext(CartContext);
   if (!context) {

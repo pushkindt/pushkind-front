@@ -1,9 +1,15 @@
+/**
+ * @file Cart.tsx renders the cart drawer, quantity controls, and checkout CTA.
+ */
 import React from "react";
 import type { User } from "../types";
 import { formatPrice, getPrimaryImage } from "../utils/formatPrice";
 import { PlusIcon, MinusIcon, TrashIcon, XIcon } from "./Icons";
 import { useCart } from "../contexts/CartContext";
 
+/**
+ * Props accepted by the `Cart` drawer component.
+ */
 interface CartProps {
   isOpen: boolean;
   onClose: () => void;
@@ -11,6 +17,10 @@ interface CartProps {
   onLoginClick: () => void;
 }
 
+/**
+ * Slide-over cart drawer that summarizes the shopper's selections and
+ * dispatches login or checkout intents based on authentication state.
+ */
 const Cart: React.FC<CartProps> = ({
   isOpen,
   onClose,
@@ -32,6 +42,9 @@ const Cart: React.FC<CartProps> = ({
     priceFallback,
   );
 
+  /**
+   * Placeholder checkout handler until server-side ordering is wired up.
+   */
   const handleCheckout = () => {
     alert("Начат процесс оформления заказа! (демо)");
   };

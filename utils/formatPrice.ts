@@ -1,3 +1,7 @@
+/**
+ * @file formatPrice.ts groups helpers for pricing labels and image URLs.
+ */
+
 export interface FormatPriceOptions extends Intl.NumberFormatOptions {
   locale?: string;
   fallback?: string;
@@ -7,6 +11,9 @@ const DEFAULT_LOCALE = 'ru-RU';
 const DEFAULT_FALLBACK = 'Цена недоступна';
 const PLACEHOLDER_IMAGE = '/placeholder.png';
 
+/**
+ * Formats a cent-denominated amount into a localized currency string.
+ */
 export const formatPrice = (
   priceCents: number | null,
   currency: string,
@@ -26,6 +33,9 @@ export const formatPrice = (
   }).format(priceCents / 100);
 };
 
+/**
+ * Formats a unit price label such as "за 1 кг".
+ */
 export const formatUnitPrice = (
   amount: number | null,
   units?: string | null,
@@ -39,6 +49,7 @@ export const formatUnitPrice = (
   return `${prefix} ${amount} ${units}`;
 };
 
+/** Adds a `_resized` suffix to an image filename when possible. */
 export const appendResizedSuffix = (url: string): string => {
   if (!url) {
     return url;
@@ -68,6 +79,7 @@ export const appendResizedSuffix = (url: string): string => {
   return `${baseUrl.slice(0, dotIndex)}_resized${baseUrl.slice(dotIndex)}${suffix}`;
 };
 
+/** Returns the primary image (or placeholder) for a product. */
 export const getPrimaryImage = (imageUrls: string[] = []): string => {
   if (!imageUrls.length) {
     return PLACEHOLDER_IMAGE;

@@ -1,9 +1,13 @@
+/**
+ * @file Header.test.tsx asserts the header renders key affordances.
+ */
 import React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import Header from "./Header";
 
+/** Utility that wraps the tested component with a router. */
 const renderWithRouter = (ui: React.ReactNode) =>
     render(<MemoryRouter>{ui}</MemoryRouter>);
 

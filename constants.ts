@@ -1,3 +1,6 @@
+/**
+ * @file constants.ts validates and exports build-time environment constants.
+ */
 const hubId = import.meta.env.VITE_HUB_ID;
 if (!hubId) {
   throw new Error("Отсутствует переменная окружения VITE_HUB_ID");

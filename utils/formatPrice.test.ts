@@ -1,3 +1,6 @@
+/**
+ * @file formatPrice.test.ts covers currency and unit label helpers.
+ */
 import { describe, expect, it } from "vitest";
 import { formatPrice, formatUnitPrice } from "./formatPrice";
 
