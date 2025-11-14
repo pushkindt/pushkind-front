@@ -5,6 +5,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import AppRoutes from "./routes";
 import * as api from "./services/api";
+import { CartProvider } from "./contexts/CartContext";
 
 vi.mock("./services/api", () => ({
     fetchCategories: vi.fn(),
@@ -52,7 +53,9 @@ describe("App", () => {
         const user = userEvent.setup();
         render(
             <MemoryRouter>
-                <AppRoutes />
+                <CartProvider>
+                    <AppRoutes />
+                </CartProvider>
             </MemoryRouter>,
         );
 

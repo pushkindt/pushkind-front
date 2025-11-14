@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import type { User, Product, Tag, CartItem, ProductLayout } from "./types";
+import React, { useEffect, useState } from "react";
+import type { User, Product, Tag, ProductLayout } from "./types";
 import Header from "./components/Header";
 import LoginModal from "./components/LoginModal";
 import Cart from "./components/Cart";
@@ -13,17 +13,18 @@ import TagView from "./views/TagView";
 import ProductView from "./views/ProductView";
 import useCatalogData from "./hooks/useCatalogData";
 import useProductDetail from "./hooks/useProductDetail";
+import { useCart } from "./contexts/CartContext";
+import useTransientFlag from "./hooks/useTransientFlag";
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
-  const [cart, setCart] = useState<CartItem[]>([]);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [productLayout, setProductLayout] = useState<ProductLayout>("grid");
-  const [isAddFeedbackActive, setIsAddFeedbackActive] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const addToCartFeedbackTimeoutRef =
-    useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { addItem, itemCount } = useCart();
+  const { isActive: isAddFeedbackActive, activate: triggerAddFeedback } =
+    useTransientFlag();
 
   const { view, goHome, goToCategory, goToTag } = useViewNavigation();
 
@@ -45,14 +46,6 @@ const App: React.FC = () => {
   const selectedProduct = isProductView ? productDetailData.product : null;
 
   useEffect(() => {
-    return () => {
-      if (addToCartFeedbackTimeoutRef.current) {
-        clearTimeout(addToCartFeedbackTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
     setActiveImageIndex(0);
   }, [selectedProduct?.id]);
 
@@ -61,47 +54,10 @@ const App: React.FC = () => {
     setIsLoginModalOpen(false);
   };
 
-  const handleAddToCart = (product: Product) => {
-    setCart((prevCart) => {
-      const existingItem = prevCart.find((item) => item.id === product.id);
-      if (existingItem) {
-        return prevCart.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item,
-        );
-      }
-      return [...prevCart, { ...product, quantity: 1 }];
-    });
-  };
-
   const handleAddToCartWithFeedback = (product: Product) => {
-    handleAddToCart(product);
-    setIsAddFeedbackActive(true);
-    if (addToCartFeedbackTimeoutRef.current) {
-      clearTimeout(addToCartFeedbackTimeoutRef.current);
-    }
-    addToCartFeedbackTimeoutRef.current = setTimeout(() => {
-      setIsAddFeedbackActive(false);
-      addToCartFeedbackTimeoutRef.current = null;
-    }, 1000);
+    addItem(product);
+    triggerAddFeedback();
   };
-
-  const handleUpdateCartQuantity = (productId: number, quantity: number) => {
-    if (quantity <= 0) {
-      handleRemoveFromCart(productId);
-      return;
-    }
-    setCart((cart) =>
-      cart.map((item) => (item.id === productId ? { ...item, quantity } : item)),
-    );
-  };
-
-  const handleRemoveFromCart = (productId: number) => {
-    setCart((cart) => cart.filter((item) => item.id !== productId));
-  };
-
-  const cartItemCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   const getTitle = () => {
     switch (view.type) {
@@ -155,7 +111,6 @@ const App: React.FC = () => {
           products={products}
           productLayout={productLayout}
           onCategorySelect={goToCategory}
-          onAddToCart={handleAddToCart}
         />
       );
     }
@@ -165,7 +120,6 @@ const App: React.FC = () => {
         <TagView
           products={products}
           productLayout={productLayout}
-          onAddToCart={handleAddToCart}
         />
       );
     }
@@ -178,7 +132,6 @@ const App: React.FC = () => {
         productLayout={productLayout}
         onCategorySelect={goToCategory}
         onTagSelect={goToTag}
-        onAddToCart={handleAddToCart}
       />
     );
   };
@@ -188,7 +141,7 @@ const App: React.FC = () => {
       header={
         <Header
           user={user}
-          cartItemCount={cartItemCount}
+          cartItemCount={itemCount}
           onLoginClick={() => setIsLoginModalOpen(true)}
           onCartClick={() => setIsCartOpen(true)}
         />
@@ -203,10 +156,7 @@ const App: React.FC = () => {
           <Cart
             isOpen={isCartOpen}
             onClose={() => setIsCartOpen(false)}
-            cartItems={cart}
             user={user}
-            onUpdateQuantity={handleUpdateCartQuantity}
-            onRemoveItem={handleRemoveFromCart}
             onLoginClick={() => setIsLoginModalOpen(true)}
           />
           <ToastContainer />

@@ -14,7 +14,6 @@ interface HomeViewProps {
   productLayout: ProductLayout;
   onCategorySelect: (categoryId: number, categoryName?: string) => void;
   onTagSelect: (tagId: number, tagName?: string) => void;
-  onAddToCart: (product: Product) => void;
 }
 
 const HomeView: React.FC<HomeViewProps> = ({
@@ -24,7 +23,6 @@ const HomeView: React.FC<HomeViewProps> = ({
   productLayout,
   onCategorySelect,
   onTagSelect,
-  onAddToCart,
 }) => {
   return (
     <>
@@ -77,7 +75,6 @@ const HomeView: React.FC<HomeViewProps> = ({
             key={product.id}
             product={product}
             layout={productLayout}
-            onAddToCart={onAddToCart}
           />
         ))}
       </div>

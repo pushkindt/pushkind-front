@@ -1,11 +1,16 @@
 import React from "react";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import ProductCard from "./ProductCard";
+import { CartProvider } from "../contexts/CartContext";
 
 const renderWithRouter = (ui: React.ReactNode) =>
-    render(<MemoryRouter>{ui}</MemoryRouter>);
+    render(
+        <MemoryRouter>
+            <CartProvider>{ui}</CartProvider>
+        </MemoryRouter>,
+    );
 
 describe("ProductCard", () => {
     const mockProduct = {
@@ -23,18 +28,14 @@ describe("ProductCard", () => {
     };
 
     it("renders product name and price", () => {
-        renderWithRouter(
-            <ProductCard product={mockProduct} onAddToCart={vi.fn()} />,
-        );
+        renderWithRouter(<ProductCard product={mockProduct} />);
         expect(screen.getByText("Test Product")).toBeTruthy();
         expect(screen.getByText(/100/)).toBeTruthy();
     });
 
     it("shows placeholder when no image", () => {
         const noImageProduct = { ...mockProduct, imageUrls: [] };
-        renderWithRouter(
-            <ProductCard product={noImageProduct} onAddToCart={vi.fn()} />,
-        );
+        renderWithRouter(<ProductCard product={noImageProduct} />);
         const img = screen.getByAltText("Test Product") as HTMLImageElement;
         expect(img.src).toContain("placeholder.png");
     });
@@ -47,7 +48,7 @@ describe("ProductCard", () => {
         };
 
         const { container } = renderWithRouter(
-            <ProductCard product={listProduct} layout="list" onAddToCart={vi.fn()} />,
+            <ProductCard product={listProduct} layout="list" />,
         );
 
         const wrapper = container.firstChild as HTMLElement;
