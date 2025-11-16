@@ -4,7 +4,6 @@
 import React from "react";
 import type { Category, Product } from "../types";
 import {
-  appendResizedSuffix,
   formatPrice,
   formatUnitPrice,
   PLACEHOLDER_IMAGE,
@@ -97,8 +96,8 @@ const ProductView: React.FC<ProductViewProps> = ({
                   type="button"
                   onClick={() => onImageIndexChange(index)}
                   className={`border rounded-lg overflow-hidden transition-transform duration-200 ${boundedImageIndex === index
-                      ? "border-indigo-600 scale-105"
-                      : "border-gray-200 hover:scale-105"
+                    ? "border-indigo-600 scale-105"
+                    : "border-gray-200 hover:scale-105"
                     }`}
                 >
                   <img
@@ -141,8 +140,8 @@ const ProductView: React.FC<ProductViewProps> = ({
             <button
               onClick={() => onAddToCart(product)}
               className={`w-full text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors duration-300 ${isAddFeedbackActive
-                  ? "bg-green-500 hover:bg-green-600"
-                  : "bg-indigo-600 hover:bg-indigo-700"
+                ? "bg-green-500 hover:bg-green-600"
+                : "bg-indigo-600 hover:bg-indigo-700"
                 }`}
             >
               Добавить в корзину
