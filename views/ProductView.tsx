@@ -8,6 +8,7 @@ import {
   formatUnitPrice,
   PLACEHOLDER_IMAGE,
 } from "../utils/formatPrice";
+import { sanitizeHtml } from "../utils/sanitizeHtml";
 
 /**
  * Props accepted by the `ProductView` component.
@@ -51,6 +52,10 @@ const ProductView: React.FC<ProductViewProps> = ({
   const categoryName = categories.find(
     (c) => c.id === product.categoryId,
   )?.name;
+  const safeDescription = React.useMemo(
+    () => sanitizeHtml(product.description),
+    [product.description],
+  );
 
   return (
     <div className="bg-white rounded-lg shadow-xl overflow-hidden max-w-5xl mx-auto">
@@ -128,7 +133,7 @@ const ProductView: React.FC<ProductViewProps> = ({
             )}
             <div
               className="mt-4 text-gray-600 space-y-2"
-              dangerouslySetInnerHTML={{ __html: product.description }}
+              dangerouslySetInnerHTML={{ __html: safeDescription }}
             />
           </div>
           <div className="mt-6">
