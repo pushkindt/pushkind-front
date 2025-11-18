@@ -126,7 +126,10 @@ const ProductView: React.FC<ProductViewProps> = ({
             {product.units && (
               <p className="text-sm text-gray-500">Единицы: {product.units}</p>
             )}
-            <p className="mt-4 text-gray-600">{product.description}</p>
+            <div
+              className="mt-4 text-gray-600 space-y-2"
+              dangerouslySetInnerHTML={{ __html: product.description }}
+            />
           </div>
           <div className="mt-6">
             <div className="flex items-baseline mb-4 space-x-2">
