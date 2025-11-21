@@ -9,6 +9,7 @@ import {
   formatUnitPrice,
   getPrimaryImage,
 } from "../utils/formatPrice";
+import { sanitizeHtml } from "../utils/sanitizeHtml";
 import { useCart } from "../contexts/CartContext";
 import useTransientFlag from "../hooks/useTransientFlag";
 
@@ -40,6 +41,16 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const { addItem } = useCart();
   const { isActive: isButtonFeedbackActive, activate: triggerButtonFeedback } =
     useTransientFlag();
+  const previewDescription = React.useMemo(() => {
+    const sanitized = sanitizeHtml(product.description);
+    if (!sanitized) {
+      return "";
+    }
+
+    const textOnly = sanitized.replace(/<[^>]*>/g, "");
+    const clipped = textOnly.substring(0, 50);
+    return `${clipped}${textOnly.length > 50 ? "..." : ""}`;
+  }, [product.description]);
 
   /**
    * Adds the product to the cart while triggering transient button feedback.
@@ -96,7 +107,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         )}
         {descriptionVisible && (
           <p className="text-sm text-gray-500 mt-1 flex-grow">
-            {product.description.substring(0, 50)}...
+            {previewDescription}
           </p>
         )}
         <div

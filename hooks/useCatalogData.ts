@@ -2,7 +2,7 @@
  * @file useCatalogData.ts centralizes fetching for category, tag, and product
  * data used across home, category, and tag views.
  */
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import * as api from "../services/api";
 import type { Category, Product, Tag, User, View } from "../types";
 
@@ -10,14 +10,19 @@ import type { Category, Product, Tag, User, View } from "../types";
  * Fetches catalog metadata (categories, tags, products) for the current view
  * and exposes derived loading state.
  */
-const useCatalogData = (view: View, user: User | null) => {
+const useCatalogData = (view: View, user: User | null, searchQuery = "") => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const requestIdRef = useRef(0);
+  const userId = user?.id;
 
   /** Loads all catalog data for the current view. */
   const fetchCatalogData = useCallback(async () => {
+    const requestId = requestIdRef.current + 1;
+    requestIdRef.current = requestId;
+
     if (view.type === "product") {
       setCategories([]);
       setTags([]);
@@ -34,29 +39,45 @@ const useCatalogData = (view: View, user: User | null) => {
         api.fetchCategories(categoryParentId),
         api.fetchTags(),
       ]);
+
+      if (requestId !== requestIdRef.current) {
+        return;
+      }
+
       setCategories(fetchedCategories);
       setTags(fetchedTags);
 
       let fetchedProducts: Product[] = [];
+      const searchFilter = searchQuery.trim();
       if (view.type === "home") {
-        fetchedProducts = await api.fetchProducts(user);
+        fetchedProducts = await api.fetchProducts(
+          searchFilter ? { search: searchFilter } : {},
+        );
       } else if (view.type === "category") {
-        fetchedProducts = await api.fetchProducts(user, {
+        fetchedProducts = await api.fetchProducts({
           categoryId: view.categoryId,
+          ...(searchFilter ? { search: searchFilter } : {}),
         });
       } else if (view.type === "tag") {
-        fetchedProducts = await api.fetchProducts(user, {
+        fetchedProducts = await api.fetchProducts({
           tagId: view.tagId,
+          ...(searchFilter ? { search: searchFilter } : {}),
         });
+      }
+
+      if (requestId !== requestIdRef.current) {
+        return;
       }
 
       setProducts(fetchedProducts);
     } catch (error) {
       console.error("Не удалось загрузить данные каталога:", error);
     } finally {
-      setIsLoading(false);
+      if (requestId === requestIdRef.current) {
+        setIsLoading(false);
+      }
     }
-  }, [user, view]);
+  }, [searchQuery, userId, view]);
 
   useEffect(() => {
     fetchCatalogData();

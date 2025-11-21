@@ -75,4 +75,42 @@ describe("App", () => {
       expect(layoutContainer.className).toContain("flex flex-col");
     });
   });
+
+  it("uses the search bar to request filtered products", async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <CartProvider>
+          <AppRoutes />
+        </CartProvider>
+      </MemoryRouter>,
+    );
+
+    const searchInput = await screen.findByLabelText("Поиск товаров");
+
+    await user.type(searchInput, "tea");
+
+    await waitFor(() => {
+      expect(api.fetchProducts).toHaveBeenCalledWith({ search: "tea" });
+    });
+  });
+
+  it("reads the search query from the URL and fetches filtered products", async () => {
+    render(
+      <MemoryRouter initialEntries={["/?search=карамель"]}>
+        <CartProvider>
+          <AppRoutes />
+        </CartProvider>
+      </MemoryRouter>,
+    );
+
+    const searchInput = (await screen.findByLabelText(
+      "Поиск товаров",
+    )) as HTMLInputElement;
+    expect(searchInput.value).toBe("карамель");
+
+    await waitFor(() => {
+      expect(api.fetchProducts).toHaveBeenCalledWith({ search: "карамель" });
+    });
+  });
 });

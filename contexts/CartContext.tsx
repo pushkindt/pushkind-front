@@ -5,10 +5,13 @@ import React, {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
-import type { CartItem, Product } from "../types";
+import type { CartItem, Product, User } from "../types";
+import { fetchProductById } from "../services/api";
 
 /**
  * Shape of the cart context consumers receive.
@@ -18,6 +21,7 @@ interface CartContextValue {
   addItem: (product: Product) => void;
   updateQuantity: (productId: number, quantity: number) => void;
   removeItem: (productId: number) => void;
+  refreshPricesForUser: (user: User | null) => Promise<void>;
   itemCount: number;
   subtotalCents: number;
   subtotalCurrency: string | null;
@@ -37,6 +41,11 @@ interface CartProviderProps {
  */
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>([]);
+  const itemsRef = useRef<CartItem[]>(items);
+
+  useEffect(() => {
+    itemsRef.current = items;
+  }, [items]);
 
   /** Adds a product to the cart, incrementing quantity when necessary. */
   const addItem = useCallback((product: Product) => {
@@ -97,12 +106,55 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
   const subtotalCurrency = useMemo(() => items[0]?.currency ?? null, [items]);
 
+  /**
+   * Refreshes cart items with user-aware pricing when a shopper authenticates.
+   */
+  const refreshPricesForUser = useCallback(async (user: User | null) => {
+    if (!user) {
+      return;
+    }
+
+    const itemsSnapshot = itemsRef.current;
+    if (itemsSnapshot.length === 0) {
+      return;
+    }
+
+    const updatedItems = await Promise.all(
+      itemsSnapshot.map(async (item) => {
+        const latestProduct = await fetchProductById(item.id);
+        return {
+          ...item,
+          ...(latestProduct ?? {}),
+          quantity: item.quantity,
+        };
+      }),
+    );
+
+    const updatedMap = new Map(updatedItems.map((item) => [item.id, item]));
+
+    setItems((prevItems) =>
+      prevItems.map((prevItem) => {
+        const updatedItem = updatedMap.get(prevItem.id);
+        if (!updatedItem) {
+          return prevItem;
+        }
+
+        return {
+          ...prevItem,
+          ...updatedItem,
+          quantity: prevItem.quantity,
+        };
+      }),
+    );
+  }, []);
+
   const value = useMemo(
     () => ({
       items,
       addItem,
       updateQuantity,
       removeItem,
+      refreshPricesForUser,
       itemCount,
       subtotalCents,
       subtotalCurrency,
@@ -113,6 +165,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       addItem,
       updateQuantity,
       removeItem,
+      refreshPricesForUser,
       itemCount,
       subtotalCents,
       subtotalCurrency,

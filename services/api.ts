@@ -65,10 +65,12 @@ export const fetchTags = async (): Promise<Tag[]> => {
   }
 };
 
-/** Fetches a list of products optionally filtered by category or tag. */
+/**
+ * Fetches a list of products optionally filtered by category, tag, or search.
+ * User context is inferred from the session cookie, so no userId query is sent.
+ */
 export const fetchProducts = async (
-  user: User | null,
-  filter: { categoryId?: number; tagId?: number } = {},
+  filter: { categoryId?: number; tagId?: number; search?: string } = {},
 ): Promise<Product[]> => {
   const url = new URL(buildUrl("/products"));
   if (filter.categoryId !== undefined) {
@@ -77,8 +79,10 @@ export const fetchProducts = async (
   if (filter.tagId !== undefined) {
     url.searchParams.set("tagId", String(filter.tagId));
   }
-  if (user?.id) {
-    url.searchParams.set("userId", String(user.id));
+  const searchQuery =
+    typeof filter.search === "string" ? filter.search.trim() : "";
+  if (searchQuery) {
+    url.searchParams.set("search", searchQuery);
   }
 
   try {
@@ -100,15 +104,14 @@ export const fetchProducts = async (
   }
 };
 
-/** Fetches a single product by id, returning undefined when not found. */
+/**
+ * Fetches a single product by id, returning undefined when not found.
+ * User identity is derived from the session cookie.
+ */
 export const fetchProductById = async (
-  user: User | null,
   productId: number,
 ): Promise<Product | undefined> => {
   const url = new URL(buildUrl(`/products/${productId}`));
-  if (user?.id) {
-    url.searchParams.set("userId", String(user.id));
-  }
 
   try {
     const response = await fetch(url.toString(), {

@@ -12,6 +12,7 @@ interface CategoryViewProps {
   categories: Category[];
   products: Product[];
   productLayout: ProductLayout;
+  showCategories: boolean;
   onCategorySelect: (categoryId: number, categoryName?: string) => void;
 }
 
@@ -23,11 +24,12 @@ const CategoryView: React.FC<CategoryViewProps> = ({
   categories,
   products,
   productLayout,
+  showCategories,
   onCategorySelect,
 }) => {
   return (
     <>
-      {categories.length > 0 && (
+      {showCategories && categories.length > 0 && (
         <div className="mb-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {categories.map((category) => (
