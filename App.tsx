@@ -66,7 +66,7 @@ const App: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const searchQuery = searchParams.get("search") ?? "";
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const { addItem, itemCount } = useCart();
+  const { addItem, itemCount, refreshPricesForUser } = useCart();
   const { isActive: isAddFeedbackActive, activate: triggerAddFeedback } =
     useTransientFlag();
 
@@ -134,6 +134,14 @@ const App: React.FC = () => {
       sessionRequestIdRef.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+
+    refreshPricesForUser(user);
+  }, [refreshPricesForUser, user]);
 
   /**
    * Persists the authenticated user and hides the login modal once the OTP
