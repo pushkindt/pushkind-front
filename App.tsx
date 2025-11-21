@@ -21,6 +21,7 @@ import useCatalogData from "./hooks/useCatalogData";
 import useProductDetail from "./hooks/useProductDetail";
 import { useCart } from "./contexts/CartContext";
 import useTransientFlag from "./hooks/useTransientFlag";
+import useDebouncedValue from "./hooks/useDebouncedValue";
 import { fetchCurrentUser } from "./services/api";
 import { USER_STORAGE_KEY } from "./constants";
 
@@ -65,6 +66,8 @@ const App: React.FC = () => {
   const [productLayout, setProductLayout] = useState<ProductLayout>("grid");
   const [searchParams, setSearchParams] = useSearchParams();
   const searchQuery = searchParams.get("search") ?? "";
+  const [searchInput, setSearchInput] = useState(searchQuery);
+  const debouncedSearchQuery = useDebouncedValue(searchInput, 300);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const { addItem, itemCount, refreshPricesForUser } = useCart();
   const { isActive: isAddFeedbackActive, activate: triggerAddFeedback } =
@@ -72,13 +75,13 @@ const App: React.FC = () => {
 
   const { view, goHome, goToCategory, goToTag } = useViewNavigation();
 
-  const catalogData = useCatalogData(view, user, searchQuery);
+  const catalogData = useCatalogData(view, user, debouncedSearchQuery);
   const productDetailData = useProductDetail(
     view.type === "product" ? view.productId : null,
     user,
   );
-  const isSearchActive = Boolean(searchQuery.trim());
-
+  const isSearchActive = Boolean(searchInput.trim());
+  
   const isProductView = view.type === "product";
   const isLoading = isProductView
     ? productDetailData.isLoading
@@ -143,6 +146,28 @@ const App: React.FC = () => {
     refreshPricesForUser(user);
   }, [refreshPricesForUser, user]);
 
+  useEffect(() => {
+    setSearchInput(searchQuery);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const trimmedQuery = debouncedSearchQuery.trim();
+    const currentQuery = (searchParams.get("search") ?? "").trim();
+
+    if (trimmedQuery === currentQuery) {
+      return;
+    }
+
+    const nextParams = new URLSearchParams(searchParams);
+    if (trimmedQuery) {
+      nextParams.set("search", trimmedQuery);
+    } else {
+      nextParams.delete("search");
+    }
+
+    setSearchParams(nextParams, { replace: true });
+  }, [debouncedSearchQuery, searchParams, setSearchParams]);
+
   /**
    * Persists the authenticated user and hides the login modal once the OTP
    * challenge succeeds.
@@ -163,15 +188,9 @@ const App: React.FC = () => {
     triggerAddFeedback();
   };
 
-  /** Synchronizes the search query with the URL so navigation stays in sync. */
-  const handleSearchChange = (nextValue: string) => {
-    const nextParams = new URLSearchParams(searchParams);
-    if (nextValue) {
-      nextParams.set("search", nextValue);
-    } else {
-      nextParams.delete("search");
-    }
-    setSearchParams(nextParams, { replace: true });
+  /** Updates the search input without immediately triggering navigation. */
+  const handleSearchInputChange = (nextValue: string) => {
+    setSearchInput(nextValue);
   };
 
   /**
@@ -300,8 +319,8 @@ const App: React.FC = () => {
           {view.type !== "product" && (
             <>
               <SearchBar
-                value={searchQuery}
-                onChange={handleSearchChange}
+                value={searchInput}
+                onChange={handleSearchInputChange}
                 placeholder="Поиск товаров и категорий"
               />
               <div className="flex items-center gap-2 bg-white rounded-full shadow px-2 py-1">
