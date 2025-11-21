@@ -10,7 +10,7 @@ import type { Category, Product, Tag, User, View } from "../types";
  * Fetches catalog metadata (categories, tags, products) for the current view
  * and exposes derived loading state.
  */
-const useCatalogData = (view: View, user: User | null) => {
+const useCatalogData = (view: View, user: User | null, searchQuery = "") => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -38,15 +38,21 @@ const useCatalogData = (view: View, user: User | null) => {
       setTags(fetchedTags);
 
       let fetchedProducts: Product[] = [];
+      const searchFilter = searchQuery.trim();
       if (view.type === "home") {
-        fetchedProducts = await api.fetchProducts(user);
+        fetchedProducts = await api.fetchProducts(
+          user,
+          searchFilter ? { search: searchFilter } : {},
+        );
       } else if (view.type === "category") {
         fetchedProducts = await api.fetchProducts(user, {
           categoryId: view.categoryId,
+          ...(searchFilter ? { search: searchFilter } : {}),
         });
       } else if (view.type === "tag") {
         fetchedProducts = await api.fetchProducts(user, {
           tagId: view.tagId,
+          ...(searchFilter ? { search: searchFilter } : {}),
         });
       }
 
@@ -56,7 +62,7 @@ const useCatalogData = (view: View, user: User | null) => {
     } finally {
       setIsLoading(false);
     }
-  }, [user, view]);
+  }, [searchQuery, user, view]);
 
   useEffect(() => {
     fetchCatalogData();

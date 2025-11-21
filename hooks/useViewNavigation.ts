@@ -62,15 +62,31 @@ const useViewNavigation = () => {
     return { type: "home" };
   }, [location.pathname, location.state]);
 
-  const goHome = () => navigate("/");
+  const goHome = () =>
+    navigate({
+      pathname: "/",
+      search: location.search,
+    });
   const goToCategory = (categoryId: number, categoryName?: string) =>
-    navigate(`/categories/${categoryId}`, {
-      state: { categoryName },
-    });
+    navigate(
+      {
+        pathname: `/categories/${categoryId}`,
+        search: location.search,
+      },
+      {
+        state: { categoryName },
+      },
+    );
   const goToTag = (tagId: number, tagName?: string) =>
-    navigate(`/tags/${tagId}`, {
-      state: { tagName },
-    });
+    navigate(
+      {
+        pathname: `/tags/${tagId}`,
+        search: location.search,
+      },
+      {
+        state: { tagName },
+      },
+    );
   return {
     view,
     goHome,

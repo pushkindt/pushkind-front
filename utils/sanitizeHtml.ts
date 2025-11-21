@@ -47,7 +47,10 @@ export const sanitizeHtml = (html: string): string => {
     return "";
   }
 
-  if (typeof window === "undefined" || typeof window.DOMParser === "undefined") {
+  if (
+    typeof window === "undefined" ||
+    typeof window.DOMParser === "undefined"
+  ) {
     return html;
   }
 
@@ -56,4 +59,3 @@ export const sanitizeHtml = (html: string): string => {
   sanitizeElement(doc.body);
   return doc.body.innerHTML;
 };
-

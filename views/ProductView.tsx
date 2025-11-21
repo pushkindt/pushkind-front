@@ -100,10 +100,11 @@ const ProductView: React.FC<ProductViewProps> = ({
                   key={`${product.id}-thumb-${index}`}
                   type="button"
                   onClick={() => onImageIndexChange(index)}
-                  className={`border rounded-lg overflow-hidden transition-transform duration-200 ${boundedImageIndex === index
-                    ? "border-indigo-600 scale-105"
-                    : "border-gray-200 hover:scale-105"
-                    }`}
+                  className={`border rounded-lg overflow-hidden transition-transform duration-200 ${
+                    boundedImageIndex === index
+                      ? "border-indigo-600 scale-105"
+                      : "border-gray-200 hover:scale-105"
+                  }`}
                 >
                   <img
                     className="h-16 w-24 object-cover"
@@ -147,10 +148,11 @@ const ProductView: React.FC<ProductViewProps> = ({
             </div>
             <button
               onClick={() => onAddToCart(product)}
-              className={`w-full text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors duration-300 ${isAddFeedbackActive
-                ? "bg-green-500 hover:bg-green-600"
-                : "bg-indigo-600 hover:bg-indigo-700"
-                }`}
+              className={`w-full text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors duration-300 ${
+                isAddFeedbackActive
+                  ? "bg-green-500 hover:bg-green-600"
+                  : "bg-indigo-600 hover:bg-indigo-700"
+              }`}
             >
               Добавить в корзину
             </button>

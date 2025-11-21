@@ -65,10 +65,10 @@ export const fetchTags = async (): Promise<Tag[]> => {
   }
 };
 
-/** Fetches a list of products optionally filtered by category or tag. */
+/** Fetches a list of products optionally filtered by category, tag, or search. */
 export const fetchProducts = async (
   user: User | null,
-  filter: { categoryId?: number; tagId?: number } = {},
+  filter: { categoryId?: number; tagId?: number; search?: string } = {},
 ): Promise<Product[]> => {
   const url = new URL(buildUrl("/products"));
   if (filter.categoryId !== undefined) {
@@ -76,6 +76,11 @@ export const fetchProducts = async (
   }
   if (filter.tagId !== undefined) {
     url.searchParams.set("tagId", String(filter.tagId));
+  }
+  const searchQuery =
+    typeof filter.search === "string" ? filter.search.trim() : "";
+  if (searchQuery) {
+    url.searchParams.set("search", searchQuery);
   }
   if (user?.id) {
     url.searchParams.set("userId", String(user.id));

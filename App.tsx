@@ -3,11 +3,13 @@
  * views, shared overlays, and top-level layout elements.
  */
 import React, { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import type { User, Product, Tag, ProductLayout } from "./types";
 import Header from "./components/Header";
 import LoginModal from "./components/LoginModal";
 import Cart from "./components/Cart";
 import ToastContainer from "./components/ToastContainer";
+import SearchBar from "./components/SearchBar";
 import { SpinnerIcon, ArrowLeftIcon } from "./components/Icons";
 import useViewNavigation from "./hooks/useViewNavigation";
 import Layout from "./components/Layout";
@@ -61,6 +63,8 @@ const App: React.FC = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [productLayout, setProductLayout] = useState<ProductLayout>("grid");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const searchQuery = searchParams.get("search") ?? "";
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const { addItem, itemCount } = useCart();
   const { isActive: isAddFeedbackActive, activate: triggerAddFeedback } =
@@ -68,11 +72,12 @@ const App: React.FC = () => {
 
   const { view, goHome, goToCategory, goToTag } = useViewNavigation();
 
-  const catalogData = useCatalogData(view, user);
+  const catalogData = useCatalogData(view, user, searchQuery);
   const productDetailData = useProductDetail(
     view.type === "product" ? view.productId : null,
     user,
   );
+  const isSearchActive = Boolean(searchQuery.trim());
 
   const isProductView = view.type === "product";
   const isLoading = isProductView
@@ -150,6 +155,17 @@ const App: React.FC = () => {
     triggerAddFeedback();
   };
 
+  /** Synchronizes the search query with the URL so navigation stays in sync. */
+  const handleSearchChange = (nextValue: string) => {
+    const nextParams = new URLSearchParams(searchParams);
+    if (nextValue) {
+      nextParams.set("search", nextValue);
+    } else {
+      nextParams.delete("search");
+    }
+    setSearchParams(nextParams, { replace: true });
+  };
+
   /**
    * Derives the heading for the current view using cached navigation metadata
    * when available.
@@ -209,6 +225,7 @@ const App: React.FC = () => {
           categories={categories}
           products={products}
           productLayout={productLayout}
+          showCategories={!isSearchActive}
           onCategorySelect={goToCategory}
         />
       );
@@ -224,6 +241,7 @@ const App: React.FC = () => {
         tags={tags}
         products={products}
         productLayout={productLayout}
+        showFilters={!isSearchActive}
         onCategorySelect={goToCategory}
         onTagSelect={goToTag}
       />
@@ -267,26 +285,33 @@ const App: React.FC = () => {
             Назад
           </button>
         )}
-        <div className="flex items-center gap-4 flex-wrap">
+        <div className="flex items-center gap-4 flex-wrap flex-1">
           <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
             {getTitle()}
           </h1>
           {view.type !== "product" && (
-            <div className="flex items-center gap-2 bg-white rounded-full shadow px-2 py-1">
-              {(["grid", "list"] as ProductLayout[]).map((layoutOption) => (
-                <button
-                  key={layoutOption}
-                  onClick={() => setProductLayout(layoutOption)}
-                  className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors duration-200 ${
-                    productLayout === layoutOption
-                      ? "bg-indigo-600 text-white"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
-                >
-                  {layoutOption === "grid" ? "Сетка" : "Список"}
-                </button>
-              ))}
-            </div>
+            <>
+              <SearchBar
+                value={searchQuery}
+                onChange={handleSearchChange}
+                placeholder="Поиск товаров и категорий"
+              />
+              <div className="flex items-center gap-2 bg-white rounded-full shadow px-2 py-1">
+                {(["grid", "list"] as ProductLayout[]).map((layoutOption) => (
+                  <button
+                    key={layoutOption}
+                    onClick={() => setProductLayout(layoutOption)}
+                    className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors duration-200 ${
+                      productLayout === layoutOption
+                        ? "bg-indigo-600 text-white"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    {layoutOption === "grid" ? "Сетка" : "Список"}
+                  </button>
+                ))}
+              </div>
+            </>
           )}
         </div>
       </div>
