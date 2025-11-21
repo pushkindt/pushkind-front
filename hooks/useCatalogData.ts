@@ -15,6 +15,7 @@ const useCatalogData = (view: View, user: User | null, searchQuery = "") => {
   const [tags, setTags] = useState<Tag[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const userId = user?.id;
 
   /** Loads all catalog data for the current view. */
   const fetchCatalogData = useCallback(async () => {
@@ -41,16 +42,15 @@ const useCatalogData = (view: View, user: User | null, searchQuery = "") => {
       const searchFilter = searchQuery.trim();
       if (view.type === "home") {
         fetchedProducts = await api.fetchProducts(
-          user,
           searchFilter ? { search: searchFilter } : {},
         );
       } else if (view.type === "category") {
-        fetchedProducts = await api.fetchProducts(user, {
+        fetchedProducts = await api.fetchProducts({
           categoryId: view.categoryId,
           ...(searchFilter ? { search: searchFilter } : {}),
         });
       } else if (view.type === "tag") {
-        fetchedProducts = await api.fetchProducts(user, {
+        fetchedProducts = await api.fetchProducts({
           tagId: view.tagId,
           ...(searchFilter ? { search: searchFilter } : {}),
         });
@@ -62,7 +62,7 @@ const useCatalogData = (view: View, user: User | null, searchQuery = "") => {
     } finally {
       setIsLoading(false);
     }
-  }, [searchQuery, user, view]);
+  }, [searchQuery, userId, view]);
 
   useEffect(() => {
     fetchCatalogData();

@@ -91,7 +91,7 @@ describe("App", () => {
     await user.type(searchInput, "tea");
 
     await waitFor(() => {
-      expect(api.fetchProducts).toHaveBeenCalledWith(null, { search: "tea" });
+      expect(api.fetchProducts).toHaveBeenCalledWith({ search: "tea" });
     });
   });
 
@@ -110,9 +110,7 @@ describe("App", () => {
     expect(searchInput.value).toBe("карамель");
 
     await waitFor(() => {
-      expect(api.fetchProducts).toHaveBeenCalledWith(null, {
-        search: "карамель",
-      });
+      expect(api.fetchProducts).toHaveBeenCalledWith({ search: "карамель" });
     });
   });
 });

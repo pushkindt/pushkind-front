@@ -121,7 +121,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
     const updatedItems = await Promise.all(
       itemsSnapshot.map(async (item) => {
-        const latestProduct = await fetchProductById(user, item.id);
+        const latestProduct = await fetchProductById(item.id);
         return {
           ...item,
           ...(latestProduct ?? {}),

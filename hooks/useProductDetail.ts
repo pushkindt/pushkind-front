@@ -13,6 +13,7 @@ const useProductDetail = (productId: number | null, user: User | null) => {
   const [product, setProduct] = useState<Product | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(productId !== null);
+  const userId = user?.id;
 
   /** Loads detail data for the active product id. */
   const fetchProductDetail = useCallback(async () => {
@@ -26,7 +27,7 @@ const useProductDetail = (productId: number | null, user: User | null) => {
     setIsLoading(true);
     try {
       const [fetchedProduct, fetchedCategories] = await Promise.all([
-        api.fetchProductById(user, productId),
+        api.fetchProductById(productId),
         api.fetchCategories(null),
       ]);
       setProduct(fetchedProduct ?? null);
@@ -37,7 +38,7 @@ const useProductDetail = (productId: number | null, user: User | null) => {
     } finally {
       setIsLoading(false);
     }
-  }, [productId, user]);
+  }, [productId, userId]);
 
   useEffect(() => {
     fetchProductDetail();
