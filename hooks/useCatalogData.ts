@@ -2,7 +2,7 @@
  * @file useCatalogData.ts centralizes fetching for category, tag, and product
  * data used across home, category, and tag views.
  */
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import * as api from "../services/api";
 import type { Category, Product, Tag, User, View } from "../types";
 
@@ -15,10 +15,14 @@ const useCatalogData = (view: View, user: User | null, searchQuery = "") => {
   const [tags, setTags] = useState<Tag[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const requestIdRef = useRef(0);
   const userId = user?.id;
 
   /** Loads all catalog data for the current view. */
   const fetchCatalogData = useCallback(async () => {
+    const requestId = requestIdRef.current + 1;
+    requestIdRef.current = requestId;
+
     if (view.type === "product") {
       setCategories([]);
       setTags([]);
@@ -35,6 +39,11 @@ const useCatalogData = (view: View, user: User | null, searchQuery = "") => {
         api.fetchCategories(categoryParentId),
         api.fetchTags(),
       ]);
+
+      if (requestId !== requestIdRef.current) {
+        return;
+      }
+
       setCategories(fetchedCategories);
       setTags(fetchedTags);
 
@@ -56,11 +65,17 @@ const useCatalogData = (view: View, user: User | null, searchQuery = "") => {
         });
       }
 
+      if (requestId !== requestIdRef.current) {
+        return;
+      }
+
       setProducts(fetchedProducts);
     } catch (error) {
       console.error("Не удалось загрузить данные каталога:", error);
     } finally {
-      setIsLoading(false);
+      if (requestId === requestIdRef.current) {
+        setIsLoading(false);
+      }
     }
   }, [searchQuery, userId, view]);
 
