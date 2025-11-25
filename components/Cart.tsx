@@ -6,6 +6,8 @@ import type { User } from "../types";
 import { formatPrice, getPrimaryImage } from "../utils/formatPrice";
 import { PlusIcon, MinusIcon, TrashIcon, XIcon } from "./Icons";
 import { useCart } from "../contexts/CartContext";
+import { createOrder } from "../services/api";
+import { showToast } from "../services/toast";
 
 /**
  * Props accepted by the `Cart` drawer component.
@@ -26,6 +28,7 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose, user, onLoginClick }) => {
     items,
     updateQuantity,
     removeItem,
+    clearCart,
     subtotalCents,
     subtotalCurrency,
     hasPricedItems,
@@ -38,10 +41,34 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose, user, onLoginClick }) => {
   );
 
   /**
-   * Placeholder checkout handler until server-side ordering is wired up.
+   * Submits an order for the authenticated shopper using the current cart.
    */
-  const handleCheckout = () => {
-    alert("Начат процесс оформления заказа! (демо)");
+  const handleCheckout = async () => {
+    if (!user) {
+      showToast("Пожалуйста, войдите, чтобы оформить заказ.", "error");
+      onLoginClick();
+      return;
+    }
+
+    const orderItems = items.map((item) => ({
+      productId: item.id,
+      quantity: item.quantity,
+    }));
+
+    if (orderItems.length === 0) {
+      showToast("Ваша корзина пуста.", "error");
+      return;
+    }
+
+    const success = await createOrder(orderItems);
+
+    if (success) {
+      clearCart();
+      showToast("Заказ успешно оформлен!", "success");
+      onClose();
+    } else {
+      showToast("Не удалось оформить заказ.", "error");
+    }
   };
 
   return (

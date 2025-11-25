@@ -16,6 +16,9 @@ const handleApiError = (message: string, error: unknown) => {
 /** Builds an absolute API URL for the current hub. */
 const buildUrl = (path: string) => `${BASE_API_URL}/${HUB_ID}${path}`;
 
+/** Payload item used when creating an order. */
+export type OrderItemPayload = { productId: number; quantity: number };
+
 /** Fetches categories optionally filtered by a parent id. */
 export const fetchCategories = async (
   parentId?: number | null,
@@ -283,5 +286,33 @@ export const verifyOtp = async (
   } catch (error) {
     handleApiError("Не удалось подтвердить код.", error);
     return { success: false };
+  }
+};
+
+/** Creates a new order for the authenticated customer. */
+export const createOrder = async (
+  items: OrderItemPayload[],
+): Promise<boolean> => {
+  try {
+    const response = await fetch(buildUrl("/orders"), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(items),
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Не удалось оформить заказ: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Не удалось оформить заказ.", error);
+    return false;
   }
 };
