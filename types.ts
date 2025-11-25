@@ -46,6 +46,24 @@ export interface CartItem extends Product {
   quantity: number;
 }
 
+/** Individual item within an order. */
+export interface OrderLineItem {
+  productId: number;
+  quantity: number;
+  priceCents: number | null;
+  currency: string;
+  name: string;
+}
+
+/** Customer order metadata. */
+export interface Order {
+  id: number;
+  status: string;
+  total: number;
+  createdAt: string;
+  lineItems: OrderLineItem[];
+}
+
 /** Supported product layout toggles. */
 export type ProductLayout = "grid" | "list";
 
