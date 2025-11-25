@@ -64,7 +64,7 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose, user, onLoginClick }) => {
 
     if (success) {
       clearCart();
-      showToast("Заказ успешно оформлен!", "success");
+      showToast("Заказ успешно оформлен!", "info");
       onClose();
     } else {
       showToast("Не удалось оформить заказ.", "error");
