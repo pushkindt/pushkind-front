@@ -2,7 +2,6 @@
  * @file Header.tsx renders the sticky global navigation bar.
  */
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import type { User } from "../types";
 import { ShoppingCartIcon, UserIcon } from "./Icons";
 
@@ -14,6 +13,8 @@ interface HeaderProps {
   cartItemCount: number;
   onLoginClick: () => void;
   onCartClick: () => void;
+  onHomeClick: () => void;
+  onOrdersClick?: () => void;
 }
 
 /**
@@ -24,21 +25,30 @@ const Header: React.FC<HeaderProps> = ({
   cartItemCount,
   onLoginClick,
   onCartClick,
+  onHomeClick,
+  onOrdersClick,
 }) => {
-  const navigate = useNavigate();
   return (
     <header className="bg-white shadow-md sticky top-0 z-40">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <button
-              onClick={() => navigate("/")}
+              onClick={onHomeClick}
               className="text-2xl font-bold text-gray-800 hover:text-indigo-600 transition-colors"
             >
               Витрина
             </button>
           </div>
           <div className="flex items-center space-x-4">
+            {user && onOrdersClick && (
+              <button
+                onClick={onOrdersClick}
+                className="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors"
+              >
+                Мои заказы
+              </button>
+            )}
             <button
               onClick={onLoginClick}
               className="flex items-center text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors"

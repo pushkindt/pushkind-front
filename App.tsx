@@ -17,6 +17,7 @@ import HomeView from "./views/HomeView";
 import CategoryView from "./views/CategoryView";
 import TagView from "./views/TagView";
 import ProductView from "./views/ProductView";
+import OrdersView from "./views/OrdersView";
 import useCatalogData from "./hooks/useCatalogData";
 import useProductDetail from "./hooks/useProductDetail";
 import { useCart } from "./contexts/CartContext";
@@ -73,7 +74,8 @@ const App: React.FC = () => {
   const { isActive: isAddFeedbackActive, activate: triggerAddFeedback } =
     useTransientFlag();
 
-  const { view, goHome, goToCategory, goToTag } = useViewNavigation();
+  const { view, goHome, goToOrders, goToCategory, goToTag } =
+    useViewNavigation();
 
   const catalogData = useCatalogData(view, user, debouncedSearchQuery);
   const productDetailData = useProductDetail(
@@ -215,6 +217,8 @@ const App: React.FC = () => {
         }`;
       case "product":
         return "Описание товара";
+      case "orders":
+        return "Мои заказы";
       default:
         return "Витрина";
     }
@@ -225,7 +229,7 @@ const App: React.FC = () => {
    * descriptor returned from the navigation hook.
    */
   const renderView = () => {
-    if (isLoading) {
+    if (isLoading && view.type !== "orders") {
       return (
         <div className="flex justify-center items-center h-96">
           <SpinnerIcon className="w-12 h-12 text-indigo-600" />
@@ -262,6 +266,15 @@ const App: React.FC = () => {
       return <TagView products={products} productLayout={productLayout} />;
     }
 
+    if (view.type === "orders") {
+      return (
+        <OrdersView
+          user={user}
+          onLoginClick={() => setIsLoginModalOpen(true)}
+        />
+      );
+    }
+
     return (
       <HomeView
         categories={categories}
@@ -283,6 +296,8 @@ const App: React.FC = () => {
           cartItemCount={itemCount}
           onLoginClick={() => setIsLoginModalOpen(true)}
           onCartClick={() => setIsCartOpen(true)}
+          onHomeClick={goHome}
+          onOrdersClick={user ? goToOrders : undefined}
         />
       }
       overlays={
@@ -316,7 +331,7 @@ const App: React.FC = () => {
           <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
             {getTitle()}
           </h1>
-          {view.type !== "product" && (
+          {view.type !== "product" && view.type !== "orders" && (
             <>
               <SearchBar
                 value={searchInput}

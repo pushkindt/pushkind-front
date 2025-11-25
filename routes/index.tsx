@@ -9,6 +9,7 @@ import App from "../App";
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
+      <Route path="/orders" element={<App />} />
       <Route path="/*" element={<App />} />
     </Routes>
   );

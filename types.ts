@@ -74,4 +74,5 @@ export type View =
   | { type: "home" }
   | { type: "category"; categoryId: number; categoryName: string }
   | { type: "product"; productId: number }
-  | { type: "tag"; tagId: number; tagName: string };
+  | { type: "tag"; tagId: number; tagName: string }
+  | { type: "orders" };

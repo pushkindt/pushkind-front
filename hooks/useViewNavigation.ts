@@ -21,6 +21,7 @@ const useViewNavigation = () => {
   const location = useLocation();
 
   const view = useMemo<View>(() => {
+    const ordersMatch = matchPath("/orders", location.pathname);
     const categoryMatch = matchPath(
       "/categories/:categoryId",
       location.pathname,
@@ -28,6 +29,10 @@ const useViewNavigation = () => {
     const tagMatch = matchPath("/tags/:tagId", location.pathname);
     const productMatch = matchPath("/products/:productId", location.pathname);
     const state = (location.state ?? {}) as Record<string, unknown>;
+
+    if (ordersMatch) {
+      return { type: "orders" };
+    }
 
     if (productMatch?.params.productId) {
       const productId = parseId(productMatch.params.productId);
@@ -67,6 +72,11 @@ const useViewNavigation = () => {
       pathname: "/",
       search: location.search,
     });
+  const goToOrders = () =>
+    navigate({
+      pathname: "/orders",
+      search: location.search,
+    });
   const goToCategory = (categoryId: number, categoryName?: string) =>
     navigate(
       {
@@ -90,6 +100,7 @@ const useViewNavigation = () => {
   return {
     view,
     goHome,
+    goToOrders,
     goToCategory,
     goToTag,
   };
