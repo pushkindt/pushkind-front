@@ -21,6 +21,7 @@ interface CartContextValue {
   addItem: (product: Product) => void;
   updateQuantity: (productId: number, quantity: number) => void;
   removeItem: (productId: number) => void;
+  clearCart: () => void;
   refreshPricesForUser: (user: User | null) => Promise<void>;
   itemCount: number;
   subtotalCents: number;
@@ -65,6 +66,11 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   /** Removes a product entirely from the cart. */
   const removeItem = useCallback((productId: number) => {
     setItems((prevItems) => prevItems.filter((item) => item.id !== productId));
+  }, []);
+
+  /** Clears all items from the cart. */
+  const clearCart = useCallback(() => {
+    setItems([]);
   }, []);
 
   /** Adjusts the quantity of a specific product, removing it if below 1. */
@@ -154,6 +160,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       addItem,
       updateQuantity,
       removeItem,
+      clearCart,
       refreshPricesForUser,
       itemCount,
       subtotalCents,
@@ -165,6 +172,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       addItem,
       updateQuantity,
       removeItem,
+      clearCart,
       refreshPricesForUser,
       itemCount,
       subtotalCents,
