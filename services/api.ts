@@ -3,7 +3,7 @@
  */
 import { API_URL, HUB_ID } from "../constants";
 import { showToast } from "./toast";
-import type { Category, Product, Tag, User } from "../types";
+import type { Category, Order, Product, Tag, User } from "../types";
 
 const BASE_API_URL = API_URL.replace(/\/$/, "");
 
@@ -286,6 +286,27 @@ export const verifyOtp = async (
   } catch (error) {
     handleApiError("Не удалось подтвердить код.", error);
     return { success: false };
+  }
+};
+
+/** Fetches orders belonging to the authenticated customer. */
+export const fetchOrders = async (): Promise<Order[]> => {
+  try {
+    const response = await fetch(buildUrl("/orders"), {
+      headers: { Accept: "application/json" },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Не удалось загрузить заказы: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    return (await response.json()) as Order[];
+  } catch (error) {
+    handleApiError("Не удалось загрузить заказы.", error);
+    return [];
   }
 };
 
