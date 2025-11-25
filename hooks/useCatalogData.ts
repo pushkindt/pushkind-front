@@ -31,6 +31,14 @@ const useCatalogData = (view: View, user: User | null, searchQuery = "") => {
       return;
     }
 
+    if (view.type === "orders") {
+      setCategories([]);
+      setTags([]);
+      setProducts([]);
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     try {
       const categoryParentId =

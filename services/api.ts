@@ -306,7 +306,9 @@ export const fetchOrders = async (): Promise<Order[]> => {
     return (await response.json()) as Order[];
   } catch (error) {
     handleApiError("Не удалось загрузить заказы.", error);
-    return [];
+    throw error instanceof Error
+      ? error
+      : new Error("Не удалось загрузить заказы.");
   }
 };
 
