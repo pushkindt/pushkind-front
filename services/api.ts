@@ -352,13 +352,6 @@ export const createOrder = async (
       }
     }
 
-    showToast(
-      orderId
-        ? `Заказ #${orderId} успешно оформлен!`
-        : "Заказ успешно оформлен!",
-      "info",
-    );
-
     return { success: true, orderId };
   } catch (error) {
     handleApiError("Не удалось оформить заказ.", error);
