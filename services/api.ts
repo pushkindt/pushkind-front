@@ -19,6 +19,12 @@ const buildUrl = (path: string) => `${BASE_API_URL}/${HUB_ID}${path}`;
 /** Payload item used when creating an order. */
 export type OrderItemPayload = { productId: number; quantity: number };
 
+/** Result returned after attempting to create a new order. */
+export interface CreateOrderResult {
+  success: boolean;
+  orderId?: number;
+}
+
 /** Fetches categories optionally filtered by a parent id. */
 export const fetchCategories = async (
   parentId?: number | null,
@@ -315,7 +321,7 @@ export const fetchOrders = async (): Promise<Order[]> => {
 /** Creates a new order for the authenticated customer. */
 export const createOrder = async (
   items: OrderItemPayload[],
-): Promise<boolean> => {
+): Promise<CreateOrderResult> => {
   try {
     const response = await fetch(buildUrl("/orders"), {
       method: "POST",
@@ -333,9 +339,29 @@ export const createOrder = async (
       );
     }
 
-    return true;
+    let orderId: number | undefined;
+    const contentType = response.headers.get("content-type") ?? "";
+    if (contentType.includes("application/json")) {
+      try {
+        const payload = (await response.json()) as Record<string, unknown>;
+        if (typeof payload.id === "number") {
+          orderId = payload.id;
+        }
+      } catch {
+        // Ignore body parse failures when the API responds without JSON.
+      }
+    }
+
+    showToast(
+      orderId
+        ? `Заказ #${orderId} успешно оформлен!`
+        : "Заказ успешно оформлен!",
+      "info",
+    );
+
+    return { success: true, orderId };
   } catch (error) {
-    console.error("Не удалось оформить заказ.", error);
-    return false;
+    handleApiError("Не удалось оформить заказ.", error);
+    return { success: false };
   }
 };
