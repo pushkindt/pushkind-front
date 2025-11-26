@@ -131,8 +131,8 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
   return (
     <div className="space-y-4">
       {sortedOrders.map((order) => {
-        const currency = order.lineItems[0]?.currency ?? "RUB";
-        const totalLabel = formatPrice(order.total, currency, {
+        const currency = order.currency || "RUB";
+        const totalLabel = formatPrice(order.totalCents, currency, {
           fallback: "Сумма недоступна",
         });
         const isExpanded = expandedOrders.has(order.id);
@@ -162,7 +162,7 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
 
             {isExpanded && (
               <div className="mt-4 border-t border-gray-100 pt-4 space-y-3">
-                {order.lineItems.map((item) => (
+                {order.products.map((item) => (
                   <div
                     key={`${order.id}-${item.productId}`}
                     className="flex items-start justify-between gap-4"
@@ -175,9 +175,9 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-semibold text-gray-900">
-                        {formatPrice(item.priceCents, item.currency)}
+                        {formatPrice(item.priceCents, currency)}
                       </p>
-                      <p className="text-xs text-gray-500">{item.currency}</p>
+                      <p className="text-xs text-gray-500">{currency}</p>
                     </div>
                   </div>
                 ))}
