@@ -51,7 +51,6 @@ export interface OrderLineItem {
   productId: number;
   quantity: number;
   priceCents: number | null;
-  currency: string;
   name: string;
 }
 
@@ -59,9 +58,10 @@ export interface OrderLineItem {
 export interface Order {
   id: number;
   status: string;
-  total: number;
+  currency: string;
+  totalCents: number;
   createdAt: string;
-  lineItems: OrderLineItem[];
+  products: OrderLineItem[];
 }
 
 /** Supported product layout toggles. */
