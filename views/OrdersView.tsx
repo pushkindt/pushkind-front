@@ -52,6 +52,7 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
         }
       } catch (requestError) {
         if (isMounted) {
+          console.error("Failed to load orders", requestError);
           setError("Не удалось загрузить список заказов. Попробуйте еще раз.");
         }
       } finally {

@@ -60,14 +60,11 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose, user, onLoginClick }) => {
       return;
     }
 
-    const success = await createOrder(orderItems);
+    const { success } = await createOrder(orderItems);
 
     if (success) {
       clearCart();
-      showToast("Заказ успешно оформлен!", "info");
       onClose();
-    } else {
-      showToast("Не удалось оформить заказ.", "error");
     }
   };
 

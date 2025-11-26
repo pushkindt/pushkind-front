@@ -83,7 +83,7 @@ const App: React.FC = () => {
     user,
   );
   const isSearchActive = Boolean(searchInput.trim());
-  
+
   const isProductView = view.type === "product";
   const isLoading = isProductView
     ? productDetailData.isLoading
