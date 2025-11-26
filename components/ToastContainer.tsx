@@ -47,7 +47,7 @@ const ToastContainer: React.FC = () => {
   return (
     <div
       aria-live="assertive"
-      className="fixed inset-0 pointer-events-none flex items-start justify-end p-4"
+      className="fixed inset-0 z-50 pointer-events-none flex items-start justify-end p-4"
     >
       <div className="flex w-full max-w-xs flex-col gap-3">
         {toasts.map((toast) => (
