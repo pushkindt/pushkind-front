@@ -62,6 +62,14 @@ export interface Order {
   totalCents: number;
   createdAt: string;
   products: OrderLineItem[];
+  // Optional shipping address.
+  shippingAddress: string | null;
+  // Optional consignee.
+  consignee: string | null;
+  // Optional delivery notes.
+  deliveryNotes: string | null;
+  // Optional payer.
+  payer: string | null;
 }
 
 /** Supported product layout toggles. */

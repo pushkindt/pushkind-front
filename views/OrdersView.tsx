@@ -137,6 +137,24 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
           fallback: "Сумма недоступна",
         });
         const isExpanded = expandedOrders.has(order.id);
+        const optionalFields = [
+          { label: "Адрес доставки", value: order.shippingAddress },
+          { label: "Получатель", value: order.consignee },
+          { label: "Примечания", value: order.deliveryNotes },
+          { label: "Плательщик", value: order.payer },
+        ]
+          .map((field) => ({
+            label: field.label,
+            value: field.value?.trim(),
+          }))
+          .filter(
+            (
+              field,
+            ): field is {
+              label: string;
+              value: string;
+            } => Boolean(field.value),
+          );
 
         return (
           <div key={order.id} className="bg-white shadow rounded-lg p-5">
@@ -152,6 +170,18 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
                 <p className="text-sm text-gray-600">
                   Оформлен: {new Date(order.createdAt).toLocaleString("ru-RU")}
                 </p>
+                {optionalFields.length > 0 && (
+                  <dl className="mt-3 grid gap-2 text-sm text-gray-600">
+                    {optionalFields.map((field) => (
+                      <div key={`${order.id}-${field.label}`}>
+                        <dt className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                          {field.label}
+                        </dt>
+                        <dd className="text-sm text-gray-700">{field.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                )}
               </div>
               <button
                 onClick={() => toggleExpanded(order.id)}
