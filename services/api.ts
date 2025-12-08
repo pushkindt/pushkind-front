@@ -25,6 +25,14 @@ export interface CreateOrderResult {
   orderId?: number;
 }
 
+/** Editable fields available when updating an order. */
+export type OrderUpdatePayload = {
+  shippingAddress?: string | null;
+  consignee?: string | null;
+  deliveryNotes?: string | null;
+  payer?: string | null;
+};
+
 /** Fetches categories optionally filtered by a parent id. */
 export const fetchCategories = async (
   parentId?: number | null,
@@ -315,6 +323,37 @@ export const fetchOrders = async (): Promise<Order[]> => {
     throw error instanceof Error
       ? error
       : new Error("Не удалось загрузить заказы.");
+  }
+};
+
+/** Updates order shipping, consignee, delivery notes, and payer details. */
+export const updateOrderDetails = async (
+  orderId: number,
+  payload: OrderUpdatePayload,
+): Promise<Order> => {
+  try {
+    const response = await fetch(buildUrl(`/orders/${orderId}`), {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Не удалось обновить заказ: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    return (await response.json()) as Order;
+  } catch (error) {
+    handleApiError("Не удалось обновить заказ.", error);
+    throw error instanceof Error
+      ? error
+      : new Error("Не удалось обновить заказ.");
   }
 };
 
