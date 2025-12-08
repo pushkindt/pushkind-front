@@ -10,6 +10,39 @@ import { formatPrice } from "../utils/formatPrice";
 import { SpinnerIcon } from "../components/Icons";
 import { showToast } from "../services/toast";
 
+type OrderStatusVariant = "secondary" | "success" | "primary" | "warning" | "danger";
+
+const ORDER_STATUS_VARIANT_CLASSES: Record<OrderStatusVariant, string> = {
+  secondary: "bg-gray-100 text-gray-800",
+  success: "bg-emerald-100 text-emerald-800",
+  primary: "bg-sky-100 text-sky-800",
+  warning: "bg-amber-100 text-amber-800",
+  danger: "bg-rose-100 text-rose-800",
+};
+
+const STATUS_BADGE_META: Record<
+  string,
+  { label: string; variant: OrderStatusVariant }
+> = {
+  Completed: { label: "Завершён", variant: "success" },
+  Processing: { label: "В обработке", variant: "primary" },
+  Pending: { label: "Ожидает", variant: "warning" },
+  Cancelled: { label: "Отменён", variant: "danger" },
+};
+
+const getOrderStatusBadge = (status?: string) => {
+  const statusValue = status ?? "Draft";
+  if (STATUS_BADGE_META[statusValue]) {
+    return STATUS_BADGE_META[statusValue];
+  }
+
+  if (statusValue === "Draft") {
+    return { label: "Черновик", variant: "secondary" };
+  }
+
+  return { label: "Неизвестно", variant: "secondary" };
+};
+
 interface OrdersViewProps {
   user: User | null;
   onLoginClick: () => void;
@@ -328,6 +361,8 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
               value: string;
             } => Boolean(field.value),
           );
+        const statusBadge = getOrderStatusBadge(order.status);
+        const statusBadgeClassName = `inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${ORDER_STATUS_VARIANT_CLASSES[statusBadge.variant]}`;
 
         return (
           <div key={order.id} className="bg-white shadow rounded-lg p-5">
@@ -338,7 +373,8 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
                   {totalLabel}
                 </p>
                 <p className="text-sm text-gray-600">
-                  Статус: <span className="font-medium">{order.status}</span>
+                  Статус:{" "}
+                  <span className={statusBadgeClassName}>{statusBadge.label}</span>
                 </p>
                 <p className="text-sm text-gray-600">
                   Оформлен: {new Date(order.createdAt).toLocaleString("ru-RU")}
