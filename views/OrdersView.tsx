@@ -4,9 +4,11 @@
  */
 import React, { useEffect, useMemo, useState } from "react";
 import type { Order, User } from "../types";
-import { fetchOrders } from "../services/api";
+import type { OrderUpdatePayload } from "../services/api";
+import { fetchOrders, updateOrderDetails } from "../services/api";
 import { formatPrice } from "../utils/formatPrice";
 import { SpinnerIcon } from "../components/Icons";
+import { showToast } from "../services/toast";
 
 interface OrdersViewProps {
   user: User | null;
@@ -21,6 +23,22 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedOrders, setExpandedOrders] = useState<Set<number>>(new Set());
+  const [editingOrders, setEditingOrders] = useState<Set<number>>(new Set());
+  const [orderDrafts, setOrderDrafts] = useState<
+    Record<
+      number,
+      {
+        shippingAddress: string;
+        consignee: string;
+        deliveryNotes: string;
+        payer: string;
+      }
+    >
+  >({});
+  const [savingOrders, setSavingOrders] = useState<Set<number>>(new Set());
+  const [saveStatuses, setSaveStatuses] = useState<
+    Record<number, { type: "success" | "error"; message: string }>
+  >({});
 
   const sortedOrders = useMemo(
     () =>
@@ -81,6 +99,111 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
     });
   };
 
+  const createDraftFromOrder = (order: Order) => ({
+    shippingAddress: order.shippingAddress ?? "",
+    consignee: order.consignee ?? "",
+    deliveryNotes: order.deliveryNotes ?? "",
+    payer: order.payer ?? "",
+  });
+
+  const toggleEditing = (order: Order) => {
+    setEditingOrders((current) => {
+      const nextEditing = new Set(current);
+      if (nextEditing.has(order.id)) {
+        nextEditing.delete(order.id);
+      } else {
+        nextEditing.add(order.id);
+      }
+      return nextEditing;
+    });
+
+    setOrderDrafts((currentDrafts) => ({
+      ...currentDrafts,
+      [order.id]: currentDrafts[order.id] ?? createDraftFromOrder(order),
+    }));
+    setSaveStatuses((current) => {
+      const { [order.id]: _removed, ...rest } = current;
+      return rest;
+    });
+  };
+
+  const handleDraftChange = (
+    orderId: number,
+    field: keyof OrderUpdatePayload,
+    value: string,
+  ) => {
+    setOrderDrafts((current) => ({
+      ...current,
+      [orderId]: {
+        ...(current[orderId] ?? {
+          shippingAddress: "",
+          consignee: "",
+          deliveryNotes: "",
+          payer: "",
+        }),
+        [field]: value,
+      },
+    }));
+  };
+
+  const sanitizeValue = (value: string) => {
+    const trimmed = value.trim();
+    return trimmed ? trimmed : null;
+  };
+
+  const handleSaveDetails = async (order: Order) => {
+    const draft = orderDrafts[order.id] ?? createDraftFromOrder(order);
+    const payload = {
+      shippingAddress: sanitizeValue(draft.shippingAddress),
+      consignee: sanitizeValue(draft.consignee),
+      deliveryNotes: sanitizeValue(draft.deliveryNotes),
+      payer: sanitizeValue(draft.payer),
+    } as const;
+
+    setSavingOrders((current) => new Set(current).add(order.id));
+    setSaveStatuses((current) => {
+      const { [order.id]: _removed, ...rest } = current;
+      return rest;
+    });
+
+    try {
+      const updatedOrder = await updateOrderDetails(order.id, payload);
+      setOrders((current) =>
+        current.map((existing) =>
+          existing.id === order.id ? updatedOrder : existing,
+        ),
+      );
+      setOrderDrafts((current) => ({
+        ...current,
+        [order.id]: createDraftFromOrder(updatedOrder),
+      }));
+      setSaveStatuses((current) => ({
+        ...current,
+        [order.id]: {
+          type: "success",
+          message: "Данные заказа обновлены.",
+        },
+      }));
+      showToast("Данные заказа обновлены.", "info");
+    } catch (updateError) {
+      console.error("Failed to update order", updateError);
+      setSaveStatuses((current) => ({
+        ...current,
+        [order.id]: {
+          type: "error",
+          message: "Не удалось обновить данные заказа.",
+        },
+      }));
+      showToast("Не удалось обновить данные заказа.", "error");
+    } finally {
+      setSavingOrders((current) => {
+        const nextSaving = new Set(current);
+        nextSaving.delete(order.id);
+        return nextSaving;
+      });
+    }
+  };
+
   if (!user) {
     return (
       <div className="bg-white shadow rounded-lg p-8 text-center">
@@ -137,6 +260,9 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
           fallback: "Сумма недоступна",
         });
         const isExpanded = expandedOrders.has(order.id);
+        const isEditing = editingOrders.has(order.id);
+        const isSaving = savingOrders.has(order.id);
+        const draft = orderDrafts[order.id] ?? createDraftFromOrder(order);
         const optionalFields = [
           { label: "Адрес доставки", value: order.shippingAddress },
           { label: "Получатель", value: order.consignee },
@@ -190,6 +316,111 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
                 {isExpanded ? "Скрыть товары" : "Показать товары"}
               </button>
             </div>
+
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <button
+                onClick={() => toggleEditing(order)}
+                disabled={isSaving}
+                className="text-sm font-semibold text-indigo-600 hover:text-indigo-700"
+              >
+                {isEditing ? "Скрыть редактирование" : "Редактировать данные"}
+              </button>
+              {isSaving && (
+                <span className="text-sm text-gray-500">Сохранение...</span>
+              )}
+            </div>
+
+            {isEditing && (
+              <div className="mt-4 border-t border-gray-100 pt-4 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Адрес доставки
+                    <input
+                      type="text"
+                      value={draft.shippingAddress}
+                      onChange={(event) =>
+                        handleDraftChange(order.id, "shippingAddress", event.target.value)
+                      }
+                      disabled={isSaving}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                      placeholder="Укажите адрес доставки"
+                    />
+                  </label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Получатель
+                    <input
+                      type="text"
+                      value={draft.consignee}
+                      onChange={(event) =>
+                        handleDraftChange(order.id, "consignee", event.target.value)
+                      }
+                      disabled={isSaving}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                      placeholder="Имя получателя"
+                    />
+                  </label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Примечания
+                    <textarea
+                      value={draft.deliveryNotes}
+                      onChange={(event) =>
+                        handleDraftChange(order.id, "deliveryNotes", event.target.value)
+                      }
+                      disabled={isSaving}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                      placeholder="Дополнительные пожелания к доставке"
+                      rows={3}
+                    ></textarea>
+                  </label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Плательщик
+                    <input
+                      type="text"
+                      value={draft.payer}
+                      onChange={(event) =>
+                        handleDraftChange(order.id, "payer", event.target.value)
+                      }
+                      disabled={isSaving}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                      placeholder="ФИО плательщика"
+                    />
+                  </label>
+                </div>
+
+                {saveStatuses[order.id]?.message && (
+                  <div
+                    className={`text-sm ${
+                      saveStatuses[order.id]?.type === "success"
+                        ? "text-green-700"
+                        : "text-red-700"
+                    }`}
+                  >
+                    {saveStatuses[order.id]?.message}
+                  </div>
+                )}
+
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => handleSaveDetails(order)}
+                    disabled={isSaving}
+                    className={`inline-flex items-center px-4 py-2 text-sm font-semibold rounded-md shadow-sm ${
+                      isSaving
+                        ? "bg-indigo-300 text-white"
+                        : "bg-indigo-600 text-white hover:bg-indigo-700"
+                    }`}
+                  >
+                    Сохранить изменения
+                  </button>
+                  <button
+                    onClick={() => toggleEditing(order)}
+                    disabled={isSaving}
+                    className="text-sm font-semibold text-gray-600 hover:text-gray-800"
+                  >
+                    Отмена
+                  </button>
+                </div>
+              </div>
+            )}
 
             {isExpanded && (
               <div className="mt-4 border-t border-gray-100 pt-4 space-y-3">
