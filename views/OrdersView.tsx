@@ -161,7 +161,7 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
       payer: sanitizeValue(draft.payer),
     } as const;
 
-    const previousOrders = orders;
+    const previousOrder = order;
     const optimisticOrder: Order = { ...order, ...payload };
 
     setSavingOrders((current) => new Set(current).add(order.id));
@@ -217,7 +217,11 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
       showToast("Данные заказа обновлены.", "info");
     } catch (updateError) {
       console.error("Failed to update order", updateError);
-      setOrders(previousOrders);
+      setOrders((current) =>
+        current.map((existing) =>
+          existing.id === order.id ? previousOrder : existing,
+        ),
+      );
       setOrderDrafts((current) => ({
         ...current,
         [order.id]: createDraftFromOrder(order),
