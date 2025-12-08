@@ -22,6 +22,7 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [updateError, setUpdateError] = useState<string | null>(null);
   const [expandedOrders, setExpandedOrders] = useState<Set<number>>(new Set());
   const [editingOrders, setEditingOrders] = useState<Set<number>>(new Set());
   const [orderDrafts, setOrderDrafts] = useState<
@@ -160,11 +161,25 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
       payer: sanitizeValue(draft.payer),
     } as const;
 
+    const previousOrders = orders;
+    const optimisticOrder: Order = { ...order, ...payload };
+
     setSavingOrders((current) => new Set(current).add(order.id));
     setSaveStatuses((current) => {
       const { [order.id]: _removed, ...rest } = current;
       return rest;
     });
+    setUpdateError(null);
+
+    setOrders((current) =>
+      current.map((existing) =>
+        existing.id === order.id ? optimisticOrder : existing,
+      ),
+    );
+    setOrderDrafts((current) => ({
+      ...current,
+      [order.id]: createDraftFromOrder(optimisticOrder),
+    }));
 
     try {
       const updatedOrder = await updateOrderDetails(order.id, payload);
@@ -177,6 +192,21 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
         ...current,
         [order.id]: createDraftFromOrder(updatedOrder),
       }));
+      try {
+        const refreshedOrders = await fetchOrders();
+        setOrders(refreshedOrders);
+        const refreshedOrder = refreshedOrders.find(
+          (existing) => existing.id === order.id,
+        );
+        if (refreshedOrder) {
+          setOrderDrafts((current) => ({
+            ...current,
+            [order.id]: createDraftFromOrder(refreshedOrder),
+          }));
+        }
+      } catch (refreshError) {
+        console.error("Failed to refresh orders after update", refreshError);
+      }
       setSaveStatuses((current) => ({
         ...current,
         [order.id]: {
@@ -187,6 +217,14 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
       showToast("Данные заказа обновлены.", "info");
     } catch (updateError) {
       console.error("Failed to update order", updateError);
+      setOrders(previousOrders);
+      setOrderDrafts((current) => ({
+        ...current,
+        [order.id]: createDraftFromOrder(order),
+      }));
+      setUpdateError(
+        "Не удалось обновить данные заказа. Попробуйте еще раз.",
+      );
       setSaveStatuses((current) => ({
         ...current,
         [order.id]: {
@@ -254,6 +292,11 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
 
   return (
     <div className="space-y-4">
+      {updateError && (
+        <div className="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4">
+          {updateError}
+        </div>
+      )}
       {sortedOrders.map((order) => {
         const currency = order.currency || "RUB";
         const totalLabel = formatPrice(order.totalCents, currency, {
