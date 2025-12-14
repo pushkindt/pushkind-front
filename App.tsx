@@ -312,6 +312,7 @@ const App: React.FC = () => {
             onClose={() => setIsCartOpen(false)}
             user={user}
             onLoginClick={() => setIsLoginModalOpen(true)}
+            onCheckoutSuccess={goToOrders}
           />
           <ToastContainer />
         </>
