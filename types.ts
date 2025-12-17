@@ -52,6 +52,7 @@ export interface OrderLineItem {
   quantity: number;
   priceCents: number | null;
   name: string;
+  approvedQuantity: number | null;
 }
 
 /** Customer order metadata. */

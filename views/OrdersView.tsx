@@ -10,7 +10,12 @@ import { formatPrice } from "../utils/formatPrice";
 import { SpinnerIcon } from "../components/Icons";
 import { showToast } from "../services/toast";
 
-type OrderStatusVariant = "secondary" | "success" | "primary" | "warning" | "danger";
+type OrderStatusVariant =
+  | "secondary"
+  | "success"
+  | "primary"
+  | "warning"
+  | "danger";
 
 const ORDER_STATUS_VARIANT_CLASSES: Record<OrderStatusVariant, string> = {
   secondary: "bg-gray-100 text-gray-800",
@@ -156,8 +161,9 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
       [order.id]: currentDrafts[order.id] ?? createDraftFromOrder(order),
     }));
     setSaveStatuses((current) => {
-      const { [order.id]: _removed, ...rest } = current;
-      return rest;
+      const next = { ...current };
+      delete next[order.id];
+      return next;
     });
   };
 
@@ -199,8 +205,9 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
 
     setSavingOrders((current) => new Set(current).add(order.id));
     setSaveStatuses((current) => {
-      const { [order.id]: _removed, ...rest } = current;
-      return rest;
+      const next = { ...current };
+      delete next[order.id];
+      return next;
     });
     setUpdateError(null);
 
@@ -259,9 +266,7 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
         ...current,
         [order.id]: createDraftFromOrder(order),
       }));
-      setUpdateError(
-        "Не удалось обновить данные заказа. Попробуйте еще раз.",
-      );
+      setUpdateError("Не удалось обновить данные заказа. Попробуйте еще раз.");
       setSaveStatuses((current) => ({
         ...current,
         [order.id]: {
@@ -374,7 +379,9 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
                 </p>
                 <p className="text-sm text-gray-600">
                   Статус:{" "}
-                  <span className={statusBadgeClassName}>{statusBadge.label}</span>
+                  <span className={statusBadgeClassName}>
+                    {statusBadge.label}
+                  </span>
                 </p>
                 <p className="text-sm text-gray-600">
                   Оформлен: {new Date(order.createdAt).toLocaleString("ru-RU")}
@@ -422,7 +429,11 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
                       type="text"
                       value={draft.shippingAddress}
                       onChange={(event) =>
-                        handleDraftChange(order.id, "shippingAddress", event.target.value)
+                        handleDraftChange(
+                          order.id,
+                          "shippingAddress",
+                          event.target.value,
+                        )
                       }
                       disabled={isSaving}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
@@ -435,7 +446,11 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
                       type="text"
                       value={draft.consignee}
                       onChange={(event) =>
-                        handleDraftChange(order.id, "consignee", event.target.value)
+                        handleDraftChange(
+                          order.id,
+                          "consignee",
+                          event.target.value,
+                        )
                       }
                       disabled={isSaving}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
@@ -447,7 +462,11 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
                     <textarea
                       value={draft.deliveryNotes}
                       onChange={(event) =>
-                        handleDraftChange(order.id, "deliveryNotes", event.target.value)
+                        handleDraftChange(
+                          order.id,
+                          "deliveryNotes",
+                          event.target.value,
+                        )
                       }
                       disabled={isSaving}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
@@ -516,6 +535,9 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
                       <p className="font-semibold text-gray-900">{item.name}</p>
                       <p className="text-sm text-gray-600">
                         Количество: {item.quantity}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Одобрено: {item.approvedQuantity ?? "—"}
                       </p>
                     </div>
                     <div className="text-right">
