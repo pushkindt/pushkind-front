@@ -44,7 +44,7 @@ describe("ProductCard", () => {
     expect(img.src).toContain("placeholder.png");
   });
 
-  it("renders list layout with metadata and placeholder image", () => {
+  it("renders list layout with metadata and description", () => {
     const listProduct = {
       ...mockProduct,
       description: "Detailed list description",
@@ -56,14 +56,13 @@ describe("ProductCard", () => {
     );
 
     const wrapper = container.firstChild as HTMLElement;
-    expect(wrapper.className).toContain("sm:flex");
+    expect(wrapper.className).toContain("grid");
 
-    expect(screen.getByText(/Артикул: SKU123/i)).toBeTruthy();
+    const skuRow = screen.getByText(/Артикул:/i).parentElement;
+    expect(skuRow).toBeTruthy();
+    expect(skuRow?.textContent).toMatch(/Артикул:\s*SKU123/i);
     expect(screen.getByText(/за 1 kg/i)).toBeTruthy();
-
-    const img = screen.getByAltText("Test Product") as HTMLImageElement;
-    expect(img.src).toContain("placeholder.png");
-
-    expect(screen.queryByText(/Detailed list description/)).toBeNull();
+    expect(screen.getByText(/Detailed list description/)).toBeTruthy();
+    expect(screen.queryByAltText("Test Product")).toBeNull();
   });
 });
