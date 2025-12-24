@@ -24,7 +24,7 @@ import { useCart } from "./contexts/CartContext";
 import useTransientFlag from "./hooks/useTransientFlag";
 import useDebouncedValue from "./hooks/useDebouncedValue";
 import { fetchCurrentUser } from "./services/api";
-import { USER_STORAGE_KEY } from "./constants";
+import { PRODUCT_LAYOUT_STORAGE_KEY, USER_STORAGE_KEY } from "./constants";
 
 const loadPersistedUser = (): User | null => {
   if (typeof window === "undefined") {
@@ -56,6 +56,27 @@ const persistUser = (nextUser: User | null) => {
   }
 };
 
+const loadPersistedLayout = (): ProductLayout => {
+  if (typeof window === "undefined") {
+    return "grid";
+  }
+
+  const storedValue = window.localStorage.getItem(PRODUCT_LAYOUT_STORAGE_KEY);
+  if (storedValue === "grid" || storedValue === "list") {
+    return storedValue;
+  }
+
+  return "grid";
+};
+
+const persistLayout = (layout: ProductLayout) => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.setItem(PRODUCT_LAYOUT_STORAGE_KEY, layout);
+};
+
 /**
  * Root storefront component that wires navigation, catalog data, cart actions,
  * and global overlays into a single cohesive experience.
@@ -64,7 +85,9 @@ const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [productLayout, setProductLayout] = useState<ProductLayout>("grid");
+  const [productLayout, setProductLayout] = useState<ProductLayout>(
+    loadPersistedLayout,
+  );
   const [searchParams, setSearchParams] = useSearchParams();
   const searchQuery = searchParams.get("search") ?? "";
   const [searchInput, setSearchInput] = useState(searchQuery);
@@ -147,6 +170,10 @@ const App: React.FC = () => {
 
     refreshPricesForUser(user);
   }, [refreshPricesForUser, user]);
+
+  useEffect(() => {
+    persistLayout(productLayout);
+  }, [productLayout]);
 
   useEffect(() => {
     setSearchInput(searchQuery);
