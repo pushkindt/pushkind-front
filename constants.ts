@@ -15,3 +15,5 @@ export const HUB_ID = hubId;
 export const API_URL = apiUrl;
 
 export const USER_STORAGE_KEY = "pushkind-user";
+/** Key for persisting the catalog layout preference. */
+export const PRODUCT_LAYOUT_STORAGE_KEY = "pushkind-product-layout";

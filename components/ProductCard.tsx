@@ -61,7 +61,54 @@ const ProductCard: React.FC<ProductCardProps> = ({
   };
 
   const isList = layout === "list";
-  const descriptionVisible = !isList && Boolean(product.description);
+  const descriptionVisible = Boolean(product.description);
+
+  if (isList) {
+    return (
+      <article
+        className="bg-white rounded-lg shadow-md px-5 py-4 grid gap-6 items-center sm:grid-cols-[2fr_1.2fr_auto]"
+        aria-label={product.name}
+      >
+        <div className="min-w-0">
+          <h3
+            onClick={() => navigate(`/products/${product.id}`)}
+            className="text-lg font-semibold text-gray-800 truncate cursor-pointer hover:text-indigo-600"
+          >
+            {product.name}
+          </h3>
+          {product.sku && (
+            <p className="text-xs text-gray-400 mt-1 uppercase tracking-wide">
+              <span className="mr-1">Артикул:</span>
+              <span>{product.sku}</span>
+            </p>
+          )}
+        </div>
+        <div className="min-w-0 text-sm text-gray-500">
+          {descriptionVisible ? previewDescription : ""}
+        </div>
+        <div className="flex flex-wrap items-center gap-4 justify-between sm:justify-end">
+          <div className="flex items-baseline gap-3 whitespace-nowrap">
+            <span className="text-xl font-bold text-gray-900">
+              {formattedPrice}
+            </span>
+            {unitPriceLabel && (
+              <span className="text-sm text-gray-600">{unitPriceLabel}</span>
+            )}
+          </div>
+          <button
+            onClick={handleAddClick}
+            className={`min-w-[190px] text-white rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-300 ${
+              isButtonFeedbackActive
+                ? "bg-green-500 hover:bg-green-600 focus:ring-green-500"
+                : "bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
+            } py-2 text-sm`}
+          >
+            Добавить в корзину
+          </button>
+        </div>
+      </article>
+    );
+  }
 
   return (
     <div
