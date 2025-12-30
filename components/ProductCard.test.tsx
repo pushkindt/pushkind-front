@@ -26,6 +26,7 @@ describe("ProductCard", () => {
     units: "kg",
     currency: "RUB",
     priceCents: 10000,
+    basePriceCents: null,
     tags: [],
     imageUrls: ["test.jpg"],
     amount: 1,
@@ -64,5 +65,14 @@ describe("ProductCard", () => {
     expect(screen.getByText(/за 1 kg/i)).toBeTruthy();
     expect(screen.getByText(/Detailed list description/)).toBeTruthy();
     expect(screen.queryByAltText("Test Product")).toBeNull();
+  });
+
+  it("renders base price as striked when present", () => {
+    renderWithRouter(
+      <ProductCard product={{ ...mockProduct, basePriceCents: 15000 }} />,
+    );
+
+    const basePrice = screen.getByText(/150/);
+    expect(basePrice.className).toContain("line-through");
   });
 });

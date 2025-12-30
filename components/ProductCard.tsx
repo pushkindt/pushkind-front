@@ -32,6 +32,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const navigate = useNavigate();
   const primaryImage = getPrimaryImage(product.imageUrls);
   const formattedPrice = formatPrice(product.priceCents, product.currency);
+  const formattedBasePrice =
+    typeof product.basePriceCents === "number" &&
+      Number.isFinite(product.basePriceCents)
+      ? formatPrice(product.basePriceCents, product.currency)
+      : null;
   const unitPriceLabel =
     product.priceCents !== null
       ? formatUnitPrice(product.amount, product.units)
@@ -48,8 +53,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
     }
 
     const textOnly = sanitized.replace(/<[^>]*>/g, "");
-    const clipped = textOnly.substring(0, 50);
-    return `${clipped}${textOnly.length > 50 ? "..." : ""}`;
+    const clipped = textOnly.substring(0, 100);
+    return `${clipped}${textOnly.length > 100 ? "..." : ""}`;
   }, [product.description]);
 
   /**
@@ -88,6 +93,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
         <div className="flex flex-wrap items-center gap-4 justify-between sm:justify-end">
           <div className="flex items-baseline gap-3 whitespace-nowrap">
+            {formattedBasePrice && (
+              <span className="text-sm text-gray-400 line-through">
+                {formattedBasePrice}
+              </span>
+            )}
             <span className="text-xl font-bold text-gray-900">
               {formattedPrice}
             </span>
@@ -97,11 +107,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
           <button
             onClick={handleAddClick}
-            className={`min-w-[190px] text-white rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-300 ${
-              isButtonFeedbackActive
-                ? "bg-green-500 hover:bg-green-600 focus:ring-green-500"
-                : "bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
-            } py-2 text-sm`}
+            className={`min-w-[190px] text-white rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-300 ${isButtonFeedbackActive
+              ? "bg-green-500 hover:bg-green-600 focus:ring-green-500"
+              : "bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
+              } py-2 text-sm`}
           >
             Добавить в корзину
           </button>
@@ -160,20 +169,26 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <div
           className={`flex items-center justify-between space-x-2 ${isList ? "mt-2" : "mt-4"}`}
         >
-          <span className="text-xl font-bold text-gray-900">
-            {formattedPrice}
-          </span>
+          <div className="flex items-baseline gap-2 whitespace-nowrap">
+            {formattedBasePrice && (
+              <span className="text-sm text-gray-400 line-through">
+                {formattedBasePrice}
+              </span>
+            )}
+            <span className="text-xl font-bold text-gray-900">
+              {formattedPrice}
+            </span>
+          </div>
           {unitPriceLabel && (
             <span className="text-sm text-gray-600">{unitPriceLabel}</span>
           )}
         </div>
         <button
           onClick={handleAddClick}
-          className={`w-full text-white rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-300 ${
-            isButtonFeedbackActive
-              ? "bg-green-500 hover:bg-green-600 focus:ring-green-500"
-              : "bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
-          } ${isList ? "py-2 text-sm" : "py-2 px-4"}`}
+          className={`w-full text-white rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-300 ${isButtonFeedbackActive
+            ? "bg-green-500 hover:bg-green-600 focus:ring-green-500"
+            : "bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
+            } ${isList ? "py-2 text-sm" : "py-2 px-4"}`}
         >
           Добавить в корзину
         </button>

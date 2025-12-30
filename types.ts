@@ -27,6 +27,7 @@ export interface Product {
   units: string | null;
   currency: string;
   priceCents: number | null;
+  basePriceCents: number | null;
   tags: Tag[];
   imageUrls: string[];
   amount: number | null;
