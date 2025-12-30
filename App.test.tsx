@@ -40,6 +40,7 @@ const mockProduct = {
   units: "шт",
   currency: "RUB",
   priceCents: 2500,
+  basePriceCents: null,
   tags: [mockTag],
   imageUrls: ["/sample.jpg"],
   amount: 1,

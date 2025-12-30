@@ -41,6 +41,11 @@ const ProductView: React.FC<ProductViewProps> = ({
   const imageUrls =
     product.imageUrls.length > 0 ? product.imageUrls : [PLACEHOLDER_IMAGE];
   const formattedPrice = formatPrice(product.priceCents, product.currency);
+  const formattedBasePrice =
+    typeof product.basePriceCents === "number" &&
+    Number.isFinite(product.basePriceCents)
+      ? formatPrice(product.basePriceCents, product.currency)
+      : null;
   const unitPriceLabel =
     product.priceCents !== null
       ? formatUnitPrice(product.amount, product.units)
@@ -139,6 +144,11 @@ const ProductView: React.FC<ProductViewProps> = ({
           </div>
           <div className="mt-6">
             <div className="flex items-baseline mb-4 space-x-2">
+              {formattedBasePrice && (
+                <span className="text-base text-gray-400 line-through">
+                  {formattedBasePrice}
+                </span>
+              )}
               <span className="text-3xl font-bold text-gray-900">
                 {formattedPrice}
               </span>
