@@ -206,6 +206,7 @@ const App: React.FC = () => {
     persistUser(loggedInUser);
     setIsLoginModalOpen(false);
     sessionRequestIdRef.current = null;
+    goToOrders();
   };
 
   /**
