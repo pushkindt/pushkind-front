@@ -12,6 +12,7 @@ interface HeaderProps {
   user: User | null;
   cartItemCount: number;
   onLoginClick: () => void;
+  onLogoutClick: () => void;
   onCartClick: () => void;
   onHomeClick: () => void;
   onOrdersClick?: () => void;
@@ -24,10 +25,20 @@ const Header: React.FC<HeaderProps> = ({
   user,
   cartItemCount,
   onLoginClick,
+  onLogoutClick,
   onCartClick,
   onHomeClick,
   onOrdersClick,
 }) => {
+  const handleAuthClick = () => {
+    if (user) {
+      onLogoutClick();
+      return;
+    }
+
+    onLoginClick();
+  };
+
   return (
     <header className="bg-white shadow-md sticky top-0 z-40">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -50,7 +61,7 @@ const Header: React.FC<HeaderProps> = ({
               </button>
             )}
             <button
-              onClick={onLoginClick}
+              onClick={handleAuthClick}
               className="flex items-center text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors"
             >
               <UserIcon className="w-6 h-6 mr-1" />
