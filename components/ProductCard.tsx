@@ -34,7 +34,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const formattedPrice = formatPrice(product.priceCents, product.currency);
   const formattedBasePrice =
     typeof product.basePriceCents === "number" &&
-      Number.isFinite(product.basePriceCents)
+    Number.isFinite(product.basePriceCents)
       ? formatPrice(product.basePriceCents, product.currency)
       : null;
   const unitPriceLabel =
@@ -107,10 +107,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
           <button
             onClick={handleAddClick}
-            className={`min-w-[190px] text-white rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-300 ${isButtonFeedbackActive
-              ? "bg-green-500 hover:bg-green-600 focus:ring-green-500"
-              : "bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
-              } py-2 text-sm`}
+            className={`min-w-[190px] text-white rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-300 ${
+              isButtonFeedbackActive
+                ? "bg-green-500 hover:bg-green-600 focus:ring-green-500"
+                : "bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
+            } py-2 text-sm`}
           >
             Добавить в корзину
           </button>
@@ -185,10 +186,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
         <button
           onClick={handleAddClick}
-          className={`w-full text-white rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-300 ${isButtonFeedbackActive
-            ? "bg-green-500 hover:bg-green-600 focus:ring-green-500"
-            : "bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
-            } ${isList ? "py-2 text-sm" : "py-2 px-4"}`}
+          className={`w-full text-white rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-300 ${
+            isButtonFeedbackActive
+              ? "bg-green-500 hover:bg-green-600 focus:ring-green-500"
+              : "bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
+          } ${isList ? "py-2 text-sm" : "py-2 px-4"}`}
         >
           Добавить в корзину
         </button>

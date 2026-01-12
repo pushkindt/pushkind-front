@@ -7,6 +7,7 @@ import { useSearchParams } from "react-router-dom";
 import type { User, Product, Tag, ProductLayout } from "./types";
 import Header from "./components/Header";
 import LoginModal from "./components/LoginModal";
+import LogoutModal from "./components/LogoutModal";
 import Cart from "./components/Cart";
 import ToastContainer from "./components/ToastContainer";
 import SearchBar from "./components/SearchBar";
@@ -84,10 +85,10 @@ const persistLayout = (layout: ProductLayout) => {
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [productLayout, setProductLayout] = useState<ProductLayout>(
-    loadPersistedLayout,
-  );
+  const [productLayout, setProductLayout] =
+    useState<ProductLayout>(loadPersistedLayout);
   const [searchParams, setSearchParams] = useSearchParams();
   const searchQuery = searchParams.get("search") ?? "";
   const [searchInput, setSearchInput] = useState(searchQuery);
@@ -218,6 +219,16 @@ const App: React.FC = () => {
     triggerAddFeedback();
   };
 
+  /**
+   * Clears the authenticated user and closes the logout confirmation modal.
+   */
+  const handleLogoutConfirm = () => {
+    setUser(null);
+    persistUser(null);
+    sessionRequestIdRef.current = null;
+    setIsLogoutModalOpen(false);
+  };
+
   /** Updates the search input without immediately triggering navigation. */
   const handleSearchInputChange = (nextValue: string) => {
     setSearchInput(nextValue);
@@ -323,6 +334,7 @@ const App: React.FC = () => {
           user={user}
           cartItemCount={itemCount}
           onLoginClick={() => setIsLoginModalOpen(true)}
+          onLogoutClick={() => setIsLogoutModalOpen(true)}
           onCartClick={() => setIsCartOpen(true)}
           onHomeClick={goHome}
           onOrdersClick={user ? goToOrders : undefined}
@@ -334,6 +346,11 @@ const App: React.FC = () => {
             isOpen={isLoginModalOpen}
             onClose={() => setIsLoginModalOpen(false)}
             onLoginSuccess={handleLoginSuccess}
+          />
+          <LogoutModal
+            isOpen={isLogoutModalOpen}
+            onClose={() => setIsLogoutModalOpen(false)}
+            onConfirm={handleLogoutConfirm}
           />
           <Cart
             isOpen={isCartOpen}
