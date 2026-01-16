@@ -83,11 +83,18 @@ export const fetchTags = async (): Promise<Tag[]> => {
 };
 
 /**
- * Fetches a list of products optionally filtered by category, tag, or search.
- * User context is inferred from the session cookie, so no userId query is sent.
+ * Fetches a list of products optionally filtered by category, tag, search,
+ * and inventory amount range. User context is inferred from the session cookie,
+ * so no userId query is sent.
  */
 export const fetchProducts = async (
-  filter: { categoryId?: number; tagId?: number; search?: string } = {},
+  filter: {
+    categoryId?: number;
+    tagId?: number;
+    search?: string;
+    minAmount?: number;
+    maxAmount?: number;
+  } = {},
 ): Promise<Product[]> => {
   const url = new URL(buildUrl("/products"));
   if (filter.categoryId !== undefined) {
@@ -95,6 +102,18 @@ export const fetchProducts = async (
   }
   if (filter.tagId !== undefined) {
     url.searchParams.set("tagId", String(filter.tagId));
+  }
+  if (
+    typeof filter.minAmount === "number" &&
+    Number.isFinite(filter.minAmount)
+  ) {
+    url.searchParams.set("minAmount", String(filter.minAmount));
+  }
+  if (
+    typeof filter.maxAmount === "number" &&
+    Number.isFinite(filter.maxAmount)
+  ) {
+    url.searchParams.set("maxAmount", String(filter.maxAmount));
   }
   const searchQuery =
     typeof filter.search === "string" ? filter.search.trim() : "";
