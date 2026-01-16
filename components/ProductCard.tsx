@@ -71,7 +71,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   if (isList) {
     return (
       <article
-        className="bg-white rounded-lg shadow-md px-5 py-4 grid gap-6 items-center sm:grid-cols-[320px_minmax(0,1fr)_auto]"
+        className="bg-white rounded-lg shadow-md px-5 py-4 grid gap-6 items-center sm:grid-cols-[320px_minmax(0,1fr)] md:grid-cols-[320px_minmax(0,1fr)_auto]"
         aria-label={product.name}
       >
         <div className="min-w-0">
@@ -91,7 +91,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <div className="min-w-0 text-sm text-gray-500">
           {descriptionVisible ? previewDescription : ""}
         </div>
-        <div className="flex flex-wrap items-center gap-4 justify-between sm:justify-end">
+        <div className="flex flex-wrap items-center gap-4 justify-between sm:col-span-2 sm:justify-end md:col-span-1">
           <div className="flex items-baseline gap-3 whitespace-nowrap">
             {formattedBasePrice && (
               <span className="text-sm text-gray-400 line-through">
