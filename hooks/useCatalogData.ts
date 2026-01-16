@@ -10,7 +10,13 @@ import type { Category, Product, Tag, User, View } from "../types";
  * Fetches catalog metadata (categories, tags, products) for the current view
  * and exposes derived loading state.
  */
-const useCatalogData = (view: View, user: User | null, searchQuery = "") => {
+const useCatalogData = (
+  view: View,
+  user: User | null,
+  searchQuery = "",
+  minAmount?: number,
+  maxAmount?: number,
+) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -57,19 +63,28 @@ const useCatalogData = (view: View, user: User | null, searchQuery = "") => {
 
       let fetchedProducts: Product[] = [];
       const searchFilter = searchQuery.trim();
+      const amountFilter = {
+        ...(typeof minAmount === "number" ? { minAmount } : {}),
+        ...(typeof maxAmount === "number" ? { maxAmount } : {}),
+      };
+
       if (view.type === "home") {
         fetchedProducts = await api.fetchProducts(
-          searchFilter ? { search: searchFilter } : {},
+          searchFilter
+            ? { search: searchFilter, ...amountFilter }
+            : amountFilter,
         );
       } else if (view.type === "category") {
         fetchedProducts = await api.fetchProducts({
           categoryId: view.categoryId,
           ...(searchFilter ? { search: searchFilter } : {}),
+          ...amountFilter,
         });
       } else if (view.type === "tag") {
         fetchedProducts = await api.fetchProducts({
           tagId: view.tagId,
           ...(searchFilter ? { search: searchFilter } : {}),
+          ...amountFilter,
         });
       }
 
@@ -85,7 +100,7 @@ const useCatalogData = (view: View, user: User | null, searchQuery = "") => {
         setIsLoading(false);
       }
     }
-  }, [searchQuery, userId, view]);
+  }, [maxAmount, minAmount, searchQuery, userId, view]);
 
   useEffect(() => {
     fetchCatalogData();

@@ -10,7 +10,6 @@ import LoginModal from "./components/LoginModal";
 import LogoutModal from "./components/LogoutModal";
 import Cart from "./components/Cart";
 import ToastContainer from "./components/ToastContainer";
-import SearchBar from "./components/SearchBar";
 import { SpinnerIcon, ArrowLeftIcon } from "./components/Icons";
 import useViewNavigation from "./hooks/useViewNavigation";
 import Layout from "./components/Layout";
@@ -25,7 +24,11 @@ import { useCart } from "./contexts/CartContext";
 import useTransientFlag from "./hooks/useTransientFlag";
 import useDebouncedValue from "./hooks/useDebouncedValue";
 import { fetchCurrentUser } from "./services/api";
-import { PRODUCT_LAYOUT_STORAGE_KEY, USER_STORAGE_KEY } from "./constants";
+import {
+  PRODUCT_AMOUNT_FILTER_STORAGE_KEY,
+  PRODUCT_LAYOUT_STORAGE_KEY,
+  USER_STORAGE_KEY,
+} from "./constants";
 
 const loadPersistedUser = (): User | null => {
   if (typeof window === "undefined") {
@@ -78,6 +81,51 @@ const persistLayout = (layout: ProductLayout) => {
   window.localStorage.setItem(PRODUCT_LAYOUT_STORAGE_KEY, layout);
 };
 
+type AmountFilterPreset = {
+  id: string;
+  label: string;
+  minAmount?: number;
+  maxAmount?: number;
+};
+
+const AMOUNT_FILTER_PRESETS: AmountFilterPreset[] = [
+  { id: "all", label: "Все" },
+  { id: "upto-100", label: "-100", maxAmount: 100 },
+  { id: "101-500", label: "101-500", minAmount: 101, maxAmount: 500 },
+  { id: "501-1000", label: "501-1000", minAmount: 501, maxAmount: 1000 },
+  { id: "1001-1500", label: "1001-1500", minAmount: 1001, maxAmount: 1500 },
+  { id: "1501-plus", label: "1501-", minAmount: 1501 },
+];
+
+const loadPersistedAmountFilter = (): string => {
+  if (typeof window === "undefined") {
+    return AMOUNT_FILTER_PRESETS[0].id;
+  }
+
+  const storedValue = window.localStorage.getItem(
+    PRODUCT_AMOUNT_FILTER_STORAGE_KEY,
+  );
+  if (
+    storedValue &&
+    AMOUNT_FILTER_PRESETS.some((preset) => preset.id === storedValue)
+  ) {
+    return storedValue;
+  }
+
+  return AMOUNT_FILTER_PRESETS[0].id;
+};
+
+const persistAmountFilter = (amountFilterId: string) => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.setItem(
+    PRODUCT_AMOUNT_FILTER_STORAGE_KEY,
+    amountFilterId,
+  );
+};
+
 /**
  * Root storefront component that wires navigation, catalog data, cart actions,
  * and global overlays into a single cohesive experience.
@@ -93,6 +141,9 @@ const App: React.FC = () => {
   const searchQuery = searchParams.get("search") ?? "";
   const [searchInput, setSearchInput] = useState(searchQuery);
   const debouncedSearchQuery = useDebouncedValue(searchInput, 300);
+  const [amountFilterId, setAmountFilterId] = useState(
+    loadPersistedAmountFilter,
+  );
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const { addItem, itemCount, refreshPricesForUser } = useCart();
   const { isActive: isAddFeedbackActive, activate: triggerAddFeedback } =
@@ -101,7 +152,16 @@ const App: React.FC = () => {
   const { view, goHome, goToOrders, goToCategory, goToTag } =
     useViewNavigation();
 
-  const catalogData = useCatalogData(view, user, debouncedSearchQuery);
+  const selectedAmountFilter =
+    AMOUNT_FILTER_PRESETS.find((preset) => preset.id === amountFilterId) ??
+    AMOUNT_FILTER_PRESETS[0];
+  const catalogData = useCatalogData(
+    view,
+    user,
+    debouncedSearchQuery,
+    selectedAmountFilter.minAmount,
+    selectedAmountFilter.maxAmount,
+  );
   const productDetailData = useProductDetail(
     view.type === "product" ? view.productId : null,
     user,
@@ -175,6 +235,10 @@ const App: React.FC = () => {
   useEffect(() => {
     persistLayout(productLayout);
   }, [productLayout]);
+
+  useEffect(() => {
+    persistAmountFilter(amountFilterId);
+  }, [amountFilterId]);
 
   useEffect(() => {
     setSearchInput(searchQuery);
@@ -333,6 +397,10 @@ const App: React.FC = () => {
         <Header
           user={user}
           cartItemCount={itemCount}
+          isSearchVisible={view.type !== "product" && view.type !== "orders"}
+          searchValue={searchInput}
+          searchPlaceholder="Поиск товаров и категорий"
+          onSearchChange={handleSearchInputChange}
           onLoginClick={() => setIsLoginModalOpen(true)}
           onLogoutClick={() => setIsLogoutModalOpen(true)}
           onCartClick={() => setIsCartOpen(true)}
@@ -378,12 +446,7 @@ const App: React.FC = () => {
             {getTitle()}
           </h1>
           {view.type !== "product" && view.type !== "orders" && (
-            <>
-              <SearchBar
-                value={searchInput}
-                onChange={handleSearchInputChange}
-                placeholder="Поиск товаров и категорий"
-              />
+            <div className="ml-auto w-full sm:w-auto flex items-center justify-end gap-2 flex-nowrap">
               <div className="flex items-center gap-2 bg-white rounded-full shadow px-2 py-1">
                 {(["grid", "list"] as ProductLayout[]).map((layoutOption) => (
                   <button
@@ -399,7 +462,24 @@ const App: React.FC = () => {
                   </button>
                 ))}
               </div>
-            </>
+              <div className="flex items-center gap-2 bg-white rounded-full shadow px-3 py-1">
+                <label htmlFor="amount-filter" className="sr-only">
+                  Фильтр по количеству
+                </label>
+                <select
+                  id="amount-filter"
+                  value={amountFilterId}
+                  onChange={(event) => setAmountFilterId(event.target.value)}
+                  className="text-sm font-semibold text-gray-700 bg-transparent focus:outline-none"
+                >
+                  {AMOUNT_FILTER_PRESETS.map((preset) => (
+                    <option key={preset.id} value={preset.id}>
+                      {preset.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
           )}
         </div>
       </div>

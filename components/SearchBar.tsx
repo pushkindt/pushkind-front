@@ -5,6 +5,7 @@ import React from "react";
 
 /** Props consumed by the `SearchBar` component. */
 interface SearchBarProps {
+  id?: string;
   value: string;
   placeholder?: string;
   onChange: (nextValue: string) => void;
@@ -15,6 +16,7 @@ interface SearchBarProps {
  * keeping controls accessible.
  */
 const SearchBar: React.FC<SearchBarProps> = ({
+  id = "product-search",
   value,
   placeholder = "Поиск товаров",
   onChange,
@@ -24,8 +26,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   return (
-    <div className="w-full max-w-xl">
-      <label htmlFor="product-search" className="sr-only">
+    <div className="w-full">
+      <label htmlFor={id} className="sr-only">
         Поиск товаров
       </label>
       <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-full shadow px-4 py-2 focus-within:ring-2 focus-within:ring-indigo-500">
@@ -45,7 +47,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           />
         </svg>
         <input
-          id="product-search"
+          id={id}
           type="search"
           value={value}
           onChange={handleChange}
