@@ -90,11 +90,8 @@ type AmountFilterPreset = {
 
 const AMOUNT_FILTER_PRESETS: AmountFilterPreset[] = [
   { id: "all", label: "Все" },
-  { id: "upto-100", label: "-100", maxAmount: 100 },
-  { id: "101-500", label: "101-500", minAmount: 101, maxAmount: 500 },
-  { id: "501-1000", label: "501-1000", minAmount: 501, maxAmount: 1000 },
-  { id: "1001-1500", label: "1001-1500", minAmount: 1001, maxAmount: 1500 },
-  { id: "1501-plus", label: "1501-", minAmount: 1501 },
+  { id: "small-pack", label: "Мелкая фасовка (до 500г)", maxAmount: 499 },
+  { id: "large-pack", label: "Крупная фасовка (от 500г)", minAmount: 400 },
 ];
 
 const loadPersistedAmountFilter = (): string => {
@@ -458,7 +455,7 @@ const App: React.FC = () => {
                         : "text-gray-600 hover:text-gray-900"
                     }`}
                   >
-                    {layoutOption === "grid" ? "Сетка" : "Список"}
+                    {layoutOption === "grid" ? "Карточки" : "Список"}
                   </button>
                 ))}
               </div>
