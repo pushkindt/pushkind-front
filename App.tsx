@@ -146,7 +146,7 @@ const App: React.FC = () => {
   const { isActive: isAddFeedbackActive, activate: triggerAddFeedback } =
     useTransientFlag();
 
-  const { view, goHome, goToOrders, goToCategory, goToTag } =
+  const { view, goBack, goHome, goToOrders, goToCategory, goToTag } =
     useViewNavigation();
 
   const selectedAmountFilter =
@@ -431,7 +431,7 @@ const App: React.FC = () => {
       <div className="flex flex-wrap items-center gap-4 mb-6">
         {view.type !== "home" && (
           <button
-            onClick={goHome}
+            onClick={goBack}
             className="flex items-center text-indigo-600 hover:text-indigo-800 font-semibold mr-4"
           >
             <ArrowLeftIcon className="w-5 h-5 mr-1" />
