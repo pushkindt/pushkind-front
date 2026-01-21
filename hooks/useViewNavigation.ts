@@ -72,6 +72,7 @@ const useViewNavigation = () => {
       pathname: "/",
       search: location.search,
     });
+  const goBack = () => navigate(-1);
   const goToOrders = () =>
     navigate({
       pathname: "/orders",
@@ -99,6 +100,7 @@ const useViewNavigation = () => {
     );
   return {
     view,
+    goBack,
     goHome,
     goToOrders,
     goToCategory,

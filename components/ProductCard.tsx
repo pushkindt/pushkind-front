@@ -34,7 +34,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const formattedPrice = formatPrice(product.priceCents, product.currency);
   const formattedBasePrice =
     typeof product.basePriceCents === "number" &&
-    Number.isFinite(product.basePriceCents)
+      Number.isFinite(product.basePriceCents)
       ? formatPrice(product.basePriceCents, product.currency)
       : null;
   const unitPriceLabel =
@@ -53,8 +53,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
     }
 
     const textOnly = sanitized.replace(/<[^>]*>/g, "");
-    const clipped = textOnly.substring(0, 100);
-    return `${clipped}${textOnly.length > 100 ? "..." : ""}`;
+    const clipped = textOnly.substring(0, 150);
+    return `${clipped}${textOnly.length > 150 ? "..." : ""}`;
   }, [product.description]);
 
   /**
@@ -71,7 +71,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   if (isList) {
     return (
       <article
-        className="bg-white rounded-lg shadow-md px-5 py-4 grid gap-6 items-center sm:grid-cols-[320px_minmax(0,1fr)] md:grid-cols-[320px_minmax(0,1fr)_auto]"
+        className="bg-white rounded-lg shadow-md px-5 py-4 grid gap-6 items-center sm:grid-cols-[280px_minmax(0,1fr)] md:grid-cols-[350px_minmax(0,1fr)] lg:grid-cols-[350px_minmax(0,1fr)_auto]"
         aria-label={product.name}
       >
         <div className="min-w-0">
@@ -91,7 +91,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <div className="min-w-0 text-sm text-gray-500">
           {descriptionVisible ? previewDescription : ""}
         </div>
-        <div className="flex flex-wrap items-center gap-4 justify-between sm:col-span-2 sm:justify-end md:col-span-1">
+        <div className="flex flex-wrap items-center gap-4 justify-between sm:col-span-2 sm:justify-end lg:col-span-1">
           <div className="flex items-baseline gap-3 whitespace-nowrap">
             {formattedBasePrice && (
               <span className="text-sm text-gray-400 line-through">
@@ -107,11 +107,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
           <button
             onClick={handleAddClick}
-            className={`min-w-[190px] text-white rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-300 ${
-              isButtonFeedbackActive
-                ? "bg-green-500 hover:bg-green-600 focus:ring-green-500"
-                : "bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
-            } py-2 text-sm`}
+            className={`min-w-[190px] text-white rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-300 ${isButtonFeedbackActive
+              ? "bg-green-500 hover:bg-green-600 focus:ring-green-500"
+              : "bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
+              } py-2 text-sm`}
           >
             Добавить в корзину
           </button>
@@ -186,11 +185,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
         <button
           onClick={handleAddClick}
-          className={`w-full text-white rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-300 ${
-            isButtonFeedbackActive
-              ? "bg-green-500 hover:bg-green-600 focus:ring-green-500"
-              : "bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
-          } ${isList ? "py-2 text-sm" : "py-2 px-4"}`}
+          className={`w-full text-white rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-300 ${isButtonFeedbackActive
+            ? "bg-green-500 hover:bg-green-600 focus:ring-green-500"
+            : "bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
+            } ${isList ? "py-2 text-sm" : "py-2 px-4"}`}
         >
           Добавить в корзину
         </button>
