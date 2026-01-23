@@ -134,6 +134,14 @@ const ProductView: React.FC<ProductViewProps> = ({
                 Артикул: {product.sku}
               </p>
             )}
+            {product.vendorName && (
+              <p className="mt-1 text-sm text-gray-600">
+                Поставщик:{" "}
+                <span className="font-semibold text-gray-700">
+                  {product.vendorName}
+                </span>
+              </p>
+            )}
             {product.units && (
               <p className="text-sm text-gray-500">Единицы: {product.units}</p>
             )}

@@ -3,7 +3,7 @@
  */
 import { API_URL, HUB_ID } from "../constants";
 import { showToast } from "./toast";
-import type { Category, Order, Product, Tag, User } from "../types";
+import type { Category, Order, Product, Tag, User, Vendor } from "../types";
 
 const BASE_API_URL = API_URL.replace(/\/$/, "");
 
@@ -82,15 +82,37 @@ export const fetchTags = async (): Promise<Tag[]> => {
   }
 };
 
+/** Fetches all available vendors for the storefront. */
+export const fetchVendors = async (): Promise<Vendor[]> => {
+  try {
+    const response = await fetch(buildUrl("/vendors"), {
+      headers: { Accept: "application/json" },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Не удалось загрузить поставщиков: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    return (await response.json()) as Vendor[];
+  } catch (error) {
+    handleApiError("Не удалось загрузить поставщиков.", error);
+    return [];
+  }
+};
+
 /**
- * Fetches a list of products optionally filtered by category, tag, search,
- * and inventory amount range. User context is inferred from the session cookie,
- * so no userId query is sent.
+ * Fetches a list of products optionally filtered by category, tag, vendor,
+ * search, and inventory amount range. User context is inferred from the
+ * session cookie, so no userId query is sent.
  */
 export const fetchProducts = async (
   filter: {
     categoryId?: number;
     tagId?: number;
+    vendorId?: number;
     search?: string;
     minAmount?: number;
     maxAmount?: number;
@@ -102,6 +124,9 @@ export const fetchProducts = async (
   }
   if (filter.tagId !== undefined) {
     url.searchParams.set("tagId", String(filter.tagId));
+  }
+  if (filter.vendorId !== undefined) {
+    url.searchParams.set("vendorId", String(filter.vendorId));
   }
   if (
     typeof filter.minAmount === "number" &&
