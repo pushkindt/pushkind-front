@@ -13,6 +13,7 @@ import { CartProvider } from "./contexts/CartContext";
 vi.mock("./services/api", () => ({
   fetchCategories: vi.fn(),
   fetchTags: vi.fn(),
+  fetchVendors: vi.fn(),
   fetchProducts: vi.fn(),
   fetchProductById: vi.fn(),
   fetchCurrentUser: vi.fn(),
@@ -50,6 +51,7 @@ describe("App", () => {
   beforeEach(() => {
     vi.mocked(api.fetchCategories).mockResolvedValue([mockCategory]);
     vi.mocked(api.fetchTags).mockResolvedValue([mockTag]);
+    vi.mocked(api.fetchVendors).mockResolvedValue([]);
     vi.mocked(api.fetchProducts).mockResolvedValue([mockProduct]);
     vi.mocked(api.fetchProductById).mockResolvedValue(mockProduct);
     vi.mocked(api.fetchCurrentUser).mockResolvedValue(null);

@@ -63,9 +63,8 @@ describe("ProductCard", () => {
     const skuRow = screen.getByText(/Артикул:/i).parentElement;
     expect(skuRow).toBeTruthy();
     expect(skuRow?.textContent).toMatch(/Артикул:\s*SKU123/i);
-    expect(screen.getByText(/Поставщик:/i).textContent).toMatch(
-      /Поставщик:\s*Test Vendor/i,
-    );
+    expect(screen.getByText(/Поставщик:/i)).toBeTruthy();
+    expect(screen.getByText("Test Vendor")).toBeTruthy();
     expect(screen.getByText(/за 1 kg/i)).toBeTruthy();
     expect(screen.getByText(/Detailed list description/)).toBeTruthy();
     expect(screen.queryByAltText("Test Product")).toBeNull();
