@@ -4,7 +4,7 @@
  */
 import React, { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import type { User, Product, Tag, ProductLayout } from "./types";
+import type { User, Product, Tag, Vendor, ProductLayout } from "./types";
 import Header from "./components/Header";
 import LoginModal from "./components/LoginModal";
 import LogoutModal from "./components/LogoutModal";
@@ -141,6 +141,7 @@ const App: React.FC = () => {
   const [amountFilterId, setAmountFilterId] = useState(
     loadPersistedAmountFilter,
   );
+  const [vendorFilterId, setVendorFilterId] = useState("all");
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const { addItem, itemCount, refreshPricesForUser } = useCart();
   const { isActive: isAddFeedbackActive, activate: triggerAddFeedback } =
@@ -152,12 +153,19 @@ const App: React.FC = () => {
   const selectedAmountFilter =
     AMOUNT_FILTER_PRESETS.find((preset) => preset.id === amountFilterId) ??
     AMOUNT_FILTER_PRESETS[0];
+  const parsedVendorId =
+    vendorFilterId === "all" ? null : Number(vendorFilterId);
+  const selectedVendorId =
+    typeof parsedVendorId === "number" && Number.isFinite(parsedVendorId)
+      ? parsedVendorId
+      : null;
   const catalogData = useCatalogData(
     view,
     user,
     debouncedSearchQuery,
     selectedAmountFilter.minAmount,
     selectedAmountFilter.maxAmount,
+    selectedVendorId,
   );
   const productDetailData = useProductDetail(
     view.type === "product" ? view.productId : null,
@@ -173,6 +181,7 @@ const App: React.FC = () => {
     ? productDetailData.categories
     : catalogData.categories;
   const tags: Tag[] = catalogData.tags;
+  const vendors: Vendor[] = catalogData.vendors;
   const products: Product[] = catalogData.products;
   const selectedProduct = isProductView ? productDetailData.product : null;
   const sessionRequestIdRef = useRef<symbol | null>(null);
@@ -472,6 +481,24 @@ const App: React.FC = () => {
                   {AMOUNT_FILTER_PRESETS.map((preset) => (
                     <option key={preset.id} value={preset.id}>
                       {preset.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex items-center gap-2 bg-white rounded-full shadow px-3 py-1">
+                <label htmlFor="vendor-filter" className="sr-only">
+                  Фильтр по поставщику
+                </label>
+                <select
+                  id="vendor-filter"
+                  value={vendorFilterId}
+                  onChange={(event) => setVendorFilterId(event.target.value)}
+                  className="text-sm font-semibold text-gray-700 bg-transparent focus:outline-none"
+                >
+                  <option value="all">Все поставщики</option>
+                  {vendors.map((vendor) => (
+                    <option key={vendor.id} value={String(vendor.id)}>
+                      {vendor.name}
                     </option>
                   ))}
                 </select>

@@ -17,6 +17,12 @@ export interface Tag {
   name: string;
 }
 
+/** Vendor metadata used for filtering and display. */
+export interface Vendor {
+  id: number;
+  name: string;
+}
+
 /** Storefront product representation. */
 export interface Product {
   id: number;
