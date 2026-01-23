@@ -50,6 +50,7 @@ describe("ProductCard", () => {
       ...mockProduct,
       description: "Detailed list description",
       imageUrls: [],
+      vendorName: "Test Vendor",
     };
 
     const { container } = renderWithRouter(
@@ -62,6 +63,9 @@ describe("ProductCard", () => {
     const skuRow = screen.getByText(/Артикул:/i).parentElement;
     expect(skuRow).toBeTruthy();
     expect(skuRow?.textContent).toMatch(/Артикул:\s*SKU123/i);
+    expect(screen.getByText(/Поставщик:/i).textContent).toMatch(
+      /Поставщик:\s*Test Vendor/i,
+    );
     expect(screen.getByText(/за 1 kg/i)).toBeTruthy();
     expect(screen.getByText(/Detailed list description/)).toBeTruthy();
     expect(screen.queryByAltText("Test Product")).toBeNull();

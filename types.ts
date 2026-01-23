@@ -22,6 +22,7 @@ export interface Product {
   id: number;
   categoryId: number | null;
   name: string;
+  vendorName?: string | null;
   sku: string | null;
   description: string;
   units: string | null;
