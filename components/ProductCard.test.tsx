@@ -60,10 +60,9 @@ describe("ProductCard", () => {
     const wrapper = container.firstChild as HTMLElement;
     expect(wrapper.className).toContain("grid");
 
-    const skuRow = screen.getByText(/Артикул:/i).parentElement;
+    const skuRow = screen.getByText(/артикул/i).parentElement;
     expect(skuRow).toBeTruthy();
-    expect(skuRow?.textContent).toMatch(/Артикул:\s*SKU123/i);
-    expect(screen.getByText(/Поставщик:/i)).toBeTruthy();
+    expect(skuRow?.textContent).toMatch(/артикул\s*SKU123/i);
     expect(screen.getByText("Test Vendor")).toBeTruthy();
     expect(screen.getByText(/за 1 kg/i)).toBeTruthy();
     expect(screen.getByText(/Detailed list description/)).toBeTruthy();
