@@ -71,7 +71,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   if (isList) {
     return (
       <article
-        className="bg-white rounded-lg shadow-md px-5 py-4 grid gap-6 items-center sm:grid-cols-[280px_minmax(0,1fr)] md:grid-cols-[350px_minmax(0,1fr)] lg:grid-cols-[350px_minmax(0,1fr)_auto]"
+        className="bg-white rounded-none px-5 py-4 grid gap-6 items-center sm:grid-cols-[280px_minmax(0,1fr)] md:grid-cols-[350px_minmax(0,1fr)] lg:grid-cols-[350px_minmax(0,1fr)_auto]"
         aria-label={product.name}
       >
         <div className="min-w-0">
