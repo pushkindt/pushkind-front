@@ -59,7 +59,7 @@ const CategoryView: React.FC<CategoryViewProps> = ({
         className={
           productLayout === "grid"
             ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
-            : "flex flex-col gap-3"
+            : "flex flex-col divide-y divide-gray-200"
         }
       >
         {products.map((product) => (
