@@ -71,35 +71,34 @@ const ProductCard: React.FC<ProductCardProps> = ({
   if (isList) {
     return (
       <article
-        className="bg-white rounded-none px-5 py-4 grid gap-6 items-center sm:grid-cols-[280px_minmax(0,1fr)] md:grid-cols-[350px_minmax(0,1fr)] lg:grid-cols-[350px_minmax(0,1fr)_auto]"
+        className="bg-white rounded-none px-5 py-4 grid gap-3 items-center sm:grid-cols-[minmax(0,1fr)_auto]"
         aria-label={product.name}
       >
         <div className="min-w-0">
-          <h3
-            onClick={() => navigate(`/products/${product.id}`)}
-            className="text-lg font-semibold text-gray-800 truncate cursor-pointer hover:text-indigo-600"
-          >
-            {product.name}
-          </h3>
-          {product.sku && (
-            <p className="text-xs text-gray-400 mt-1 uppercase tracking-wide">
-              <span className="mr-1">Артикул:</span>
-              <span>{product.sku}</span>
-            </p>
-          )}
-          {product.vendorName && (
-            <p className="text-xs text-gray-500 mt-1">
-              <span className="mr-1">Поставщик:</span>
+          <div className="text-[11px] text-gray-500 uppercase tracking-wide flex flex-wrap gap-x-1 gap-y-1">
+            {product.vendorName && (
               <span className="font-medium text-gray-600">
                 {product.vendorName}
               </span>
-            </p>
-          )}
+            )}
+            {product.sku && (
+              <span>
+                <span className="mr-1">артикул</span>
+                <span>{product.sku}</span>
+              </span>
+            )}
+          </div>
+          <h3
+            onClick={() => navigate(`/products/${product.id}`)}
+            className="text-xl font-bold text-gray-900 mt-1 cursor-pointer hover:text-indigo-600"
+          >
+            {product.name}
+          </h3>
+          <div className="text-xs text-gray-500 mt-1">
+            {descriptionVisible ? previewDescription : ""}
+          </div>
         </div>
-        <div className="min-w-0 text-sm text-gray-500">
-          {descriptionVisible ? previewDescription : ""}
-        </div>
-        <div className="flex flex-wrap items-center gap-4 justify-between sm:col-span-2 sm:justify-end lg:col-span-1">
+        <div className="flex flex-wrap items-center gap-3 justify-between sm:justify-end">
           <div className="flex items-baseline gap-3 whitespace-nowrap">
             {formattedBasePrice && (
               <span className="text-sm text-gray-400 line-through">
