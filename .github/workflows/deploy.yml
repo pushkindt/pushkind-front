@@ -27,6 +27,7 @@ jobs:
         run: |
           echo "VITE_API_URL=https://orders.pushkind.com/api/v1/store/" >> .env
           echo "VITE_HUB_ID=1" >> .env
+          echo "VITE_DEV=1" >> .env
 
       - name: Build site
         run: npm run build

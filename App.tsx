@@ -93,6 +93,7 @@ const AMOUNT_FILTER_PRESETS: AmountFilterPreset[] = [
   { id: "small-pack", label: "Мелкая фасовка (до 500г)", maxAmount: 499 },
   { id: "large-pack", label: "Крупная фасовка (от 500г)", minAmount: 400 },
 ];
+const isDevelopmentBannerVisible = import.meta.env.VITE_DEV === "1";
 
 const loadPersistedAmountFilter = (): string => {
   if (typeof window === "undefined") {
@@ -437,6 +438,15 @@ const App: React.FC = () => {
         </>
       }
     >
+      {isDevelopmentBannerVisible && (
+        <div
+          className="mb-4 rounded-lg border border-amber-300 bg-amber-100 px-4 py-3 text-sm font-semibold text-amber-900"
+          role="status"
+          aria-live="polite"
+        >
+          Сайт находится в разработке
+        </div>
+      )}
       <div className="flex flex-wrap items-center gap-4 mb-6">
         {view.type !== "home" && (
           <button
