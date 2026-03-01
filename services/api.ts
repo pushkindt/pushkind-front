@@ -25,6 +25,10 @@ export interface CreateOrderResult {
   orderId?: number;
 }
 
+type ErrorPayload = {
+  error?: unknown;
+};
+
 /** Editable fields available when updating an order. */
 export type OrderUpdatePayload = {
   shippingAddress?: string | null;
@@ -417,6 +421,22 @@ export const createOrder = async (
     });
 
     if (!response.ok) {
+      if (response.status === 422) {
+        const contentType = response.headers.get("content-type") ?? "";
+        if (contentType.includes("application/json")) {
+          try {
+            const payload = (await response.json()) as ErrorPayload;
+            if (typeof payload.error === "string" && payload.error.trim()) {
+              throw new Error(payload.error);
+            }
+          } catch (error) {
+            if (error instanceof Error) {
+              throw error;
+            }
+          }
+        }
+      }
+
       throw new Error(
         `Не удалось оформить заказ: ${response.status} ${response.statusText}`,
       );
@@ -437,7 +457,11 @@ export const createOrder = async (
 
     return { success: true, orderId };
   } catch (error) {
-    handleApiError("Не удалось оформить заказ.", error);
+    const message =
+      error instanceof Error && error.message.trim()
+        ? error.message
+        : "Не удалось оформить заказ.";
+    handleApiError(message, error);
     return { success: false };
   }
 };
