@@ -16,7 +16,7 @@ vi.mock("./toast", () => ({
   showToast,
 }));
 
-import { createOrder, fetchCategories } from "./api";
+import { createOrder, fetchCategories, sendOtp, verifyOtp } from "./api";
 
 const mockFetch = vi.fn<Parameters<typeof fetch>, ReturnType<typeof fetch>>();
 
@@ -93,5 +93,46 @@ describe("createOrder", () => {
       "mixed vendors are not allowed",
       "error",
     );
+  });
+});
+
+describe("otp helpers", () => {
+  beforeEach(() => {
+    globalThis.fetch = mockFetch as unknown as typeof fetch;
+  });
+
+  afterEach(() => {
+    mockFetch.mockReset();
+    showToast.mockReset();
+  });
+
+  it("surfaces the sendOtp validation error from a 422 response body", async () => {
+    mockFetch.mockResolvedValue(
+      new Response(JSON.stringify({ error: "phone is invalid" }), {
+        status: 422,
+        statusText: "Unprocessable Entity",
+        headers: { "Content-Type": "application/json" },
+      }) as ReturnType<typeof fetch>,
+    );
+
+    const result = await sendOtp("79990001122");
+
+    expect(result).toEqual({ success: false });
+    expect(showToast).toHaveBeenCalledWith("phone is invalid", "error");
+  });
+
+  it("surfaces the verifyOtp validation error from a 422 response body", async () => {
+    mockFetch.mockResolvedValue(
+      new Response(JSON.stringify({ error: "otp is expired" }), {
+        status: 422,
+        statusText: "Unprocessable Entity",
+        headers: { "Content-Type": "application/json" },
+      }) as ReturnType<typeof fetch>,
+    );
+
+    const result = await verifyOtp("79990001122", "123456");
+
+    expect(result).toEqual({ success: false });
+    expect(showToast).toHaveBeenCalledWith("otp is expired", "error");
   });
 });
