@@ -29,6 +29,29 @@ type ErrorPayload = {
   error?: unknown;
 };
 
+const throwValidationError = async (
+  response: Response,
+  fallbackMessage: string,
+) => {
+  if (response.status === 422) {
+    const contentType = response.headers.get("content-type") ?? "";
+    if (contentType.includes("application/json")) {
+      try {
+        const payload = (await response.json()) as ErrorPayload;
+        if (typeof payload.error === "string" && payload.error.trim()) {
+          throw new Error(payload.error);
+        }
+      } catch (error) {
+        if (error instanceof Error) {
+          throw error;
+        }
+      }
+    }
+  }
+
+  throw new Error(fallbackMessage);
+};
+
 /** Editable fields available when updating an order. */
 export type OrderUpdatePayload = {
   shippingAddress?: string | null;
@@ -287,14 +310,19 @@ export const sendOtp = async (phone: string): Promise<{ success: boolean }> => {
     });
 
     if (!response.ok) {
-      throw new Error(
+      await throwValidationError(
+        response,
         `Не удалось отправить код: ${response.status} ${response.statusText}`,
       );
     }
 
     return (await response.json()) as { success: boolean };
   } catch (error) {
-    handleApiError("Не удалось отправить код подтверждения.", error);
+    const message =
+      error instanceof Error && error.message.trim()
+        ? error.message
+        : "Не удалось отправить код подтверждения.";
+    handleApiError(message, error);
     return { success: false };
   }
 };
@@ -317,7 +345,8 @@ export const verifyOtp = async (
     });
 
     if (!response.ok) {
-      throw new Error(
+      await throwValidationError(
+        response,
         `Не удалось подтвердить код: ${response.status} ${response.statusText}`,
       );
     }
@@ -346,7 +375,11 @@ export const verifyOtp = async (
 
     return { success: data.success };
   } catch (error) {
-    handleApiError("Не удалось подтвердить код.", error);
+    const message =
+      error instanceof Error && error.message.trim()
+        ? error.message
+        : "Не удалось подтвердить код.";
+    handleApiError(message, error);
     return { success: false };
   }
 };
@@ -421,23 +454,8 @@ export const createOrder = async (
     });
 
     if (!response.ok) {
-      if (response.status === 422) {
-        const contentType = response.headers.get("content-type") ?? "";
-        if (contentType.includes("application/json")) {
-          try {
-            const payload = (await response.json()) as ErrorPayload;
-            if (typeof payload.error === "string" && payload.error.trim()) {
-              throw new Error(payload.error);
-            }
-          } catch (error) {
-            if (error instanceof Error) {
-              throw error;
-            }
-          }
-        }
-      }
-
-      throw new Error(
+      await throwValidationError(
+        response,
         `Не удалось оформить заказ: ${response.status} ${response.statusText}`,
       );
     }
