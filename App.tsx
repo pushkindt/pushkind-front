@@ -278,8 +278,8 @@ const App: React.FC = () => {
     setUser(loggedInUser);
     persistUser(loggedInUser);
     setIsLoginModalOpen(false);
+    setIsCartOpen(true);
     sessionRequestIdRef.current = null;
-    goToOrders();
   };
 
   /**
