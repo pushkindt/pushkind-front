@@ -126,7 +126,7 @@ const Header: React.FC<HeaderProps> = ({
             >
               <UserIcon className="w-6 h-6 sm:mr-1" />
               <span className="sr-only sm:not-sr-only">
-                {user ? `Привет, ${user.name}` : "Войти"}
+                {user ? user.name : "Войти"}
               </span>
             </button>
             <div className="h-6 w-px bg-gray-200"></div>

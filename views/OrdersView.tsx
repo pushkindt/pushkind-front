@@ -51,12 +51,17 @@ const getOrderStatusBadge = (status?: string) => {
 interface OrdersViewProps {
   user: User | null;
   onLoginClick: () => void;
+  refreshToken?: number;
 }
 
 /**
  * Displays an overview of all orders with collapsible detail rows.
  */
-const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
+const OrdersView: React.FC<OrdersViewProps> = ({
+  user,
+  onLoginClick,
+  refreshToken = 0,
+}) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -124,7 +129,7 @@ const OrdersView: React.FC<OrdersViewProps> = ({ user, onLoginClick }) => {
     return () => {
       isMounted = false;
     };
-  }, [user]);
+  }, [refreshToken, user]);
 
   const toggleExpanded = (orderId: number) => {
     setExpandedOrders((current) => {

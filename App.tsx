@@ -133,6 +133,7 @@ const App: React.FC = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [ordersRefreshToken, setOrdersRefreshToken] = useState(0);
   const [productLayout, setProductLayout] =
     useState<ProductLayout>(loadPersistedLayout);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -306,6 +307,19 @@ const App: React.FC = () => {
   };
 
   /**
+   * Navigates to the orders screen after checkout or triggers a reload when the
+   * customer is already viewing their order history.
+   */
+  const handleCheckoutSuccess = () => {
+    if (view.type === "orders") {
+      setOrdersRefreshToken((current) => current + 1);
+      return;
+    }
+
+    goToOrders();
+  };
+
+  /**
    * Derives the heading for the current view using cached navigation metadata
    * when available.
    */
@@ -381,6 +395,7 @@ const App: React.FC = () => {
         <OrdersView
           user={user}
           onLoginClick={() => setIsLoginModalOpen(true)}
+          refreshToken={ordersRefreshToken}
         />
       );
     }
@@ -432,7 +447,7 @@ const App: React.FC = () => {
             onClose={() => setIsCartOpen(false)}
             user={user}
             onLoginClick={() => setIsLoginModalOpen(true)}
-            onCheckoutSuccess={goToOrders}
+            onCheckoutSuccess={handleCheckoutSuccess}
           />
           <ToastContainer />
         </>
