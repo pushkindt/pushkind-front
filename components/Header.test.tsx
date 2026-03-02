@@ -33,7 +33,7 @@ describe("Header", () => {
         onCartClick={vi.fn()}
       />,
     );
-    expect(screen.getByText(/Привет, Test/)).toBeTruthy();
+    expect(screen.getByText("Test")).toBeTruthy();
   });
 
   it("shows cart item count badge", () => {

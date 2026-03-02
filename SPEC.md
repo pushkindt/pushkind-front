@@ -93,7 +93,7 @@ Notes:
 
 - Header (`components/Header.tsx`)
   - Brand (“Витрина”) → navigates home
-  - Login button (“Войти” / “Привет, {name}”) → opens OTP modal
+  - Login button (“Войти” / “{name}”) → opens OTP modal
   - Cart button → opens cart drawer
   - “Мои заказы” link shows only when `user` exists
 - Layout frame (`components/Layout.tsx`)
