@@ -58,7 +58,7 @@ Pushkind Frontend is the client-facing storefront for the Pushkind Orders platfo
 
 1. Copy `.env.example` to `.env.local`.
 2. Set `VITE_HUB_ID` to the identifier for the Pushkind hub you are targeting.
-3. Set `VITE_API_URL` to the base URL of the Pushkind Orders API instance.
+3. Set `VITE_ORDERS_API_URL` to the base URL of the Pushkind Orders API instance.
 4. Provide any additional Vite environment variables required by your deployment (all `VITE_` prefixed variables are exposed to the client).
 
 ## Getting Started
@@ -137,7 +137,7 @@ The Vite dev server runs at [http://localhost:5173](http://localhost:5173) with 
 ## Deployment Notes
 
 - Vite outputs built assets into the `dist/` directory; deploy its contents to your static hosting provider.
-- Ensure environment variables are defined at build time (e.g., `VITE_API_URL`, `VITE_HUB_ID`).
+- Ensure environment variables are defined at build time (e.g., `VITE_ORDERS_API_URL`, `VITE_HUB_ID`).
 - The application relies on the Pushkind Orders API for dynamic data; verify network access from the hosting environment.
 
 ## Troubleshooting

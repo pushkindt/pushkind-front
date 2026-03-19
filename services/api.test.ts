@@ -8,7 +8,8 @@ const { showToast } = vi.hoisted(() => ({
 }));
 
 vi.mock("../constants", () => ({
-  API_URL: "https://example.com/",
+  ORDERS_API_URL: "https://example.com/",
+  CRM_API_URL: "https://crm.example.com/",
   HUB_ID: "hub",
 }));
 
@@ -16,7 +17,13 @@ vi.mock("./toast", () => ({
   showToast,
 }));
 
-import { createOrder, fetchCategories, sendOtp, verifyOtp } from "./api";
+import {
+  createOrder,
+  fetchCategories,
+  logoutUser,
+  sendOtp,
+  verifyOtp,
+} from "./api";
 
 const mockFetch = vi.fn<Parameters<typeof fetch>, ReturnType<typeof fetch>>();
 
@@ -119,6 +126,18 @@ describe("otp helpers", () => {
 
     expect(result).toEqual({ success: false });
     expect(showToast).toHaveBeenCalledWith("phone is invalid", "error");
+    expect(mockFetch).toHaveBeenCalledWith(
+      "https://crm.example.com/hub/auth/otp",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ phone: "+79990001122" }),
+      },
+    );
   });
 
   it("surfaces the verifyOtp validation error from a 422 response body", async () => {
@@ -134,5 +153,38 @@ describe("otp helpers", () => {
 
     expect(result).toEqual({ success: false });
     expect(showToast).toHaveBeenCalledWith("otp is expired", "error");
+    expect(mockFetch).toHaveBeenCalledWith(
+      "https://crm.example.com/hub/auth/otp/verify",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ phone: "+79990001122", otp: "123456" }),
+      },
+    );
+  });
+
+  it("posts logout to the CRM auth base URL", async () => {
+    mockFetch.mockResolvedValue(
+      new Response(JSON.stringify({ success: true }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }) as ReturnType<typeof fetch>,
+    );
+
+    const result = await logoutUser();
+
+    expect(result).toEqual({ success: true });
+    expect(mockFetch).toHaveBeenCalledWith(
+      "https://crm.example.com/hub/auth/logout",
+      {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        credentials: "include",
+      },
+    );
   });
 });

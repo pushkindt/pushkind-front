@@ -23,7 +23,7 @@ import useProductDetail from "./hooks/useProductDetail";
 import { useCart } from "./contexts/CartContext";
 import useTransientFlag from "./hooks/useTransientFlag";
 import useDebouncedValue from "./hooks/useDebouncedValue";
-import { fetchCurrentUser } from "./services/api";
+import { fetchCurrentUser, logoutUser } from "./services/api";
 import {
   PRODUCT_AMOUNT_FILTER_STORAGE_KEY,
   PRODUCT_LAYOUT_STORAGE_KEY,
@@ -294,7 +294,12 @@ const App: React.FC = () => {
   /**
    * Clears the authenticated user and closes the logout confirmation modal.
    */
-  const handleLogoutConfirm = () => {
+  const handleLogoutConfirm = async () => {
+    const { success } = await logoutUser();
+    if (!success) {
+      return;
+    }
+
     setUser(null);
     persistUser(null);
     sessionRequestIdRef.current = null;

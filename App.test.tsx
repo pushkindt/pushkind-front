@@ -17,6 +17,7 @@ vi.mock("./services/api", () => ({
   fetchProducts: vi.fn(),
   fetchProductById: vi.fn(),
   fetchCurrentUser: vi.fn(),
+  logoutUser: vi.fn(),
 }));
 
 const mockCategory = {
@@ -47,6 +48,14 @@ const mockProduct = {
   amount: 1,
 };
 
+const mockUser = {
+  id: 1,
+  hub_id: 1,
+  name: "Тестовый пользователь",
+  email: null,
+  phone: "+79990000000",
+};
+
 describe("App", () => {
   beforeEach(() => {
     vi.mocked(api.fetchCategories).mockResolvedValue([mockCategory]);
@@ -55,6 +64,7 @@ describe("App", () => {
     vi.mocked(api.fetchProducts).mockResolvedValue([mockProduct]);
     vi.mocked(api.fetchProductById).mockResolvedValue(mockProduct);
     vi.mocked(api.fetchCurrentUser).mockResolvedValue(null);
+    vi.mocked(api.logoutUser).mockResolvedValue({ success: true });
   });
 
   it("switches from grid to list layout when the selector is clicked", async () => {
@@ -115,5 +125,30 @@ describe("App", () => {
     await waitFor(() => {
       expect(api.fetchProducts).toHaveBeenCalledWith({ search: "карамель" });
     });
+  });
+
+  it("keeps the user signed in when logout fails", async () => {
+    const user = userEvent.setup();
+    vi.mocked(api.fetchCurrentUser).mockResolvedValue(mockUser);
+    vi.mocked(api.logoutUser).mockResolvedValue({ success: false });
+
+    render(
+      <MemoryRouter>
+        <CartProvider>
+          <AppRoutes />
+        </CartProvider>
+      </MemoryRouter>,
+    );
+
+    await screen.findByRole("button", { name: mockUser.name });
+
+    await user.click(screen.getByRole("button", { name: mockUser.name }));
+    await user.click(await screen.findByRole("button", { name: "Выйти" }));
+
+    expect(api.logoutUser).toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: mockUser.name })).toBeTruthy();
+    expect(
+      screen.getByText("Вы уверены, что хотите выйти из аккаунта?"),
+    ).toBeTruthy();
   });
 });

@@ -1,11 +1,12 @@
 /**
  * @file api.ts wraps Pushkind backend endpoints with typed helper functions.
  */
-import { API_URL, HUB_ID } from "../constants";
+import { CRM_API_URL, HUB_ID, ORDERS_API_URL } from "../constants";
 import { showToast } from "./toast";
 import type { Category, Order, Product, Tag, User, Vendor } from "../types";
 
-const BASE_API_URL = API_URL.replace(/\/$/, "");
+const BASE_ORDERS_API_URL = ORDERS_API_URL.replace(/\/$/, "");
+const BASE_CRM_API_URL = CRM_API_URL.replace(/\/$/, "");
 
 /** Shows a toast and logs an error for failed API interactions. */
 const handleApiError = (message: string, error: unknown) => {
@@ -14,7 +15,9 @@ const handleApiError = (message: string, error: unknown) => {
 };
 
 /** Builds an absolute API URL for the current hub. */
-const buildUrl = (path: string) => `${BASE_API_URL}/${HUB_ID}${path}`;
+const buildUrl = (path: string) => `${BASE_ORDERS_API_URL}/${HUB_ID}${path}`;
+/** Builds an absolute CRM auth URL for the current hub. */
+const buildCrmUrl = (path: string) => `${BASE_CRM_API_URL}/${HUB_ID}${path}`;
 
 /** Payload item used when creating an order. */
 export type OrderItemPayload = { productId: number; quantity: number };
@@ -227,7 +230,7 @@ export const fetchProductById = async (
 /** Loads the authenticated customer when the session cookie is present. */
 export const fetchCurrentUser = async (): Promise<User | null> => {
   try {
-    const response = await fetch(buildUrl("/auth/session"), {
+    const response = await fetch(buildCrmUrl("/auth/session"), {
       headers: { Accept: "application/json" },
       credentials: "include",
     });
@@ -299,7 +302,7 @@ const normalizePhone = (phone: string) =>
 export const sendOtp = async (phone: string): Promise<{ success: boolean }> => {
   const payloadPhone = normalizePhone(phone);
   try {
-    const response = await fetch(buildUrl("/auth/otp"), {
+    const response = await fetch(buildCrmUrl("/auth/otp"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -334,7 +337,7 @@ export const verifyOtp = async (
 ): Promise<{ success: boolean; user?: User }> => {
   const payloadPhone = normalizePhone(phone);
   try {
-    const response = await fetch(buildUrl("/auth/otp/verify"), {
+    const response = await fetch(buildCrmUrl("/auth/otp/verify"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -380,6 +383,28 @@ export const verifyOtp = async (
         ? error.message
         : "Не удалось подтвердить код.";
     handleApiError(message, error);
+    return { success: false };
+  }
+};
+
+/** Logs out the current storefront customer from the CRM-owned session. */
+export const logoutUser = async (): Promise<{ success: boolean }> => {
+  try {
+    const response = await fetch(buildCrmUrl("/auth/logout"), {
+      method: "POST",
+      headers: { Accept: "application/json" },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Не удалось завершить сеанс: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    return { success: true };
+  } catch (error) {
+    handleApiError("Не удалось завершить сеанс.", error);
     return { success: false };
   }
 };
