@@ -6,13 +6,19 @@ if (!hubId) {
   throw new Error("Отсутствует переменная окружения VITE_HUB_ID");
 }
 
-const apiUrl = import.meta.env.VITE_API_URL;
-if (!apiUrl) {
-  throw new Error("Отсутствует переменная окружения VITE_API_URL");
+const ordersApiUrl = import.meta.env.VITE_ORDERS_API_URL;
+if (!ordersApiUrl) {
+  throw new Error("Отсутствует переменная окружения VITE_ORDERS_API_URL");
+}
+
+const crmApiUrl = import.meta.env.VITE_CRM_API_URL;
+if (!crmApiUrl) {
+  throw new Error("Отсутствует переменная окружения VITE_CRM_API_URL");
 }
 
 export const HUB_ID = hubId;
-export const API_URL = apiUrl;
+export const ORDERS_API_URL = ordersApiUrl;
+export const CRM_API_URL = crmApiUrl;
 
 export const USER_STORAGE_KEY = "pushkind-user";
 /** Key for persisting the catalog layout preference. */

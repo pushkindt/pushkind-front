@@ -18,6 +18,17 @@ Key characteristics:
 - Support OTP login flow and “My Orders” history for authenticated customers.
 - Keep network access centralized in `services/api.ts` with shared types in `types.ts`.
 
+## Planned Auth Split
+
+The feature spec [crm-direct-store-auth.md](/home/matrizaev/pushkind/specs/features/crm-direct-store-auth.md)
+defines the target backend split for storefront authentication.
+
+- `VITE_ORDERS_API_URL` remains the Orders base URL for catalog, pricing, and order requests.
+- A new `VITE_CRM_API_URL` will be introduced for storefront auth/session/logout requests.
+- The frontend user shape is expected to remain compatible with the current `User` interface.
+- The browser session cookie remains `store-session`, but CRM becomes the issuing authority for it.
+- During the migration window, the Orders-owned auth routes documented below remain the live behavior until the frontend is switched.
+
 ## Non-goals
 
 - Admin/catalog management UI.
@@ -200,7 +211,7 @@ Defined in `types.ts`:
 
 All API calls are hub-scoped and built as:
 
-`{API_URL (without trailing slash)}/{VITE_HUB_ID}{path}`
+`{ORDERS_API_URL (without trailing slash)}/{VITE_HUB_ID}{path}`
 
 All requests:
 
@@ -276,7 +287,7 @@ The app does not implement a unified retry framework, but these rules guide beha
 Validated in `constants.ts` at startup (throws if missing):
 
 - `VITE_HUB_ID` (string/number-like identifier used in URL path)
-- `VITE_API_URL` (base store API URL, e.g. `https://orders.pushkind.com/api/v1/store/`)
+- `VITE_ORDERS_API_URL` (base store API URL, e.g. `https://orders.pushkind.com/api/v1/store/`)
 
 Local examples:
 
@@ -297,7 +308,7 @@ Configured in `vite.config.ts`:
 - Build output is generated into `dist/` by `npm run build`.
 - GitHub Actions workflow `./.github/workflows/deploy.yml`:
   - Builds on pushes to `main`.
-  - Creates a `.env` during CI with `VITE_API_URL` and `VITE_HUB_ID`.
+  - Creates a `.env` during CI with `VITE_ORDERS_API_URL` and `VITE_HUB_ID`.
   - Deploys `dist/` via `rsync` to `cicd@store.pushkind.com:/var/www/html/`.
 
 ## Testing & quality checks
